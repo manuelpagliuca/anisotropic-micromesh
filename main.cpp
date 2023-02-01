@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     Mainwindow w;
     w.show();  
 
-    w.loadCube();
+    w.loadPallas500();
 
     return a.exec();
 }

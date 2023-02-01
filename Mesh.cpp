@@ -162,6 +162,11 @@ void Mesh::displaceVertices(float k)
         v.pos = v.pos + (k * v.norm);
 }
 
+void Mesh::displaceVertex(int index, float k)
+{
+    vertices[index].pos = vertices[index].pos + (k * vertices[index].norm);
+}
+
 void Mesh::displaceFace(float k)
 {
     for (Face& f : faces) {
@@ -172,6 +177,50 @@ void Mesh::displaceFace(float k)
         v0.pos = v0.pos + (k * f.norm);
         v1.pos = v1.pos + (k * f.norm);
         v2.pos = v2.pos + (k * f.norm);
+    }
+}
+
+void Mesh::displaceVerticesTowardsTargetMesh(const Mesh &targetMesh)
+{
+    int index = 0;
+    std::vector<std::tuple<int, float>> displacements;
+
+    for (auto &v: vertices) {
+        glm::vec3 rayOrigin = v.pos;
+        glm::vec3 rayDirection = glm::normalize(v.norm);
+        float tMin = FLT_MAX;
+
+        for (auto &f: targetMesh.faces) {
+            // Triangle processing
+            glm::vec3 v0 = targetMesh.vertices[f.index[0]].pos;
+            glm::vec3 v1 = targetMesh.vertices[f.index[1]].pos;
+            glm::vec3 v2 = targetMesh.vertices[f.index[2]].pos;
+            glm::vec3 v01 = v0 - v1;
+            glm::vec3 v02 = v0 - v2;
+            glm::vec3 planeNormal = glm::normalize(glm::cross(v01, v02));
+
+            // Use v0 for finding the 'd' parameter of the supporting plane
+            float d = glm::dot(planeNormal, v0);
+            // finding 't' parameter of ray
+            float t = (glm::dot(planeNormal, rayOrigin) + d) / glm::dot(planeNormal, rayDirection);
+            // finding the point on the ray
+            glm::vec3 P = rayOrigin + rayDirection * t;
+            // vector verices acting as barycentric coordinates for highlighting the point
+            float v0P = glm::dot(glm::cross(v1 - v0, P - v1), rayDirection);
+            float v1P = glm::dot(glm::cross(v2 - v1, P - v1), rayDirection);
+            float v2P = glm::dot(glm::cross(v0 - v2, P - v2), rayDirection);
+
+            if (!(v0P < 0 && v1P < 0 && v2P < 0) && abs(tMin) > abs(t)) {
+                 tMin = t;
+            }
+        }
+        displacements.push_back(std::tuple<int, float>(index, tMin));
+        index++;
+    }
+
+    for (const auto &e: displacements) {
+        auto & [index, t] = e;
+        displaceVertex(index, t);
     }
 }
 

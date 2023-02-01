@@ -44,7 +44,10 @@ public:
     void updateVertexNormals();
     void updateBoundingBox();
     void displaceVertices(float k);
+    void displaceVertex(int index, float k);
     void displaceFace(float k);
+
+    void displaceVerticesTowardsTargetMesh(const Mesh& targetMesh);
 
     static Mesh parseOFF(const std::string& rawOFF);
     static Mesh parseOBJ(const std::string& rawOBJ);

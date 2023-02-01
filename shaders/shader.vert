@@ -7,5 +7,6 @@ out vec3 color;
 
 void main(){
     gl_Position = model * vec4(position, 1.0);
-    color = clamp(position, 0.2, 1.0);
+    color = vec3(1.0);
+    // color = clamp(position, 0.2, 1.0);
 }

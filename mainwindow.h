@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ui_Mainwindow.h"
+#include "ui_mainwindow.h"
 
 #include <QtWidgets/QMainWindow>
 #include <QWidget>
@@ -17,12 +17,11 @@ class Mainwindow : public QMainWindow
 public:
     Mainwindow(QWidget* parent = nullptr);
     ~Mainwindow() {};
-
-    void loadCube();
+    void loadPallas500();
 protected:
     void mousePressEvent(QMouseEvent* ev);
     void mouseMoveEvent(QMouseEvent* ev);
-    void wheelEvent(QWheelEvent *ev);
+    void wheelEvent(QWheelEvent* ev);
     void keyPressEvent(QKeyEvent* ev);
 
 private:
@@ -30,7 +29,8 @@ private:
 	std::string readFile(const char* file_loc);
 
     // Mesh loading
-    Mesh mesh;
+    Mesh baseMesh;
+    Mesh targetMesh;
 
     // Mouse Trackball
     QPoint startPos;
@@ -40,8 +40,10 @@ public slots: void on_actionLoad_triggered();
 public slots: void on_actionUnload_triggered();
 public slots: void on_actionSave_triggered();
 public slots: void on_actionExit_triggered();
+
 public slots: void on_actionWireframe_triggered();
 public slots: void on_actionSubdivide_triggered();
 public slots: void on_actionVertex_displacement_triggered();
 public slots: void on_actionFace_displacement_triggered();
+public slots: void on_actionExtract_displacements_triggered();
 };
