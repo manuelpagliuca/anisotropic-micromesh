@@ -121,6 +121,7 @@ void Mainwindow::on_actionExtract_displacements_triggered() {
     QString filePath = QFileDialog::getOpenFileName(this,
         tr("Load Mesh"), ".\\mesh",
         tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
+
     if (!filePath.isEmpty()) {
         std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
         std::string file = readFile(filePath.toStdString().c_str());
@@ -128,6 +129,15 @@ void Mainwindow::on_actionExtract_displacements_triggered() {
         if (ext == ".off") targetMesh = Mesh::parseOFF(file);
         else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
+        bool ok;
+        int k = QInputDialog::getInt(this, tr("Insert the number of subdivision you would like to perform"),
+                                     tr("Number of subdivisions:"), 1, 1, 9, 1, &ok);
+        if (ok) {
+            for (int i = 0; i < k; i++) {
+              baseMesh = baseMesh.subdivide();
+              ui.openGLWidget->updateMeshData(baseMesh);
+            }
+         }
         baseMesh.displaceVerticesTowardsTargetMesh(targetMesh);
         ui.openGLWidget->updateMeshData(baseMesh);
     }
