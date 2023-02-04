@@ -157,7 +157,9 @@ std::string RenderingCanvas::readFile(const char* fileLocation) const
 
 void RenderingCanvas::loadMeshData(const Mesh &mesh)
 {
+    vertices.clear();
     vertices = mesh.getPositionsVector();
+    faces.clear();
     faces = mesh.getFacesVector();
     loadDataOnOpenGLBuffer();
     model = glm::mat4(1.f);
