@@ -1,3 +1,11 @@
+# Folders
+debug
+release
+dependencies
+notes
+.qtc_clangd
+
+
 # C++ objects and libs
 *.slo
 *.lo

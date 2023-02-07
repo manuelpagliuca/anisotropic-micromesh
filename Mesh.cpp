@@ -44,9 +44,9 @@ Mesh Mesh::subdivide()
         int v1 = f.index[1];
         int v2 = f.index[2];
 
-        int m01 = subdivided.addVertex((vertices[v0].pos + vertices[v1].pos) / 2.0f);
-        int m12 = subdivided.addVertex((vertices[v1].pos + vertices[v2].pos) / 2.0f);
-        int m20 = subdivided.addVertex((vertices[v2].pos + vertices[v0].pos) / 2.0f);
+        int m01 = subdivided.addVertex((vertices.at(v0).pos + vertices.at(v1).pos) / 2.0f);
+        int m12 = subdivided.addVertex((vertices.at(v1).pos + vertices.at(v2).pos) / 2.0f);
+        int m20 = subdivided.addVertex((vertices.at(v2).pos + vertices.at(v0).pos) / 2.0f);
 
         subdivided.addFace(m01, m12, m20);
         subdivided.addFace(v0, m01, m20);
