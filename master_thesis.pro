@@ -8,20 +8,20 @@ CONFIG += c++17 console
 INCLUDEPATH += $$PWD/dependencies/GLM
 
 SOURCES += \
+    GLWidget.cpp \
     main.cpp \
     BoundingBox.cpp \
     Mainwindow.cpp \
     Mesh.cpp \
-    RenderingCanvas.cpp \
     Shader.cpp \
     Main.cpp \
     Trackball.cpp
 
 HEADERS += \
     BoundingBox.h \
+    GLWidget.h \
     Mainwindow.h \
     Mesh.h \
-    RenderingCanvas.h \
     Shader.h \
     Trackball.h
 

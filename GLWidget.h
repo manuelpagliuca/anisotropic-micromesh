@@ -15,12 +15,12 @@
 #include <GLM/gtc/type_ptr.hpp>
 
 
-class RenderingCanvas : public QOpenGLWidget, protected QOpenGLExtraFunctions
+class GLWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
 	Q_OBJECT
 
 public:
-    explicit RenderingCanvas(QWidget* parent);
+    explicit GLWidget(QWidget* parent);
 
     void loadMeshData(const Mesh& mesh);
     void updateMeshData(const Mesh& mesh);

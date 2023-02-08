@@ -1,17 +1,17 @@
-﻿#include "RenderingCanvas.h"
+﻿#include "GLWidget.h"
 
 #define INIT_MEM 0xDEADBEEF
 
 using namespace std;
 
-RenderingCanvas::RenderingCanvas(QWidget* parent) : QOpenGLWidget(parent)
+GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent)
 {
 	VAO = VBO = EBO = 0;
     shaderProgram = modelLocation = 0;
     model = glm::mat4(1.f);
 }
 
-void RenderingCanvas::paintGL()
+void GLWidget::paintGL()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.f, 0.f, 0.f, 1.f);  
@@ -43,7 +43,7 @@ void RenderingCanvas::paintGL()
     update();
 }
 
-void RenderingCanvas::initializeGL()
+void GLWidget::initializeGL()
 {
     initializeOpenGLFunctions();
     glEnable(GL_DEPTH_TEST);
@@ -53,7 +53,7 @@ void RenderingCanvas::initializeGL()
     initOpenGLBuffers();
 }
 
-void RenderingCanvas::initShaders()
+void GLWidget::initShaders()
 {
     std::string vertexShaderSrc = readFile("./shaders/shader.vert");
     std::string fragShaderSrc = readFile("./shaders/shader.frag");
@@ -85,7 +85,7 @@ void RenderingCanvas::initShaders()
     glUseProgram(shaderProgram);
 }
 
-void RenderingCanvas::initOpenGLBuffers()
+void GLWidget::initOpenGLBuffers()
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -104,7 +104,7 @@ void RenderingCanvas::initOpenGLBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void RenderingCanvas::loadDataOnOpenGLBuffer()
+void GLWidget::loadDataOnOpenGLBuffer()
 {
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -118,7 +118,7 @@ void RenderingCanvas::loadDataOnOpenGLBuffer()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-GLuint RenderingCanvas::createShader(GLenum type, const GLchar* source)
+GLuint GLWidget::createShader(GLenum type, const GLchar* source)
 {
 	GLuint shader = glCreateShader(type);
 	glShaderSource(shader, 1, &source, nullptr);
@@ -134,7 +134,7 @@ GLuint RenderingCanvas::createShader(GLenum type, const GLchar* source)
 	return shader;
 }
 
-std::string RenderingCanvas::readFile(const char* fileLocation) const
+std::string GLWidget::readFile(const char* fileLocation) const
 {
 	std::string content;
     std::ifstream fileStream(fileLocation, std::ios::in);
@@ -155,7 +155,7 @@ std::string RenderingCanvas::readFile(const char* fileLocation) const
 	return content;
 }
 
-void RenderingCanvas::loadMeshData(const Mesh &mesh)
+void GLWidget::loadMeshData(const Mesh &mesh)
 {
     vertices.clear();
     vertices = mesh.getPositionsVector();
@@ -167,7 +167,7 @@ void RenderingCanvas::loadMeshData(const Mesh &mesh)
     update();
 }
 
-void RenderingCanvas::updateMeshData(const Mesh &mesh)
+void GLWidget::updateMeshData(const Mesh &mesh)
 {
     vertices = mesh.getPositionsVector();
     faces = mesh.getFacesVector();
@@ -175,7 +175,7 @@ void RenderingCanvas::updateMeshData(const Mesh &mesh)
     update();
 }
 
-void RenderingCanvas::unloadMeshData()
+void GLWidget::unloadMeshData()
 {
     vertices.clear();
     faces.clear();
@@ -183,7 +183,7 @@ void RenderingCanvas::unloadMeshData()
 	update();
 }
 
-void RenderingCanvas::wireframePaint()
+void GLWidget::wireframePaint()
 {
     wireframeMode = !wireframeMode;
     update();
