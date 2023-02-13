@@ -16,7 +16,7 @@ Mainwindow::Mainwindow(QWidget* parent) : QMainWindow(parent)
 
 void Mainwindow::loadPallas500()
 {
-    std::string pallasOBJ500 = readFile("./mesh/pallas_10000.obj");
+    std::string pallasOBJ500 = readFile("./mesh/pallas_500.obj");
     baseMesh = Mesh::parseOBJ(pallasOBJ500);
     ui.openGLWidget->loadMeshData(baseMesh);
     ui.actionSave->setEnabled(true);
