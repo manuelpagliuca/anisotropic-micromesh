@@ -3,8 +3,8 @@
 Mainwindow::Mainwindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-	int x = screen()->size().width() / 2 - width() / 2;
-	int	y = screen()->size().height() / 2 - height() / 2;
+    const int x = screen()->size().width() / 2 - width() / 2;
+    const int y = screen()->size().height() / 2 - height() / 2;
 	move(x, y);
 
     ui.actionSave->setEnabled(false);
@@ -46,8 +46,12 @@ void Mainwindow::wheelEvent(QWheelEvent *ev)
 
 void Mainwindow::keyPressEvent(QKeyEvent *ev)
 {
-    if (ev->key() == Qt::Key_Escape)
-        exit(1);
+    if (ev->key() == Qt::Key_Escape) exit(1);
+    else if(ev->key() == Qt::Key_W) ui.openGLWidget->wireframePaint();
+    else if(ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
+    else if(ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
+    else if(ev->key() == Qt::Key_L) on_actionLoad_triggered();
+    else if(ev->key() == Qt::Key_U) on_actionUnload_triggered();
 }
 
 void Mainwindow::on_actionSave_triggered() {
@@ -134,12 +138,19 @@ void Mainwindow::on_actionExtract_displacements_triggered() {
                                      tr("Number of subdivisions:"), 1, 1, 9, 1, &ok);
         if (ok) {
             for (int i = 0; i < k; i++) {
-              baseMesh = baseMesh.subdivide();
-              ui.openGLWidget->updateMeshData(baseMesh);
+                baseMesh = baseMesh.subdivide();
             }
-         }
-        baseMesh.displaceVerticesTowardsTargetMesh(targetMesh);
-        ui.openGLWidget->updateMeshData(baseMesh);
+            ui.openGLWidget->updateMeshData(baseMesh);
+        }
+
+        Mesh tmpMesh = baseMesh;
+        auto displacements = tmpMesh.displaceVerticesTowardsTargetMesh(targetMesh);
+
+        morphDialog = new MorphDialog(this);
+        morphDialog->show();
+        morphDialog->setMesh(baseMesh);
+        morphDialog->setGLWidget(ui.openGLWidget);
+        morphDialog->setDisplacementsDelta(displacements);
     }
 }
 

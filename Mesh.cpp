@@ -121,6 +121,10 @@ void Mesh::exportOBJ(const std::string& f_name) const
     file_stream.close();
 }
 
+void Mesh::updateGL()
+{
+}
+
 void Mesh::updateFaceNormals()
 {
     for (Face& f : faces) {
@@ -180,7 +184,7 @@ void Mesh::displaceFace(float k)
     }
 }
 
-void Mesh::displaceVerticesTowardsTargetMesh(const Mesh &targetMesh)
+std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(const Mesh &targetMesh)
 {
     int index = 0;
     std::vector<std::tuple<int, float>> displacements;
@@ -222,6 +226,8 @@ void Mesh::displaceVerticesTowardsTargetMesh(const Mesh &targetMesh)
         auto & [index, t] = e;
         displaceVertex(index, t);
     }
+
+    return displacements;
 }
 
 std::vector<float> Mesh::getPositionsVector() const

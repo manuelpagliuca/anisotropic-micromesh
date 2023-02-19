@@ -47,12 +47,14 @@ public:
     void displaceVertex(int index, float k);
     void displaceFace(float k);
 
-    void displaceVerticesTowardsTargetMesh(const Mesh& targetMesh);
+    std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh& targetMesh);
 
     static Mesh parseOFF(const std::string& rawOFF);
     static Mesh parseOBJ(const std::string& rawOBJ);
     void exportOFF(const std::string& fileName) const;
     void exportOBJ(const std::string& fileName) const;
+
+    void updateGL();
 
     void print() const;
 };

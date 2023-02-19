@@ -9,6 +9,7 @@
 #include <QFileDialog>
 
 #include "Mesh.h"
+#include "morphdialog.h"
 
 class Mainwindow : public QMainWindow
 {
@@ -27,6 +28,7 @@ protected:
 private:
     Ui::mainWindowClass ui;
 	std::string readFile(const char* file_loc);
+    MorphDialog *morphDialog;
 
     // Mesh loading
     Mesh baseMesh;
