@@ -7,7 +7,7 @@ BoundingBox::BoundingBox(glm::vec3 point)
 
 glm::vec3 BoundingBox::center() const
 {
-    return glm::mix(minPoint, maxPoint, 0.5f);
+    return glm::mix(minPoint, maxPoint,0.5f);
 }
 
 float BoundingBox::diagonal() const

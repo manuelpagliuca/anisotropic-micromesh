@@ -6,7 +6,7 @@
 #include "GLWidget.h"
 
 namespace Ui {
-class MorphWindows;
+    class MorphWindows;
 }
 
 class MorphDialog : public QDialog

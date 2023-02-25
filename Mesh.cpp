@@ -209,23 +209,23 @@ std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(cons
             float t = (glm::dot(planeNormal, rayOrigin) + d) / glm::dot(planeNormal, rayDirection);
             // finding the point on the ray
             glm::vec3 P = rayOrigin + rayDirection * t;
-            // vector verices acting as barycentric coordinates for highlighting the point
+            // vector vertices acting as barycentric coordinates for highlighting the point
             float v0P = glm::dot(glm::cross(v1 - v0, P - v1), rayDirection);
             float v1P = glm::dot(glm::cross(v2 - v1, P - v1), rayDirection);
             float v2P = glm::dot(glm::cross(v0 - v2, P - v2), rayDirection);
 
             if (!(v0P < 0 && v1P < 0 && v2P < 0) && abs(tMin) > abs(t)) {
-                 tMin = t;
+                tMin = t;
             }
         }
         displacements.push_back(std::tuple<int, float>(index, tMin));
         index++;
     }
 
-    for (const auto &e: displacements) {
-        auto & [index, t] = e;
-        displaceVertex(index, t);
-    }
+//    for (const auto &e: displacements) {
+//        auto & [index, t] = e;
+//        displaceVertex(index, t);
+//    }
 
     return displacements;
 }
