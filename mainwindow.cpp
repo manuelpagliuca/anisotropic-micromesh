@@ -134,8 +134,10 @@ void Mainwindow::on_actionExtract_displacements_triggered() {
         else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
         bool ok;
-        int k = QInputDialog::getInt(this, tr("Insert the number of subdivision you would like to perform"),
-                                     tr("Number of subdivisions:"), 1, 1, 9, 1, &ok);
+        int k = QInputDialog::getInt(this, tr("Insert the number of subdivision to perform"),
+                                     tr("Number of subdivisions:"), 1, 1, 9, 1, &ok,
+                                     this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+
         if (ok) {
             for (int i = 0; i < k; i++) {
                 baseMesh = baseMesh.subdivide();
