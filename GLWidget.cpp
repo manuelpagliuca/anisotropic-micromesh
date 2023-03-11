@@ -1,7 +1,5 @@
 ﻿#include "GLWidget.h"
 
-#define INIT_MEM 0xDEADBEEF
-
 using namespace std;
 
 GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent)
@@ -9,6 +7,20 @@ GLWidget::GLWidget(QWidget* parent) : QOpenGLWidget(parent)
 	VAO = VBO = EBO = 0;
     shaderProgram = modelLocation = 0;
     model = glm::mat4(1.f);
+}
+
+void GLWidget::loadDataOnGLBuffers()
+{
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * faces.size(), faces.data(), GL_STATIC_DRAW);
+
+    glBindVertexArray(0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void GLWidget::paintGL()
@@ -20,20 +32,19 @@ void GLWidget::paintGL()
 
     glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
 
-    glUniform1i(wireLocation, 0); // wire off
+    glUniform1i(wireLocation, 0); // wireframe starts disabled
 
     glBindVertexArray(VAO);
     glEnableVertexAttribArray(0);
 
     // Drawing
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-    int numFaces = static_cast<int>(faces.size());
-    glDrawElements(GL_TRIANGLES, numFaces, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(faces.size()), GL_UNSIGNED_INT, nullptr);
 
-    if (wireframeMode){
+    if (wireframeMode) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glUniform1i(wireLocation, 1); // wire on
-        glDrawElements(GL_TRIANGLES, numFaces, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(faces.size()), GL_UNSIGNED_INT, nullptr);
     }
 
     // Unbind
@@ -49,8 +60,8 @@ void GLWidget::initializeGL()
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(1, 1);
+    initGLBuffers();
     initShaders();
-    initOpenGLBuffers();
 }
 
 void GLWidget::initShaders()
@@ -85,18 +96,18 @@ void GLWidget::initShaders()
     glUseProgram(shaderProgram);
 }
 
-void GLWidget::initOpenGLBuffers()
+void GLWidget::initGLBuffers()
 {
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(INIT_MEM), nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(INIT_MEM), nullptr, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 0, nullptr, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (void*)0);
     glBindVertexArray(0);
@@ -104,18 +115,32 @@ void GLWidget::initOpenGLBuffers()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void GLWidget::loadDataOnOpenGLBuffer()
+void GLWidget::loadMeshData(const Mesh &mesh)
 {
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+    vertices.clear();
+    faces.clear();
+    vertices = mesh.getPositionsVector();
+    faces = mesh.getFacesVector();
+    loadDataOnGLBuffers();
+    model = glm::mat4(1.f);
+    model = mesh.bbox.centering();
+    update();
+}
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int) * faces.size(), faces.data(), GL_STATIC_DRAW);
+void GLWidget::unloadMeshData()
+{
+    vertices.clear();
+    faces.clear();
+    loadDataOnGLBuffers();
+    update();
+}
 
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+void GLWidget::updateMeshData(const Mesh &mesh)
+{
+    vertices = mesh.getPositionsVector();
+    faces = mesh.getFacesVector();
+    loadDataOnGLBuffers();
+    update();
 }
 
 GLuint GLWidget::createShader(GLenum type, const GLchar* source)
@@ -153,34 +178,6 @@ std::string GLWidget::readFile(const char* fileLocation) const
 
     fileStream.close();
 	return content;
-}
-
-void GLWidget::loadMeshData(const Mesh &mesh)
-{
-    vertices.clear();
-    vertices = mesh.getPositionsVector();
-    faces.clear();
-    faces = mesh.getFacesVector();
-    loadDataOnOpenGLBuffer();
-    model = glm::mat4(1.f);
-    model = mesh.bbox.centering();
-    update();
-}
-
-void GLWidget::updateMeshData(const Mesh &mesh)
-{
-    vertices = mesh.getPositionsVector();
-    faces = mesh.getFacesVector();
-    loadDataOnOpenGLBuffer();
-    update();
-}
-
-void GLWidget::unloadMeshData()
-{
-    vertices.clear();
-    faces.clear();
-    loadDataOnOpenGLBuffer();
-	update();
 }
 
 void GLWidget::wireframePaint()

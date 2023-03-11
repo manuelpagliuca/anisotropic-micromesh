@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     Mainwindow w;
     w.show();  
 
-    w.loadPallas500();
+    w.loadDemoMesh();
 
     return a.exec();
 }

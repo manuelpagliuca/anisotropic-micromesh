@@ -18,7 +18,7 @@ struct Vertex {
 };
 
 struct Face {
-	int index[3];
+    unsigned int index[3];
 	glm::vec3 norm;
 };
 
@@ -26,6 +26,7 @@ class Mesh : protected QOpenGLExtraFunctions
 {
 public:
 	Mesh();
+    ~Mesh();
     BoundingBox bbox;
 	std::vector<Vertex> vertices;
     std::vector<Face> faces;
@@ -34,7 +35,7 @@ public:
     int addFace(int i0, int i1, int i2);
 
     std::vector<float> getPositionsVector() const;
-    std::vector<int> getFacesVector() const;
+    std::vector<unsigned int> getFacesVector() const;
 
 	void draw(bool wireframe);
     void drawDirect();

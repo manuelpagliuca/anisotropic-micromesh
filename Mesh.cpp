@@ -2,6 +2,12 @@
 
 Mesh::Mesh() {}
 
+Mesh::~Mesh()
+{
+    vertices.clear();
+    faces.clear();
+}
+
 int Mesh::addVertex(glm::vec3 pos)
 {
     Vertex v;
@@ -90,35 +96,35 @@ void Mesh::exportOFF(const std::string& fileName) const
     fileStream.close();
 }
 
-void Mesh::exportOBJ(const std::string& f_name) const
+void Mesh::exportOBJ(const std::string& fName) const
 {
     std::ostringstream oss;
-    std::string file_name_ext = f_name + ".obj";
-    std::ofstream file_stream(".\\mesh\\" + file_name_ext, std::ios::out);
+    std::string fileNameExt = fName + ".obj";
+    std::ofstream fileStream(".\\mesh\\" + fileNameExt, std::ios::out);
 
-    if (!file_stream.is_open()) {
-        printf("Failed to open \'%s\'. File doesn't exist.", file_name_ext.c_str());
+    if (!fileStream.is_open()) {
+        printf("Failed to open \'%s\'. File doesn't exist.", fileNameExt.c_str());
         return;
     }
 
     for (const Vertex& v : vertices) {
-        file_stream << std::setprecision(6) << std::fixed
+        fileStream << std::setprecision(6) << std::fixed
                     << "vn " << v.norm.x
                     << " " << v.norm.y
                     << " " << v.norm.z << std::endl;
-        file_stream << std::setprecision(6) << std::fixed
+        fileStream << std::setprecision(6) << std::fixed
                     << "v " << v.pos.x
                     << " " << v.pos.y
                     << " " << v.pos.z << std::endl;
     }
 
     for (const Face& f : faces)
-        file_stream << "f "
+        fileStream << "f "
                     << f.index[0] + 1 << "//" << f.index[0] + 1 << " "
                     << f.index[1] + 1 << "//" << f.index[1] + 1 << " "
                     << f.index[2] + 1 << "//" << f.index[2] + 1 << std::endl;
 
-    file_stream.close();
+    fileStream.close();
 }
 
 void Mesh::updateGL()
@@ -241,9 +247,9 @@ std::vector<float> Mesh::getPositionsVector() const
     return pos;
 }
 
-std::vector<int> Mesh::getFacesVector() const
+std::vector<unsigned int> Mesh::getFacesVector() const
 {
-    std::vector<int> indices;
+    std::vector<unsigned int> indices;
     for (auto& f : faces) {
         indices.push_back(f.index[0]);
         indices.push_back(f.index[1]);
@@ -256,8 +262,8 @@ void Mesh::draw(bool wireframe)
 {
     initializeOpenGLFunctions();
     glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
-    int num_faces = static_cast<int>(getFacesVector().size());
-    glDrawElements(GL_TRIANGLES, num_faces, GL_UNSIGNED_INT, 0);
+    unsigned int numFaces = static_cast<unsigned int>(getFacesVector().size());
+    glDrawElements(GL_TRIANGLES, numFaces, GL_UNSIGNED_INT, 0);
 }
 
 void Mesh::drawDirect()
@@ -299,9 +305,9 @@ Mesh Mesh::parseOFF(const std::string& rawOFF)
     std::getline(iss, line);
 
     Mesh mesh = Mesh();
-    int n_total = numVertices + numFaces + 0; // todo: atm no edges
+    int nTotal = numVertices + numFaces + 0; // todo: atm no edges
 
-    for (int i = 0; i < n_total; i++) {
+    for (int i = 0; i < nTotal; i++) {
         if (i < numVertices) {
             float x, y, z;
             iss >> x >> y >> z;
@@ -355,7 +361,7 @@ Mesh Mesh::parseOBJ(const std::string& raw_obj)
     std::vector<glm::vec3> positions;
     std::vector<glm::vec2> texels;
     std::vector<glm::vec3> normals;
-    std::vector<glm::ivec3> faces;
+    std::vector<glm::uvec3> faces;
 
     while (std::getline(in, line))
     {
@@ -401,7 +407,7 @@ Mesh Mesh::parseOBJ(const std::string& raw_obj)
             is >> i2;
             is >> dump;
             is >> i3;
-            faces.push_back(glm::ivec3(--i1, --i2, --i3));
+            faces.push_back(glm::uvec3(--i1, --i2, --i3));
         }
     }
 

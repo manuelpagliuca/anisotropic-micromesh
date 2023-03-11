@@ -36,8 +36,8 @@ protected:
 
 private:
     void initShaders();
-    void initOpenGLBuffers();
-    void loadDataOnOpenGLBuffer();
+    void initGLBuffers();
+    void loadDataOnGLBuffers();
 
     GLuint createShader(GLenum type, const GLchar* source);
     std::string readFile(const char* fileLocation) const;
@@ -52,5 +52,5 @@ private:
 
     bool wireframeMode = false;
     std::vector<float> vertices;
-    std::vector<int> faces;
+    std::vector<unsigned int> faces;
 };

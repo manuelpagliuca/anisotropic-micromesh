@@ -18,7 +18,7 @@ class Mainwindow : public QMainWindow
 public:
     Mainwindow(QWidget* parent = nullptr);
     ~Mainwindow() {};
-    void loadPallas500();
+    void loadDemoMesh();
 protected:
     void mousePressEvent(QMouseEvent* ev);
     void mouseMoveEvent(QMouseEvent* ev);

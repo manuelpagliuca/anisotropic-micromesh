@@ -3,8 +3,8 @@
 Mainwindow::Mainwindow(QWidget* parent) : QMainWindow(parent)
 {
 	ui.setupUi(this);
-    const int x = screen()->size().width() / 2 - width() / 2;
-    const int y = screen()->size().height() / 2 - height() / 2;
+    const int x = (screen()->size().width() / 2) - (width() / 2);
+    const int y = (screen()->size().height() / 2) - (height() / 2);
 	move(x, y);
 
     ui.actionSave->setEnabled(false);
@@ -14,10 +14,10 @@ Mainwindow::Mainwindow(QWidget* parent) : QMainWindow(parent)
     ui.actionVertex_displacement->setEnabled(false);
 }
 
-void Mainwindow::loadPallas500()
+void Mainwindow::loadDemoMesh()
 {
-    std::string pallasOBJ500 = readFile("./mesh/pallas_500.obj");
-    baseMesh = Mesh::parseOBJ(pallasOBJ500);
+    std::string pallasOBJ10000 = readFile("./mesh/ico_norm.off");
+    baseMesh = Mesh::parseOFF(pallasOBJ10000);
     ui.openGLWidget->loadMeshData(baseMesh);
     ui.actionSave->setEnabled(true);
     ui.actionSubdivide->setEnabled(true);
@@ -76,7 +76,7 @@ void Mainwindow::on_actionLoad_triggered() {
     if (!filePath.isEmpty()) {
         std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
         std::string file = readFile(filePath.toStdString().c_str());
-
+        baseMesh = Mesh();
 		if (ext == ".off") {
             baseMesh = Mesh::parseOFF(file);
             ui.openGLWidget->loadMeshData(baseMesh);
@@ -110,12 +110,13 @@ void Mainwindow::on_actionVertex_displacement_triggered() {
 }
 
 void Mainwindow::on_actionFace_displacement_triggered() {
-	bool valid;
+    bool ok;
 	double k = QInputDialog::getDouble(this,
 		tr("Insert face displacement factor"),
-        tr("Amount:"), 0.0, -3.0, 5.0, 4, &valid);
+        tr("Amount:"), 0.0, -3.0, 5.0, 4, &ok,
+        this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-	if (valid) {
+    if (ok) {
         baseMesh.displaceFace(k);
         ui.openGLWidget->updateMeshData(baseMesh);
 	}

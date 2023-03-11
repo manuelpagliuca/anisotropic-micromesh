@@ -22,7 +22,7 @@ void MorphDialog::setGLWidget(GLWidget *glWidget)
     this->glWidget = glWidget;
 }
 
-void MorphDialog::setDisplacementsDelta(std::vector<std::tuple<int, float> > displacements)
+void MorphDialog::setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements)
 {
     displacementsDeltas = displacements;
 

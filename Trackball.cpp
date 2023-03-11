@@ -7,17 +7,13 @@ void TrackBall::trackMousePositions(QPoint currPos, int openGLWWidth, int openGL
     op1 = getTrackBallVector(prevPos, openGLWWidth, openGLWHeight);
     op2 = getTrackBallVector(currPos, openGLWWidth, openGLWHeight);
 
-    std::cout << glm::to_string(op1) << ", " << glm::to_string(op2) << std::endl;
     if (op1 != op2) {
         rotAngle = std::acosf(std::min(1.0f, glm::dot(op1, op2))) * sensitivity;
         rotAxis = glm::cross(op1, op2);
 
-        //std::cout << rotAngle << ", " << glm::to_string(rotAxis) << std::endl;
-
         prevPos = currPos;
         rotation = true;
     }
-
 }
 
 void TrackBall::setFistClick(QPoint initialPos)
