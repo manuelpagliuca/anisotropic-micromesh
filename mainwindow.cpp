@@ -16,8 +16,8 @@ Mainwindow::Mainwindow(QWidget* parent) : QMainWindow(parent)
 
 void Mainwindow::loadDemoMesh()
 {
-    std::string pallasOBJ10000 = readFile("./mesh/ico_norm.off");
-    baseMesh = Mesh::parseOFF(pallasOBJ10000);
+    std::string pallasOBJ2500 = readFile("./mesh/pallas_2500.obj");
+    baseMesh = Mesh::parseOBJ(pallasOBJ2500);
     ui.openGLWidget->loadMeshData(baseMesh);
     ui.actionSave->setEnabled(true);
     ui.actionSubdivide->setEnabled(true);

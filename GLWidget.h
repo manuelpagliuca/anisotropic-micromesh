@@ -36,8 +36,6 @@ protected:
 
 private:
     void initShaders();
-    void initGLBuffers();
-    void loadDataOnGLBuffers();
 
     GLuint createShader(GLenum type, const GLchar* source);
     std::string readFile(const char* fileLocation) const;
