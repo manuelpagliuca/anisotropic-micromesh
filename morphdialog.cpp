@@ -39,17 +39,12 @@ MorphDialog::~MorphDialog()
 
 void MorphDialog::on_horizontalSlider_valueChanged(int value)
 {
-    currentValue = value;
-}
-
-void MorphDialog::on_horizontalSlider_sliderReleased()
-{
-    previousValue = currentValue;
+    previousValue = value;
 
     targetMesh = baseMesh;
     for (const auto &e: displacementsDeltas) {
         auto & [index, t] = e;
-        targetMesh.displaceVertex(index, t * currentValue);
+        targetMesh.displaceVertex(index, t * value);
     }
 
     glWidget->updateMeshData(targetMesh);
