@@ -48,4 +48,6 @@ public slots: void on_actionSubdivide_triggered();
 public slots: void on_actionVertex_displacement_triggered();
 public slots: void on_actionFace_displacement_triggered();
 public slots: void on_actionExtract_displacements_triggered();
+private slots:
+    void on_actionSubdivision_surfaces_Uniform_triggered();
 };

@@ -41,6 +41,7 @@ public:
     void drawDirect();
 
 	Mesh subdivide();
+    Mesh subdivide(int subdivision);
     void updateFaceNormals();
     void updateVertexNormals();
     void updateBoundingBox();

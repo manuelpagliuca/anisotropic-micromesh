@@ -199,3 +199,18 @@ std::string Mainwindow::readFile(const char* file_loc)
 	file_stream.close();
 	return content;
 }
+
+void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
+{
+    bool ok;
+    int subdivisions = QInputDialog::getInt(this, tr("Insert the number of subdivision to perform"),
+                                 tr("Number of subdivisions:"), 1, 1, 9, 1, &ok,
+                                 this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+
+    if (ok) {
+        baseMesh = baseMesh.subdivide(subdivisions);
+        ui.openGLWidget->updateMeshData(baseMesh);
+        ui.openGLWidget->updateMeshData(baseMesh);
+    }
+}
+

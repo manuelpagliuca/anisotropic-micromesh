@@ -35,7 +35,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>30</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSome">
@@ -57,6 +57,7 @@
     <addaction name="actionVertex_displacement"/>
     <addaction name="actionFace_displacement"/>
     <addaction name="actionExtract_displacements"/>
+    <addaction name="actionSubdivision_surfaces_Uniform"/>
    </widget>
    <addaction name="menuSome"/>
    <addaction name="menuMesh"/>
@@ -126,6 +127,11 @@
   <action name="actionExtract_displacements">
    <property name="text">
     <string>Extract displacements...</string>
+   </property>
+  </action>
+  <action name="actionSubdivision_surfaces_Uniform">
+   <property name="text">
+    <string>Subdivision surfaces: Uniform</string>
    </property>
   </action>
  </widget>
