@@ -73,57 +73,25 @@ Mesh Mesh::subdivide(int subdivision)
         int v1 = f.index[1];
         int v2 = f.index[2];
 
-        glm::vec3 subdv0v1 = (vertices.at(v0).pos + vertices.at(v1).pos) / float(subdivision);
-        glm::vec3 subdv1v2 = (vertices.at(v1).pos + vertices.at(v2).pos) / float(subdivision);
-        glm::vec3 subdv2v0 = (vertices.at(v2).pos + vertices.at(v0).pos) / float(subdivision);
+        glm::vec3 delta0 = (vertices.at(v2).pos - vertices.at(v0).pos);
+        glm::vec3 delta1 = (vertices.at(v2).pos - vertices.at(v1).pos);
+        glm::vec3 delta2 = (vertices.at(v1).pos - vertices.at(v0).pos);
 
-        glm::vec3 deltav0v1 = (vertices.at(v0).pos - subdv0v1);
-        glm::vec3 deltav1v2 = (vertices.at(v1).pos - subdv1v2);
-        glm::vec3 deltav2v0 = (vertices.at(v2).pos - subdv2v0);
+        //glm::vec3 abDelta = ab / float(subdivision);
+        //glm::vec3 bcDelta = bc / float(subdivision);
+        //glm::vec3 cdDelta = cd / float(subdivision);
 
-        std::vector<glm::vec3> v0v1Subdivisions;
-        std::vector<glm::vec3> v1v2Subdivisions;
-        std::vector<glm::vec3> v2v0Subdivisions;
-
-        v0v1Subdivisions.push_back(subdv0v1);
-        v1v2Subdivisions.push_back(subdv1v2);
-        v2v0Subdivisions.push_back(subdv2v0);
-
-        for (int i = 0; i < subdivision - 1; i++) {
-            subdv0v1 = subdv0v1 + deltav0v1;
-            subdv1v2 = subdv0v1 + deltav1v2;
-            subdv2v0 = subdv0v1 + deltav2v0;
-
-            v0v1Subdivisions.push_back(subdv0v1);
-            v0v1Subdivisions.push_back(subdv1v2);
-            v0v1Subdivisions.push_back(subdv2v0);
-        }
-
-        // Calcola i centroidi dei triangoli sottodivisi
         for (int i = 0; i < subdivision; i++) {
             for (int j = 0; j < subdivision - i; j++) {
-                int k = subdivision - i - j - 1;
-                glm::vec3 centroid = (v0v1Subdivisions.at(i * subdivision + j) + v1v2Subdivisions.at(i * subdivision + j) + v2v0Subdivisions.at(i * subdivision + k)) / 3.0f;
-                subdivided.addVertex(centroid);
-            }
-        }
+                glm::vec3 newVertex = vertices.at(v0).pos + (float(i) * abDelta) + (float(j) * bcDelta);
+                glm::vec3 t2 = newVertex + abDelta;
+                glm::vec3 t3 = t2 + bcDelta;
 
-        // Aggiungi le nuove facce
-        int numVerts = vertices.size();
-        for (int i = 0; i < subdivision - 1; i++) {
-            for (int j = 0; j < subdivision - i; j++) {
-                int k = subdivision - i - j - 1;
-                int a = numVerts + (i * subdivision + j);
-                int b = numVerts + (i * subdivision + j + 1);
-                int c = numVerts + ((i + 1) * subdivision + j + 1);
-                int d = numVerts + ((i + 1) * subdivision + j);
-                if (i == subdivision - 2) {
-                    subdivided.addFace(v0, d, c);
-                }
-                else {
-                    subdivided.addFace(a, b, c);
-                    subdivided.addFace(a, c, d);
-                }
+                int m01 = subdivided.addVertex(newVertex);
+                int m12 = subdivided.addVertex(t2);
+                int m20 = subdivided.addVertex(t3);
+
+                subdivided.addFace(m01, m12, m20);
             }
         }
     }
