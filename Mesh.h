@@ -14,7 +14,7 @@
 struct Vertex {
 	glm::vec3 pos;
 	glm::vec3 norm;
-	glm::vec3 tex;
+    glm::vec2 tex;
 };
 
 struct Face {

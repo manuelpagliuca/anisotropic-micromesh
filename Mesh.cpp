@@ -73,25 +73,28 @@ Mesh Mesh::subdivide(int subdivision)
         int v1 = f.index[1];
         int v2 = f.index[2];
 
-        glm::vec3 delta0 = (vertices.at(v2).pos - vertices.at(v0).pos);
-        glm::vec3 delta1 = (vertices.at(v2).pos - vertices.at(v1).pos);
-        glm::vec3 delta2 = (vertices.at(v1).pos - vertices.at(v0).pos);
+        glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(subdivision);
+        glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(subdivision);
+        glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(subdivision);
 
-        //glm::vec3 abDelta = ab / float(subdivision);
-        //glm::vec3 bcDelta = bc / float(subdivision);
-        //glm::vec3 cdDelta = cd / float(subdivision);
+        int stored [2];
 
         for (int i = 0; i < subdivision; i++) {
             for (int j = 0; j < subdivision - i; j++) {
-                glm::vec3 newVertex = vertices.at(v0).pos + (float(i) * abDelta) + (float(j) * bcDelta);
-                glm::vec3 t2 = newVertex + abDelta;
-                glm::vec3 t3 = t2 + bcDelta;
+                glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
+                glm::vec3 t2 = t1 + delta2;
+                glm::vec3 t3 = t2 + delta1;
 
-                int m01 = subdivided.addVertex(newVertex);
-                int m12 = subdivided.addVertex(t2);
-                int m20 = subdivided.addVertex(t3);
+                int m1 = subdivided.addVertex(t1);
+                int m2 = subdivided.addVertex(t2);
+                int m3 = subdivided.addVertex(t3);
 
-                subdivided.addFace(m01, m12, m20);
+                subdivided.addFace(m1, m3, m2);
+                if (j > 0)
+                    subdivided.addFace(stored[0], stored[1], m3);
+
+                stored[0] = m2;
+                stored[1] = m3;
             }
         }
     }

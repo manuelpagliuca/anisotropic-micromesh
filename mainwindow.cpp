@@ -47,11 +47,12 @@ void Mainwindow::wheelEvent(QWheelEvent *ev)
 void Mainwindow::keyPressEvent(QKeyEvent *ev)
 {
     if (ev->key() == Qt::Key_Escape) exit(1);
-    else if(ev->key() == Qt::Key_W) ui.openGLWidget->wireframePaint();
-    else if(ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
-    else if(ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
-    else if(ev->key() == Qt::Key_L) on_actionLoad_triggered();
-    else if(ev->key() == Qt::Key_U) on_actionUnload_triggered();
+    else if (ev->key() == Qt::Key_W) ui.openGLWidget->wireframePaint();
+    else if (ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
+    else if (ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
+    else if (ev->key() == Qt::Key_O) on_actionSubdivision_surfaces_Uniform_triggered();
+    else if (ev->key() == Qt::Key_L) on_actionLoad_triggered();
+    else if (ev->key() == Qt::Key_U) on_actionUnload_triggered();
 }
 
 void Mainwindow::on_actionSave_triggered() {
