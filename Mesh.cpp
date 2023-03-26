@@ -104,7 +104,6 @@ Mesh Mesh::subdivide(int subdivision)
 
 double Mesh::doubleArea()
 {
-    // Heron's formula
     double avgArea = 0.0f;
 
     for (const Face &f: faces) {
@@ -119,7 +118,6 @@ double Mesh::doubleArea()
     }
 
     avgArea /= faces.size();
-    qDebug() << avgArea;
     return avgArea;
 }
 
