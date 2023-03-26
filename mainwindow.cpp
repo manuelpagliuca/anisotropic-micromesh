@@ -18,6 +18,8 @@ void Mainwindow::loadDemoMesh()
 {
     std::string pallasOBJ2500 = readFile("./mesh/pallas_2500.obj");
     baseMesh = Mesh::parseOBJ(pallasOBJ2500);
+    qDebug() << "Double surface area: "  <<  baseMesh.doubleArea();
+    printf("%f", baseMesh.doubleArea());
     ui.openGLWidget->loadMeshData(baseMesh);
     ui.actionSave->setEnabled(true);
     ui.actionSubdivide->setEnabled(true);

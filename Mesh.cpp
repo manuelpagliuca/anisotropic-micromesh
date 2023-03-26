@@ -102,6 +102,27 @@ Mesh Mesh::subdivide(int subdivision)
     return subdivided;
 }
 
+double Mesh::doubleArea()
+{
+    // Heron's formula
+    double avgArea = 0.0f;
+
+    for (const Face &f: faces) {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        glm::vec3 ab = (vertices.at(v1).pos - vertices.at(v0).pos);
+        glm::vec3 bc = (vertices.at(v2).pos - vertices.at(v1).pos);
+
+        avgArea += glm::cross(ab, bc).length();
+    }
+
+    avgArea /= faces.size();
+    qDebug() << avgArea;
+    return avgArea;
+}
+
 void Mesh::exportOFF(const std::string& fileName) const
 {
     std::ostringstream oss;

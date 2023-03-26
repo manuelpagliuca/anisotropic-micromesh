@@ -42,6 +42,7 @@ public:
 
 	Mesh subdivide();
     Mesh subdivide(int subdivision);
+    double doubleArea();
     void updateFaceNormals();
     void updateVertexNormals();
     void updateBoundingBox();
