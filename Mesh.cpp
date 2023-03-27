@@ -102,9 +102,9 @@ Mesh Mesh::subdivide(int subdivision)
     return subdivided;
 }
 
-double Mesh::doubleArea()
+float Mesh::doubleArea()
 {
-    double avgArea = 0.0f;
+    float avgArea = 0.0f;
 
     for (const Face &f: faces) {
         int v0 = f.index[0];
@@ -114,10 +114,12 @@ double Mesh::doubleArea()
         glm::vec3 ab = (vertices.at(v1).pos - vertices.at(v0).pos);
         glm::vec3 bc = (vertices.at(v2).pos - vertices.at(v1).pos);
 
-        avgArea += glm::cross(ab, bc).length();
+        float faceArea = glm::length(glm::cross(ab, bc));
+        avgArea += faceArea;
     }
 
     avgArea /= faces.size();
+    qDebug() << avgArea;
     return avgArea;
 }
 
