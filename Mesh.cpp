@@ -119,38 +119,31 @@ Mesh Mesh::adaptiveSubdivision()
         displacements.push_back(glm::abs(avgFaceDoubleArea - faceDoubleArea));
     }
 
+    float variance = 0.0f;
+    for (float dis : displacements) {
+        variance += dis;
+    }
+
+    variance /= displacements.size();
+    int subLevelSpan = static_cast<int>(std::round(variance));
+
     auto min = *std::min_element(displacements.begin(), displacements.end());
     auto max = *std::max_element(displacements.begin(), displacements.end());
 
-    float var = 0.0f;
-    for (float dis : displacements) {
-        var += dis;
-    }
-    var /= displacements.size();
-
-    qDebug() << "Min: " << min;
-    qDebug() << "Max: " << max;
-    qDebug() << "Double Area: " << avgFaceDoubleArea;
-    qDebug() << "Displacement variance: " << var;
-
-    int maxSubLevel = static_cast<int>(std::round(max));
     int minSubLevel = static_cast<int>(std::round(min));
+    int maxSubLevel = static_cast<int>(std::round(max));
     int avgSubLevel = static_cast<int>(std::round(avgFaceDoubleArea));
-
-    qDebug() << "Min: " << maxSubLevel;
-    qDebug() << "Max: " << minSubLevel;
-    qDebug() << "Double Area: " << avgSubLevel;
 
     std::map<int, int> areaToSubdivisionMap;
 
-    for (int level = avgSubLevel - 1; level >= 0; level--) {
-        areaToSubdivisionMap[level] = level + 1;
+    for (int level = avgSubLevel - subLevelSpan; level >= minSubLevel; level--) {
+        areaToSubdivisionMap[level] = level + subLevelSpan;
     }
 
     areaToSubdivisionMap[avgSubLevel] = avgSubLevel + 1;
 
-    for (int level = avgSubLevel + 1; level <= maxSubLevel; level++) {
-        areaToSubdivisionMap[level] = level + 1;
+    for (int level = avgSubLevel + subLevelSpan; level <= maxSubLevel; level++) {
+        areaToSubdivisionMap[level] = level + subLevelSpan;
     }
 
     qDebug() << areaToSubdivisionMap;
