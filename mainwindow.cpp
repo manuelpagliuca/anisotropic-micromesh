@@ -215,3 +215,11 @@ void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
     }
 }
 
+
+void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
+{
+    baseMesh = baseMesh.adaptiveSubdivision();
+    ui.openGLWidget->updateMeshData(baseMesh);
+    ui.openGLWidget->updateMeshData(baseMesh);
+}
+

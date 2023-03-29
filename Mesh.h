@@ -33,6 +33,7 @@ public:
 
     int addVertex(glm::vec3 pos);
     int addFace(int i0, int i1, int i2);
+    float averageFaceDoubleArea();
 
     std::vector<float> getPositionsVector() const;
     std::vector<unsigned int> getFacesVector() const;
@@ -42,7 +43,7 @@ public:
 
 	Mesh subdivide();
     Mesh subdivide(int subdivision);
-    float doubleArea();
+    Mesh adaptiveSubdivision();
     void updateFaceNormals();
     void updateVertexNormals();
     void updateBoundingBox();
