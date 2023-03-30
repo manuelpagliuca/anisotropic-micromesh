@@ -78,7 +78,7 @@ Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
         int faceDoubleArea = std::round(glm::length(glm::cross(v01, v12)));
 
         int subdivisions = areaToSubdivisionMap[faceDoubleArea];
-        qDebug() << subdivisions;
+
         glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(subdivisions);
         glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(subdivisions);
         glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(subdivisions);
@@ -96,8 +96,7 @@ Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
                 int m3 = subdivided.addVertex(t3);
 
                 subdivided.addFace(m1, m3, m2);
-                if (j > 0)
-                    subdivided.addFace(stored[0], stored[1], m3);
+                if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
 
                 stored[0] = m2;
                 stored[1] = m3;
@@ -108,7 +107,7 @@ Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
     return subdivided;
 }
 
-Mesh Mesh::subdivide(int subdivision)
+Mesh Mesh::nSubdivide(int n)
 {
     Mesh subdivided = Mesh();
     subdivided.vertices = this->vertices;
@@ -118,14 +117,14 @@ Mesh Mesh::subdivide(int subdivision)
         int v1 = f.index[1];
         int v2 = f.index[2];
 
-        glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(subdivision);
-        glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(subdivision);
-        glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(subdivision);
+        glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(n);
+        glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(n);
+        glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(n);
 
         int stored [2];
 
-        for (int i = 0; i < subdivision; i++) {
-            for (int j = 0; j < subdivision - i; j++) {
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n - i; j++) {
                 glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
                 glm::vec3 t2 = t1 + delta2;
                 glm::vec3 t3 = t2 + delta1;
@@ -147,59 +146,39 @@ Mesh Mesh::subdivide(int subdivision)
     return subdivided;
 }
 
-Mesh Mesh::adaptiveSubdivision()
+std::map<int, int> Mesh::getDoubleAreaSubdivisionMap() const
 {
     Mesh subdivided = Mesh();
-    float avgFaceDoubleArea = averageFaceDoubleArea();
-    std::vector<float> displacements;
+    float avgFaceDoubleArea = getFacesAvgDoubleArea();
+    std::vector<float> facesDeviations = getDeviationsFromFacesAvgDoubleArea();
 
-    for (const Face &f : faces) {
-        int v0 = f.index[0];
-        int v1 = f.index[1];
-        int v2 = f.index[2];
+    float facesStdDeviation = 0.0f;
+    for (float deviations : facesDeviations)
+        facesStdDeviation += deviations;
+    facesStdDeviation /= facesDeviations.size();
 
-        glm::vec3 v01 = (vertices.at(v1).pos - vertices.at(v0).pos);
-        glm::vec3 v12 = (vertices.at(v2).pos - vertices.at(v1).pos);
-        float faceDoubleArea = glm::length(glm::cross(v01, v12));
-        displacements.push_back(glm::abs(avgFaceDoubleArea - faceDoubleArea));
-    }
+    int subdivisionInterval = static_cast<int>(std::round(facesStdDeviation));
 
-    float variance = 0.0f;
-    for (float dis : displacements) {
-        variance += dis;
-    }
+    float maxDisplacementFromAvg = *std::max_element(facesDeviations.begin(), facesDeviations.end());
 
-    variance /= displacements.size();
-    int subLevelSpan = static_cast<int>(std::round(variance));
-
-    auto min = *std::min_element(displacements.begin(), displacements.end());
-    auto max = *std::max_element(displacements.begin(), displacements.end());
-
-    int minSubLevel = static_cast<int>(std::round(min)) <= 0 ? 1 : static_cast<int>(std::round(min));
-    int maxSubLevel = static_cast<int>(std::round(max));
-    int avgSubLevel = static_cast<int>(std::round(avgFaceDoubleArea));
+    int minSubdivisionLevel = 0;
+    int maxSubdivisionLevel = static_cast<int>(std::round(maxDisplacementFromAvg)) * 2;
+    int avgSubdivisionLevel = static_cast<int>(std::round(avgFaceDoubleArea));
 
     std::map<int, int> areaToSubdivisionMap;
 
-    for (int level = avgSubLevel - subLevelSpan; level >= minSubLevel; level--) {
-        areaToSubdivisionMap[level] = level + subLevelSpan;
-    }
+    for (int level = avgSubdivisionLevel - subdivisionInterval; level >= minSubdivisionLevel; level--)
+        areaToSubdivisionMap[level] = level + subdivisionInterval;
 
-    areaToSubdivisionMap[avgSubLevel] = avgSubLevel + 1;
+    areaToSubdivisionMap[avgSubdivisionLevel] = avgSubdivisionLevel + 1;
 
-    for (int level = avgSubLevel + subLevelSpan; level <= maxSubLevel; level++) {
-        areaToSubdivisionMap[level] = level + subLevelSpan;
-    }
+    for (int level = avgSubdivisionLevel + subdivisionInterval; level <= maxSubdivisionLevel; level++)
+        areaToSubdivisionMap[level] = level + subdivisionInterval;
 
-    qDebug() << minSubLevel;
-    qDebug() << maxSubLevel;
-    qDebug() << avgSubLevel;
-    qDebug() << areaToSubdivisionMap;
-
-    return adaptiveSubdivide(areaToSubdivisionMap);
+    return areaToSubdivisionMap;
 }
 
-float Mesh::averageFaceDoubleArea()
+float Mesh::getFacesAvgDoubleArea() const
 {
     float avgArea = 0.0f;
 
@@ -216,8 +195,25 @@ float Mesh::averageFaceDoubleArea()
     }
 
     avgArea /= faces.size();
-    qDebug() << avgArea;
     return avgArea;
+}
+
+std::vector<float> Mesh::getDeviationsFromFacesAvgDoubleArea() const
+{
+    float avgFaceDoubleArea = getFacesAvgDoubleArea();
+    std::vector<float> deviations;
+    for (const Face &f : faces) {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        glm::vec3 v01 = (vertices.at(v1).pos - vertices.at(v0).pos);
+        glm::vec3 v12 = (vertices.at(v2).pos - vertices.at(v1).pos);
+        float faceDoubleArea = glm::length(glm::cross(v01, v12));
+        deviations.push_back(glm::abs(avgFaceDoubleArea - faceDoubleArea));
+    }
+
+    return deviations;
 }
 
 void Mesh::exportOFF(const std::string& fileName) const

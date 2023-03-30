@@ -33,17 +33,18 @@ public:
 
     int addVertex(glm::vec3 pos);
     int addFace(int i0, int i1, int i2);
-    float averageFaceDoubleArea();
 
     std::vector<float> getPositionsVector() const;
     std::vector<unsigned int> getFacesVector() const;
+    std::map<int, int> getDoubleAreaSubdivisionMap() const;
+    float getFacesAvgDoubleArea() const;
+    std::vector<float> getDeviationsFromFacesAvgDoubleArea() const;
 
 	void draw(bool wireframe);
     void drawDirect();
 
 	Mesh subdivide();
-    Mesh subdivide(int subdivision);
-    Mesh adaptiveSubdivision();
+    Mesh nSubdivide(int subdivision);
     Mesh adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap);
 
     void updateFaceNormals();
