@@ -44,6 +44,8 @@ public:
 	Mesh subdivide();
     Mesh subdivide(int subdivision);
     Mesh adaptiveSubdivision();
+    Mesh adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap);
+
     void updateFaceNormals();
     void updateVertexNormals();
     void updateBoundingBox();
