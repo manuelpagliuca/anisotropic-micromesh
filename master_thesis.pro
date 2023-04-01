@@ -20,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     BoundingBox.h \
+    Debug.h \
     GLWidget.h \
     Mainwindow.h \
     Mesh.h \
