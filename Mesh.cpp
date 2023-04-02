@@ -148,7 +148,6 @@ Mesh Mesh::nSubdivide(int n)
 
 std::map<int, int> Mesh::getDoubleAreaSubdivisionMap() const
 {
-    Mesh subdivided = Mesh();
     float avgFaceDoubleArea = getFacesAvgDoubleArea();
     std::vector<float> facesDeviations = getDeviationsFromFacesAvgDoubleArea();
 
