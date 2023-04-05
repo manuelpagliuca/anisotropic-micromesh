@@ -6,6 +6,7 @@ Mesh::~Mesh()
 {
     vertices.clear();
     faces.clear();
+    edges.clear();
 }
 
 int Mesh::addVertex(glm::vec3 pos)
@@ -29,15 +30,12 @@ int Mesh::addFace(int i0, int i1, int i2)
 
 void Mesh::print() const
 {
-    std::cout << vertices.size() << " " << faces.size() << "\n";// << " " << edges.size();
-
-    for (auto& v : vertices)
-        std::cout << glm::to_string(v.pos) << "\n";
-
+    std::cout << vertices.size() << " " << faces.size() << "\n";
+    for (auto& v : vertices) std::cout << glm::to_string(v.pos) << "\n";
     std::cout << std::endl;
-
-    for (auto& f : faces)
-        std::cout << f.index[0] << f.index[1] << f.index[2] << "\n";
+    for (auto& f : faces) std::cout << f.index[0] << f.index[1] << f.index[2] << "\n";
+    std::cout << std::endl;
+    for (auto& e : edges) std::cout << e.faces[0] << e.faces[1] << "\n"
 }
 
 Mesh Mesh::subdivide()
@@ -217,6 +215,49 @@ void Mesh::updateVertexNormals()
 
     for (Vertex& v : vertices)
         v.norm = glm::normalize(v.norm);
+}
+
+void Mesh::updateFaceToFaceAdjacency()
+{
+    for (auto& face : faces) {
+        for (int i = 0; i < 3; i++) {
+            face.edges[i] = -1;
+        }
+    }
+
+    // Itera su tutte le facce e sui loro lati
+    for (int faceIndex = 0; faceIndex < faces.size(); faceIndex++) {
+        for (int sideIndex = 0; sideIndex < 3; sideIndex++) {
+            int vertexIndex0 = faces[faceIndex].index[sideIndex];
+            int vertexIndex1 = faces[faceIndex].index[(sideIndex + 1) % 3];
+            // Cerca il lato corrispondente sulle facce adiacenti
+            bool foundAdjacent = false;
+            for (auto edgeIndex : edges[vertexIndex0]) {
+                Edge& edge = edges[edgeIndex];
+                int adjacentFaceIndex = edge.faces[0] == faceIndex ? edge.faces[1] : edge.faces[0];
+                if (adjacentFaceIndex == -1) {
+                    continue;
+                }
+                Face& adjacentFace = faces[adjacentFaceIndex];
+                int adjacentSideIndex = -1;
+                for (int i = 0; i < 3; i++) {
+                    if (adjacentFace.index[i] == vertexIndex0 && adjacentFace.index[(i + 1) % 3] == vertexIndex1) {
+                        adjacentSideIndex = i;
+                        break;
+                    }
+                }
+                if (adjacentSideIndex != -1) {
+                    foundAdjacent = true;
+                    faces[faceIndex].adjacent[sideIndex] = adjacentFaceIndex;
+                    adjacentFace.adjacent[adjacentSideIndex] = faceIndex;
+                    break;
+                }
+            }
+            if (!foundAdjacent) {
+                faces[faceIndex].adjacent[sideIndex] = -1;
+            }
+        }
+    }
 }
 
 void Mesh::updateBoundingBox()

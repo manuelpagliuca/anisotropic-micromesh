@@ -19,7 +19,13 @@ struct Vertex {
 
 struct Face {
     unsigned int index[3];
+    unsigned int edges[3];
 	glm::vec3 norm;
+};
+
+struct Edge {
+    unsigned int faces[2];
+    unsigned int side[2];
 };
 
 class Mesh : protected QOpenGLExtraFunctions
@@ -30,6 +36,7 @@ public:
     BoundingBox bbox;
 	std::vector<Vertex> vertices;
     std::vector<Face> faces;
+    std::vector<Edge> edges;
 
     int addVertex(glm::vec3 pos);
     int addFace(int i0, int i1, int i2);
@@ -45,6 +52,7 @@ public:
     float doubleArea();
     void updateFaceNormals();
     void updateVertexNormals();
+    void updateFaceToFaceAdjacency();
     void updateBoundingBox();
     void displaceVertices(float k);
     void displaceVertex(int index, float k);
