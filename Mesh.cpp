@@ -61,7 +61,7 @@ Mesh Mesh::subdivide()
     return subdivided;
 }
 
-Mesh Mesh::subdivide(int subdivision)
+Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
 {
     Mesh subdivided = Mesh();
     subdivided.vertices = this->vertices;
@@ -71,14 +71,58 @@ Mesh Mesh::subdivide(int subdivision)
         int v1 = f.index[1];
         int v2 = f.index[2];
 
-        glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(subdivision);
-        glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(subdivision);
-        glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(subdivision);
+        glm::vec3 v01 = (vertices.at(v1).pos - vertices.at(v0).pos);
+        glm::vec3 v12 = (vertices.at(v2).pos - vertices.at(v1).pos);
+        int faceDoubleArea = std::round(glm::length(glm::cross(v01, v12)));
+
+        int subdivisions = areaToSubdivisionMap[faceDoubleArea];
+
+        glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(subdivisions);
+        glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(subdivisions);
+        glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(subdivisions);
 
         int stored [2];
 
-        for (int i = 0; i < subdivision; i++) {
-            for (int j = 0; j < subdivision - i; j++) {
+        for (int i = 0; i < subdivisions; i++) {
+            for (int j = 0; j < subdivisions - i; j++) {
+                glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
+                glm::vec3 t2 = t1 + delta2;
+                glm::vec3 t3 = t2 + delta1;
+
+                int m1 = subdivided.addVertex(t1);
+                int m2 = subdivided.addVertex(t2);
+                int m3 = subdivided.addVertex(t3);
+
+                subdivided.addFace(m1, m3, m2);
+                if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
+
+                stored[0] = m2;
+                stored[1] = m3;
+            }
+        }
+    }
+
+    return subdivided;
+}
+
+Mesh Mesh::nSubdivide(int n)
+{
+    Mesh subdivided = Mesh();
+    subdivided.vertices = this->vertices;
+
+    for (const Face& f: faces) {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(n);
+        glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(n);
+        glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(n);
+
+        int stored [2];
+
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n - i; j++) {
                 glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
                 glm::vec3 t2 = t1 + delta2;
                 glm::vec3 t3 = t2 + delta1;
@@ -100,7 +144,38 @@ Mesh Mesh::subdivide(int subdivision)
     return subdivided;
 }
 
-float Mesh::doubleArea()
+std::map<int, int> Mesh::getDoubleAreaSubdivisionMap() const
+{
+    float avgFaceDoubleArea = getFacesAvgDoubleArea();
+    std::vector<float> facesDeviations = getDeviationsFromFacesAvgDoubleArea();
+
+    float facesStdDeviation = 0.0f;
+    for (float deviations : facesDeviations)
+        facesStdDeviation += deviations;
+    facesStdDeviation /= facesDeviations.size();
+
+    int subdivisionInterval = static_cast<int>(std::round(facesStdDeviation));
+
+    float maxDisplacementFromAvg = *std::max_element(facesDeviations.begin(), facesDeviations.end());
+
+    int minSubdivisionLevel = 0;
+    int maxSubdivisionLevel = static_cast<int>(std::round(maxDisplacementFromAvg)) * 2;
+    int avgSubdivisionLevel = static_cast<int>(std::round(avgFaceDoubleArea));
+
+    std::map<int, int> areaToSubdivisionMap;
+
+    for (int level = avgSubdivisionLevel - subdivisionInterval; level >= minSubdivisionLevel; level--)
+        areaToSubdivisionMap[level] = level + subdivisionInterval;
+
+    areaToSubdivisionMap[avgSubdivisionLevel] = avgSubdivisionLevel + 1;
+
+    for (int level = avgSubdivisionLevel + subdivisionInterval; level <= maxSubdivisionLevel; level++)
+        areaToSubdivisionMap[level] = level + subdivisionInterval;
+
+    return areaToSubdivisionMap;
+}
+
+float Mesh::getFacesAvgDoubleArea() const
 {
     float avgArea = 0.0f;
 
@@ -117,8 +192,25 @@ float Mesh::doubleArea()
     }
 
     avgArea /= faces.size();
-    qDebug() << avgArea;
     return avgArea;
+}
+
+std::vector<float> Mesh::getDeviationsFromFacesAvgDoubleArea() const
+{
+    float avgFaceDoubleArea = getFacesAvgDoubleArea();
+    std::vector<float> deviations;
+    for (const Face &f : faces) {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        glm::vec3 v01 = (vertices.at(v1).pos - vertices.at(v0).pos);
+        glm::vec3 v12 = (vertices.at(v2).pos - vertices.at(v1).pos);
+        float faceDoubleArea = glm::length(glm::cross(v01, v12));
+        deviations.push_back(glm::abs(avgFaceDoubleArea - faceDoubleArea));
+    }
+
+    return deviations;
 }
 
 void Mesh::exportOFF(const std::string& fileName) const

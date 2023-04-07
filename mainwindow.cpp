@@ -100,33 +100,37 @@ void Mainwindow::on_actionLoad_triggered() {
 }
 
 void Mainwindow::on_actionVertex_displacement_triggered() {
-	bool valid;
-    double k = QInputDialog::getDouble(this,
-                                       tr("Insert vertex displacement factor"),
-                                       tr("Amount:"), 0.0, -3.0, 5.0, 4, &valid);
-	if (valid) {
+    bool isValid;
+    double k = QInputDialog::getDouble(
+                this,
+                tr("Insert vertex displacement factor"),
+                tr("Amount:"), 0.0, -3.0, 5.0, 4, &isValid,
+                this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    if (isValid) {
         baseMesh.displaceVertices(k);
         ui.openGLWidget->updateMeshData(baseMesh);
 	}
 }
 
 void Mainwindow::on_actionFace_displacement_triggered() {
-    bool ok;
-	double k = QInputDialog::getDouble(this,
-		tr("Insert face displacement factor"),
-        tr("Amount:"), 0.0, -3.0, 5.0, 4, &ok,
-        this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    bool isValid;
+    double k = QInputDialog::getDouble(
+                this,
+                tr("Insert face displacement factor"),
+                tr("Amount:"), 0.0, -3.0, 5.0, 4, &isValid,
+                this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-    if (ok) {
+    if (isValid) {
         baseMesh.displaceFace(k);
         ui.openGLWidget->updateMeshData(baseMesh);
 	}
 }
 
 void Mainwindow::on_actionExtract_displacements_triggered() {
-    QString filePath = QFileDialog::getOpenFileName(this,
-        tr("Load Mesh"), ".\\mesh",
-        tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
+    QString filePath = QFileDialog::getOpenFileName(
+                this,
+                tr("Load Mesh"), ".\\mesh",
+                tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
     if (!filePath.isEmpty()) {
         std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
@@ -135,15 +139,15 @@ void Mainwindow::on_actionExtract_displacements_triggered() {
         if (ext == ".off") targetMesh = Mesh::parseOFF(file);
         else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
-        bool ok;
-        int k = QInputDialog::getInt(this, tr("Insert the number of subdivision to perform"),
-                                     tr("Number of subdivisions:"), 1, 1, 9, 1, &ok,
-                                     this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+        bool isValid;
+        int k = QInputDialog::getInt(
+                    this,
+                    tr("Insert the number of subdivision to perform"),
+                    tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
+                    this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-        if (ok) {
-            for (int i = 0; i < k; i++) {
-                baseMesh = baseMesh.subdivide();
-            }
+        if (isValid) {
+            for (int i = 0; i < k; i++) baseMesh = baseMesh.subdivide();
             ui.openGLWidget->updateMeshData(baseMesh);
         }
 
@@ -203,15 +207,22 @@ std::string Mainwindow::readFile(const char* file_loc)
 
 void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
 {
-    bool ok;
+    bool isValid;
     int subdivisions = QInputDialog::getInt(this, tr("Insert the number of subdivision to perform"),
-                                 tr("Number of subdivisions:"), 1, 1, 9, 1, &ok,
+                                 tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
                                  this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-    if (ok) {
-        baseMesh = baseMesh.subdivide(subdivisions);
+    if (isValid) {
+        baseMesh = baseMesh.nSubdivide(subdivisions);
         ui.openGLWidget->updateMeshData(baseMesh);
         ui.openGLWidget->updateMeshData(baseMesh);
     }
 }
 
+void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
+{
+    auto subdivisionMap = baseMesh.getDoubleAreaSubdivisionMap();
+    baseMesh = baseMesh.adaptiveSubdivide(subdivisionMap);
+    ui.openGLWidget->updateMeshData(baseMesh);
+    ui.openGLWidget->updateMeshData(baseMesh);
+}

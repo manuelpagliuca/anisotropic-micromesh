@@ -43,13 +43,17 @@ public:
 
     std::vector<float> getPositionsVector() const;
     std::vector<unsigned int> getFacesVector() const;
+    std::map<int, int> getDoubleAreaSubdivisionMap() const;
+    float getFacesAvgDoubleArea() const;
+    std::vector<float> getDeviationsFromFacesAvgDoubleArea() const;
 
 	void draw(bool wireframe);
     void drawDirect();
 
 	Mesh subdivide();
-    Mesh subdivide(int subdivision);
-    float doubleArea();
+    Mesh nSubdivide(int subdivision);
+    Mesh adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap);
+
     void updateFaceNormals();
     void updateVertexNormals();
     void updateFaceToFaceAdjacency();
