@@ -332,6 +332,10 @@ void Mesh::updateEdges()
         bool operator<(const AvailableEdge &o) const {
             return startVertexIndex < o.startVertexIndex || (startVertexIndex == o.startVertexIndex && endVertexIndex < o.endVertexIndex);
         }
+
+        bool operator>(const AvailableEdge &o) const {
+            return startVertexIndex > o.startVertexIndex || (startVertexIndex == o.startVertexIndex && endVertexIndex > o.endVertexIndex);
+        }
     };
 
     struct EdgeLocalLocation {
