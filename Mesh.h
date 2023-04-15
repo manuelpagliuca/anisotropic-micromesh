@@ -8,6 +8,8 @@
 #include <QtOpenGL>
 #include <GLM/vec3.hpp>
 #include <GLM/gtx/string_cast.hpp>
+#include <map>
+#include <utility>
 
 #include "BoundingBox.h"
 
@@ -40,6 +42,7 @@ public:
 
     int addVertex(glm::vec3 pos);
     int addFace(int i0, int i1, int i2);
+    int addEdge(int i0, int i1, int s0, int s1);
 
     std::vector<float> getPositionsVector() const;
     std::vector<unsigned int> getFacesVector() const;
@@ -56,7 +59,7 @@ public:
 
     void updateFaceNormals();
     void updateVertexNormals();
-    void updateFaceToFaceAdjacency();
+    void updateEdges();
     void updateBoundingBox();
     void displaceVertices(float k);
     void displaceVertex(int index, float k);

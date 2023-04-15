@@ -28,6 +28,17 @@ int Mesh::addFace(int i0, int i1, int i2)
     return static_cast<int>(faces.size() - 1);
 }
 
+int Mesh::addEdge(int i0, int i1, int s0, int s1)
+{
+    Edge e;
+    e.faces[0] = i0;
+    e.faces[1] = i1;
+    e.side[0] = s0;
+    e.side[1] = s1;
+    edges.push_back(e);
+    return static_cast<int>(edges.size() - 1);
+}
+
 void Mesh::print() const
 {
     std::cout << vertices.size() << " " << faces.size() << "\n";
@@ -132,8 +143,7 @@ Mesh Mesh::nSubdivide(int n)
                 int m3 = subdivided.addVertex(t3);
 
                 subdivided.addFace(m1, m3, m2);
-                if (j > 0)
-                    subdivided.addFace(stored[0], stored[1], m3);
+                if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
 
                 stored[0] = m2;
                 stored[1] = m3;
@@ -309,9 +319,63 @@ void Mesh::updateVertexNormals()
         v.norm = glm::normalize(v.norm);
 }
 
-void Mesh::updateFaceToFaceAdjacency()
+void Mesh::updateEdges()
 {
+    struct AvailableEdge {
+        unsigned int startVertexIndex;
+        unsigned int endVertexIndex;
 
+        bool operator==(const AvailableEdge &o) const {
+            return startVertexIndex == o.startVertexIndex && endVertexIndex == o.endVertexIndex;
+        }
+
+        bool operator<(const AvailableEdge &o) const {
+            return startVertexIndex < o.startVertexIndex || (startVertexIndex == o.startVertexIndex && endVertexIndex < o.endVertexIndex);
+        }
+    };
+
+    struct EdgeLocalLocation {
+        unsigned int faceIndex;
+        unsigned int edgeId;
+    };
+
+    std::map<AvailableEdge, EdgeLocalLocation> matingPool;
+
+    unsigned int faceIndex = 0;
+
+    for (Face &f : faces) {
+        for (int w = 0; w < 3; w++) {
+            AvailableEdge edgeToCheck = AvailableEdge();
+            edgeToCheck.startVertexIndex = f.index[(w+1) % 3];
+            edgeToCheck.endVertexIndex = f.index[w];
+
+            auto it = matingPool.find(edgeToCheck);
+
+            if (it != matingPool.end()) {
+                auto matchingEdgeLocation = it->second;
+                int edgeIndex = addEdge(faceIndex, matchingEdgeLocation.faceIndex, w, matchingEdgeLocation.edgeId);
+                f.edges[w] = edgeIndex;
+                matingPool.erase(it);
+            } else {
+                AvailableEdge availableEdge = AvailableEdge();
+                availableEdge.startVertexIndex = f.index[w];
+                availableEdge.endVertexIndex = f.index[(w+1) % 3];
+
+                EdgeLocalLocation edgeLocation = EdgeLocalLocation();
+                edgeLocation.faceIndex = faceIndex;
+                edgeLocation.edgeId = w;
+
+                matingPool.insert( {availableEdge, edgeLocation} );
+            }
+        }
+        faceIndex++;
+    }
+
+    for (auto &openEdge : matingPool) {
+        auto openEdgeLocation = openEdge.second;
+        int edgeIndex = addEdge(openEdgeLocation.faceIndex,  -1, openEdgeLocation.edgeId, -1);
+        faces.at(openEdgeLocation.faceIndex).edges[openEdgeLocation.edgeId] = edgeIndex;
+    }
 }
 
 void Mesh::updateBoundingBox()
@@ -487,6 +551,7 @@ Mesh Mesh::parseOFF(const std::string& rawOFF)
     mesh.updateBoundingBox();
     mesh.updateFaceNormals();
     mesh.updateVertexNormals();
+    mesh.updateEdges();
 
     return mesh;
 }
@@ -581,5 +646,7 @@ Mesh Mesh::parseOBJ(const std::string& raw_obj)
     mesh.updateBoundingBox();
     mesh.updateFaceNormals();
     mesh.updateVertexNormals();
+    mesh.updateEdges();
+
     return mesh;
 }
