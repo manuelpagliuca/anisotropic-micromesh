@@ -382,6 +382,34 @@ void Mesh::updateEdges()
     }
 }
 
+void Mesh::updateEdgesSubdivisions()
+{
+    float avgEdge = 0.f;
+    for (auto &e : edges) {
+        avgEdge += glm::length(vertices.at(e.faces[0]).pos - vertices.at(e.faces[1]).pos);
+    }
+    avgEdge /= edges.size();
+
+    // definire i livelli di suddivisione, l'edge medio corrisponde a 2^i per i=1
+    // calcolare un vettore di deviazioni degli edge dalla media
+    // calcolare la deviazione media
+    // creare una mappa delle suddivisioni in base alla lunghezza (funzione ausiliaria)
+
+    for (auto &f : faces) {
+        // controllo nella mappa la lunghezza che si avvicina di piu' rispetto a quella dell'edge corrente
+        // se presente consider l'edge locked piu' grande come riferimento, altrimenti prendo l'edge piu' grande
+        // (se tutti e tre sono locked, non faccio nulla)
+
+        // ottengo il livello di suddivisione considerato e lo imposto nell'edge (per ogni edge)
+        // considero il secondo edge, otteno il livello di suddivisione e controllo che rispetti il vincolo (rispetto all'edge considerato)
+        // considero il terzo edge, imposto il livell odi suddivisione e controllo che rispetti il vincolo (rispetto all'edge considerato)
+        // imposto tutti e tre gli edge come locked
+    }
+
+    // controllo se vi sono vincoli non rispettati tra le facce (itero per edge)
+
+}
+
 void Mesh::updateBoundingBox()
 {
     bbox.init(vertices[0].pos);

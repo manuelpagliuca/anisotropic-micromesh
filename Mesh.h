@@ -28,6 +28,8 @@ struct Face {
 struct Edge {
     unsigned int faces[2];
     unsigned int side[2];
+    unsigned int subdivisions = -1;
+    bool locked = false;
 };
 
 class Mesh : protected QOpenGLExtraFunctions
@@ -60,7 +62,8 @@ public:
     void updateFaceNormals();
     void updateVertexNormals();
     void updateEdges();
-    void updateBoundingBox();
+    void updateEdgesSubdivisions();
+    void updateBoundingBox();   
     void displaceVertices(float k);
     void displaceVertex(int index, float k);
     void displaceFace(float k);
