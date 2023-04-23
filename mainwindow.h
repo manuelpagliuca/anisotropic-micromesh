@@ -49,4 +49,6 @@ public slots: void on_actionFace_displacement_triggered();
 public slots: void on_actionExtract_displacements_triggered();
 public slots: void on_actionSubdivision_surfaces_Uniform_triggered();
 public slots: void on_actionSubdivision_surfaces_Adaptive_triggered();
+public slots: void on_actionSubdivision_surfaces_Micromesh_triggered();
+
 };

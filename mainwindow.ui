@@ -9,7 +9,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>800</width>
+    <width>795</width>
     <height>800</height>
    </rect>
   </property>
@@ -34,8 +34,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>800</width>
-     <height>26</height>
+     <width>795</width>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSome">
@@ -59,6 +59,7 @@
     <addaction name="actionExtract_displacements"/>
     <addaction name="actionSubdivision_surfaces_Uniform"/>
     <addaction name="actionSubdivision_surfaces_Adaptive"/>
+    <addaction name="actionSubdivision_surfaces_Micromesh"/>
    </widget>
    <addaction name="menuSome"/>
    <addaction name="menuMesh"/>
@@ -140,6 +141,11 @@
     <string>Subdivision surfaces: Adaptive</string>
    </property>
   </action>
+  <action name="actionSubdivision_surfaces_Micromesh">
+   <property name="text">
+    <string>Subdivision surfaces: Micromesh</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <customwidgets>
@@ -195,6 +201,22 @@
     </hint>
     <hint type="destinationlabel">
      <x>639</x>
+     <y>27</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionSubdivision_surfaces_Micromesh</sender>
+   <signal>triggered()</signal>
+   <receiver>mainToolBar</receiver>
+   <slot>show()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>397</x>
      <y>27</y>
     </hint>
    </hints>

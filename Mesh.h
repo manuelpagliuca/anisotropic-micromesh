@@ -48,9 +48,15 @@ public:
 
     std::vector<float> getPositionsVector() const;
     std::vector<unsigned int> getFacesVector() const;
-    std::map<int, int> getDoubleAreaSubdivisionMap() const;
-    float getFacesAvgDoubleArea() const;
-    std::vector<float> getDeviationsFromFacesAvgDoubleArea() const;
+
+    std::map<int, int> getDoubleAreaToSubdivisionLevelMap() const;
+    std::map<int, int> getEdgeLengthToSubdivisionLevelMap() const;
+
+    float getAvgFacesDoubleArea() const;
+    float getAvgEdgeLength() const;
+
+    std::vector<float> getDeviationsFromAvgFaceDoubleArea() const;
+    std::vector<float> getDeviationsFromAvgEdge() const;
 
 	void draw(bool wireframe);
     void drawDirect();
@@ -58,6 +64,7 @@ public:
 	Mesh subdivide();
     Mesh nSubdivide(int subdivision);
     Mesh adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap);
+    Mesh micromeshSubdivide();
 
     void updateFaceNormals();
     void updateVertexNormals();

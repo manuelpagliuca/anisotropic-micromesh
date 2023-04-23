@@ -221,8 +221,13 @@ void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
 
 void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
 {
-    auto subdivisionMap = baseMesh.getDoubleAreaSubdivisionMap();
+    auto subdivisionMap = baseMesh.getDoubleAreaToSubdivisionLevelMap();
     baseMesh = baseMesh.adaptiveSubdivide(subdivisionMap);
     ui.openGLWidget->updateMeshData(baseMesh);
+}
+
+void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()
+{
+    baseMesh = baseMesh.micromeshSubdivide();
     ui.openGLWidget->updateMeshData(baseMesh);
 }

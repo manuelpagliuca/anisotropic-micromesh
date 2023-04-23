@@ -116,6 +116,13 @@ Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
     return subdivided;
 }
 
+Mesh Mesh::micromeshSubdivide()
+{
+    Mesh subdivided = Mesh();
+    qDebug() << "To implement";
+    return subdivided;
+}
+
 Mesh Mesh::nSubdivide(int n)
 {
     Mesh subdivided = Mesh();
@@ -154,10 +161,10 @@ Mesh Mesh::nSubdivide(int n)
     return subdivided;
 }
 
-std::map<int, int> Mesh::getDoubleAreaSubdivisionMap() const
+std::map<int, int> Mesh::getDoubleAreaToSubdivisionLevelMap() const
 {
-    float avgFaceDoubleArea = getFacesAvgDoubleArea();
-    std::vector<float> facesDeviations = getDeviationsFromFacesAvgDoubleArea();
+    float avgFaceDoubleArea = getAvgFacesDoubleArea();
+    std::vector<float> facesDeviations = getDeviationsFromAvgFaceDoubleArea();
 
     float facesStdDeviation = 0.0f;
     for (float deviations : facesDeviations)
@@ -185,7 +192,40 @@ std::map<int, int> Mesh::getDoubleAreaSubdivisionMap() const
     return areaToSubdivisionMap;
 }
 
-float Mesh::getFacesAvgDoubleArea() const
+std::map<int, int> Mesh::getEdgeLengthToSubdivisionLevelMap() const
+{
+    float avgEdgeLength = getAvgEdgeLength();
+    std::vector<float> edgesAvgLengthDeviations = getDeviationsFromAvgEdge();
+
+    float edgeAvgLengthStdDeviation = 0.0f;
+    for (float deviations : edgesAvgLengthDeviations) {
+        edgeAvgLengthStdDeviation += deviations;
+    }
+
+    edgeAvgLengthStdDeviation /= edgesAvgLengthDeviations.size();
+
+    int subdivisionInterval = static_cast<int>(std::round(edgeAvgLengthStdDeviation));
+
+    float maxDisplacementFromAvg = *std::max_element(edgesAvgLengthDeviations.begin(), edgesAvgLengthDeviations.end());
+
+    int minSubdivisionLevel = 0;
+    int maxSubdivisionLevel = static_cast<int>(std::round(maxDisplacementFromAvg)) * 2;
+    int avgSubdivisionLevel = static_cast<int>(std::round(avgEdgeLength));
+
+    std::map<int, int> edgeLengthToSubdivisionMap;
+
+    for (int level = avgSubdivisionLevel - subdivisionInterval; level >= minSubdivisionLevel; level--)
+        edgeLengthToSubdivisionMap[level] = level + subdivisionInterval;
+
+    edgeLengthToSubdivisionMap[avgSubdivisionLevel] = avgSubdivisionLevel + 1;
+
+    for (int level = avgSubdivisionLevel + subdivisionInterval; level <= maxSubdivisionLevel; level++)
+        edgeLengthToSubdivisionMap[level] = level + subdivisionInterval;
+
+    return edgeLengthToSubdivisionMap;
+}
+
+float Mesh::getAvgFacesDoubleArea() const
 {
     float avgArea = 0.0f;
 
@@ -205,9 +245,30 @@ float Mesh::getFacesAvgDoubleArea() const
     return avgArea;
 }
 
-std::vector<float> Mesh::getDeviationsFromFacesAvgDoubleArea() const
+float Mesh::getAvgEdgeLength() const
 {
-    float avgFaceDoubleArea = getFacesAvgDoubleArea();
+    float avgEdge = 0.0f;
+
+    for (const Face &f: faces) {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        float l0 = glm::length(vertices.at(v1).pos - vertices.at(v0).pos);
+        float l1 = glm::length(vertices.at(v2).pos - vertices.at(v1).pos);
+        float l2 = glm::length(vertices.at(v0).pos - vertices.at(v2).pos);
+
+        avgEdge += (l0 + l1 + l2);
+
+    }
+
+    avgEdge /= faces.size() * 3;
+    return avgEdge;
+}
+
+std::vector<float> Mesh::getDeviationsFromAvgFaceDoubleArea() const
+{
+    float avgFaceDoubleArea = getAvgFacesDoubleArea();
     std::vector<float> deviations;
     for (const Face &f : faces) {
         int v0 = f.index[0];
@@ -218,6 +279,28 @@ std::vector<float> Mesh::getDeviationsFromFacesAvgDoubleArea() const
         glm::vec3 v12 = (vertices.at(v2).pos - vertices.at(v1).pos);
         float faceDoubleArea = glm::length(glm::cross(v01, v12));
         deviations.push_back(glm::abs(avgFaceDoubleArea - faceDoubleArea));
+    }
+
+    return deviations;
+}
+
+std::vector<float> Mesh::getDeviationsFromAvgEdge() const
+{
+    float avgEdgeLength = getAvgEdgeLength();
+    std::vector<float> deviations;
+
+    for (const Face &f : faces) {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        float l0 = glm::length(vertices.at(v1).pos - vertices.at(v0).pos);
+        float l1 = glm::length(vertices.at(v2).pos - vertices.at(v1).pos);
+        float l2 = glm::length(vertices.at(v0).pos - vertices.at(v2).pos);
+
+        float avgFaceEdge = (l0 + l1 + l2) / 3;
+
+        deviations.push_back(glm::abs(avgEdgeLength - avgFaceEdge));
     }
 
     return deviations;
@@ -384,18 +467,32 @@ void Mesh::updateEdges()
 
 void Mesh::updateEdgesSubdivisions()
 {
-    float avgEdge = 0.f;
-    for (auto &e : edges) {
-        avgEdge += glm::length(vertices.at(e.faces[0]).pos - vertices.at(e.faces[1]).pos);
+    auto subdivisionMap = getEdgeLengthToSubdivisionLevelMap();
+
+    for (auto &f : faces) {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        int l0 = glm::round(glm::length(vertices.at(v1).pos - vertices.at(v0).pos));
+        int l1 = glm::round(glm::length(vertices.at(v2).pos - vertices.at(v1).pos));
+        int l2 = glm::round(glm::length(vertices.at(v0).pos - vertices.at(v2).pos));
+
+        edges.at(f.edges[0]).subdivisions = subdivisionMap[l0];
+        edges.at(f.edges[1]).subdivisions = subdivisionMap[l1];
+        edges.at(f.edges[2]).subdivisions = subdivisionMap[l2];
     }
-    avgEdge /= edges.size();
+
+    for (auto &e : edges) {
+        qDebug() << e.subdivisions ;
+    }
 
     // definire i livelli di suddivisione, l'edge medio corrisponde a 2^i per i=1
     // calcolare un vettore di deviazioni degli edge dalla media
     // calcolare la deviazione media
     // creare una mappa delle suddivisioni in base alla lunghezza (funzione ausiliaria)
 
-    for (auto &f : faces) {
+//    for (auto &f : faces) {
         // controllo nella mappa la lunghezza che si avvicina di piu' rispetto a quella dell'edge corrente
         // se presente consider l'edge locked piu' grande come riferimento, altrimenti prendo l'edge piu' grande
         // (se tutti e tre sono locked, non faccio nulla)
@@ -404,7 +501,7 @@ void Mesh::updateEdgesSubdivisions()
         // considero il secondo edge, otteno il livello di suddivisione e controllo che rispetti il vincolo (rispetto all'edge considerato)
         // considero il terzo edge, imposto il livell odi suddivisione e controllo che rispetti il vincolo (rispetto all'edge considerato)
         // imposto tutti e tre gli edge come locked
-    }
+//    }
 
     // controllo se vi sono vincoli non rispettati tra le facce (itero per edge)
 
@@ -584,6 +681,7 @@ Mesh Mesh::parseOFF(const std::string& rawOFF)
     mesh.updateFaceNormals();
     mesh.updateVertexNormals();
     mesh.updateEdges();
+    mesh.updateEdgesSubdivisions();
 
     return mesh;
 }
@@ -679,6 +777,7 @@ Mesh Mesh::parseOBJ(const std::string& raw_obj)
     mesh.updateFaceNormals();
     mesh.updateVertexNormals();
     mesh.updateEdges();
+    mesh.updateEdgesSubdivisions();
 
     return mesh;
 }
