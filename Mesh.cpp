@@ -483,9 +483,26 @@ void Mesh::updateEdgesSubdivisions()
         edges.at(f.edges[2]).subdivisions = subdivisionMap[l2];
     }
 
-    for (auto &e : edges) {
-        qDebug() << e.subdivisions ;
+    for (auto &f :faces) {
+        int i = edges.at(f.edges[0]).subdivisions;
+        int j = edges.at(f.edges[1]).subdivisions;
+        int k = edges.at(f.edges[2]).subdivisions;
+
+        qDebug() << i << " " << j << " " << k;
+
+        if (std::abs(i-j) > 1 && std::abs(j - k) > 1 && std::abs(i - k) > 1) {
+            int avg = (i + j + k) / 3;
+            // prendere il valore minimo
+        }
     }
+
+//    for (auto &f :faces) {
+//        int i = edges.at(f.edges[0]).subdivisions;
+//        int j = edges.at(f.edges[1]).subdivisions;
+//        int k = edges.at(f.edges[2]).subdivisions;
+
+//        qDebug() << i << " " << j << " " << k;
+//    }
 
     // definire i livelli di suddivisione, l'edge medio corrisponde a 2^i per i=1
     // calcolare un vettore di deviazioni degli edge dalla media
