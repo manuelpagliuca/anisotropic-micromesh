@@ -484,15 +484,33 @@ void Mesh::updateEdgesSubdivisions()
     }
 
     for (auto &f :faces) {
-        int i = edges.at(f.edges[0]).subdivisions;
-        int j = edges.at(f.edges[1]).subdivisions;
-        int k = edges.at(f.edges[2]).subdivisions;
+        std::vector<Edge> consideredEdges;
+        consideredEdges.push_back(edges.at(f.edges[0]));
+        consideredEdges.push_back(edges.at(f.edges[1]));
+        consideredEdges.push_back(edges.at(f.edges[2]));
 
-        qDebug() << i << " " << j << " " << k;
-
+        qDebug() << consideredEdges[0].subdivisions << " " << consideredEdges[1].subdivisions << " " << consideredEdges[2].subdivisions;
+        
+        int i = consideredEdges[0].subdivisions;
+        int j = consideredEdges[1].subdivisions;
+        int k = consideredEdges[2].subdivisions;
+        
         if (std::abs(i-j) > 1 && std::abs(j - k) > 1 && std::abs(i - k) > 1) {
-            int avg = (i + j + k) / 3;
-            // prendere il valore minimo
+            int avgIndex = (i + j + k) / 3;
+            consideredEdges[0].subdivisions = avg;
+            consideredEdges[1].subdivisions = avg;
+            consideredEdges[2].subdivisions = avg;
+            
+            auto min = std::max(consideredEdges.begin(), consideredEdges.end());
+            min->subdivisions = avg - 1;
+            
+            edges.at(f.edges[0]).subdivisions = consideredEdges[0].subdivisions;
+            edges.at(f.edges[1]).subdivisions = consideredEdges[1].subdivisions;
+            edges.at(f.edges[2]).subdivisions = consideredEdges[2].subdivisions;
+        }
+        // controllare se il vincolo non viene rispettato da un lato
+        else if () {
+        
         }
     }
 
