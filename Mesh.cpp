@@ -176,7 +176,7 @@ std::map<int, int> Mesh::getDoubleAreaToSubdivisionLevelMap() const
     float maxDisplacementFromAvg = *std::max_element(facesDeviations.begin(), facesDeviations.end());
 
     int minSubdivisionLevel = 0;
-    int maxSubdivisionLevel = static_cast<int>(std::round(maxDisplacementFromAvg)) * 2;
+    int maxSubdivisionLevel = static_cast<int>(std::round(maxDisplacementFromAvg));
     int avgSubdivisionLevel = static_cast<int>(std::round(avgFaceDoubleArea));
 
     std::map<int, int> areaToSubdivisionMap;
@@ -209,7 +209,7 @@ std::map<int, int> Mesh::getEdgeLengthToSubdivisionLevelMap() const
     float maxDisplacementFromAvg = *std::max_element(edgesAvgLengthDeviations.begin(), edgesAvgLengthDeviations.end());
 
     int minSubdivisionLevel = 0;
-    int maxSubdivisionLevel = static_cast<int>(std::round(maxDisplacementFromAvg)) * 2;
+    int maxSubdivisionLevel = static_cast<int>(std::round(maxDisplacementFromAvg)) * 3;
     int avgSubdivisionLevel = static_cast<int>(std::round(avgEdgeLength));
 
     std::map<int, int> edgeLengthToSubdivisionMap;
@@ -468,7 +468,7 @@ void Mesh::updateEdges()
 void Mesh::updateEdgesSubdivisions()
 {
     auto subdivisionMap = getEdgeLengthToSubdivisionLevelMap();
-
+    qDebug() << subdivisionMap;
     for (auto &f : faces) {
         int v0 = f.index[0];
         int v1 = f.index[1];
@@ -484,62 +484,42 @@ void Mesh::updateEdgesSubdivisions()
     }
 
     for (auto &f :faces) {
-        std::vector<Edge> consideredEdges;
-        consideredEdges.push_back(edges.at(f.edges[0]));
-        consideredEdges.push_back(edges.at(f.edges[1]));
-        consideredEdges.push_back(edges.at(f.edges[2]));
+        std::vector<int> edgeIndices;
+        edgeIndices.push_back(edges.at(f.edges[0]).subdivisions);
+        edgeIndices.push_back(edges.at(f.edges[1]).subdivisions);
+        edgeIndices.push_back(edges.at(f.edges[2]).subdivisions);
 
-        qDebug() << consideredEdges[0].subdivisions << " " << consideredEdges[1].subdivisions << " " << consideredEdges[2].subdivisions;
+        qDebug() << edgeIndices[0] << " " << edgeIndices[1] << " " << edgeIndices[2];
         
-        int i = consideredEdges[0].subdivisions;
-        int j = consideredEdges[1].subdivisions;
-        int k = consideredEdges[2].subdivisions;
-        
-        if (std::abs(i-j) > 1 && std::abs(j - k) > 1 && std::abs(i - k) > 1) {
-            int avgIndex = (i + j + k) / 3;
-            consideredEdges[0].subdivisions = avg;
-            consideredEdges[1].subdivisions = avg;
-            consideredEdges[2].subdivisions = avg;
-            
-            auto min = std::max(consideredEdges.begin(), consideredEdges.end());
-            min->subdivisions = avg - 1;
-            
-            edges.at(f.edges[0]).subdivisions = consideredEdges[0].subdivisions;
-            edges.at(f.edges[1]).subdivisions = consideredEdges[1].subdivisions;
-            edges.at(f.edges[2]).subdivisions = consideredEdges[2].subdivisions;
+        int i = edgeIndices[0];
+        int j = edgeIndices[1];
+        int k = edgeIndices[2];
+
+        int totalDelta = std::abs(i-j) + std::abs(j-k) + std::abs(i-k);
+        qDebug() << std::abs(i-j) << " " << std::abs(j-k) << " " << std::abs(i-k);
+        qDebug() << "totalDelta: " << totalDelta;
+
+        // vincolo non rispettato da 2 edge
+        if (totalDelta > 2) {
+            if (totalDelta > 4) {
+                int avgIndex = (i + j + k) / 3;
+                edgeIndices[0] = avgIndex;
+                edgeIndices[1] = avgIndex;
+                edgeIndices[2] = avgIndex;
+            } else {
+                auto max = std::max(edgeIndices.begin(), edgeIndices.end());
+                qDebug() << *max;
+
+            }
         }
-        // controllare se il vincolo non viene rispettato da un lato
-        else if () {
-        
-        }
+
+        edges.at(f.edges[0]).subdivisions = edgeIndices[0];
+        edges.at(f.edges[1]).subdivisions = edgeIndices[1];
+        edges.at(f.edges[2]).subdivisions = edgeIndices[2];
+
+        qDebug() << "After constraint: " << edges.at(f.edges[0]).subdivisions << " " <<
+        edges.at(f.edges[1]).subdivisions << " " << edges.at(f.edges[2]).subdivisions;
     }
-
-//    for (auto &f :faces) {
-//        int i = edges.at(f.edges[0]).subdivisions;
-//        int j = edges.at(f.edges[1]).subdivisions;
-//        int k = edges.at(f.edges[2]).subdivisions;
-
-//        qDebug() << i << " " << j << " " << k;
-//    }
-
-    // definire i livelli di suddivisione, l'edge medio corrisponde a 2^i per i=1
-    // calcolare un vettore di deviazioni degli edge dalla media
-    // calcolare la deviazione media
-    // creare una mappa delle suddivisioni in base alla lunghezza (funzione ausiliaria)
-
-//    for (auto &f : faces) {
-        // controllo nella mappa la lunghezza che si avvicina di piu' rispetto a quella dell'edge corrente
-        // se presente consider l'edge locked piu' grande come riferimento, altrimenti prendo l'edge piu' grande
-        // (se tutti e tre sono locked, non faccio nulla)
-
-        // ottengo il livello di suddivisione considerato e lo imposto nell'edge (per ogni edge)
-        // considero il secondo edge, otteno il livello di suddivisione e controllo che rispetti il vincolo (rispetto all'edge considerato)
-        // considero il terzo edge, imposto il livell odi suddivisione e controllo che rispetti il vincolo (rispetto all'edge considerato)
-        // imposto tutti e tre gli edge come locked
-//    }
-
-    // controllo se vi sono vincoli non rispettati tra le facce (itero per edge)
-
 }
 
 void Mesh::updateBoundingBox()
