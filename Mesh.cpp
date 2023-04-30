@@ -508,6 +508,7 @@ void Mesh::updateEdgesSubdivisions()
                 edgeIndices[2] = avgIndex;
             } else {
                 qDebug() << edgeIndices;
+                // Va gestito il caso in cui ci sono due massimi uguali...
                 auto max = std::max(edgeIndices.begin(), edgeIndices.end());
                 int index = std::distance(edgeIndices.begin(), max);
 //                qDebug() << "Max is " << edgeIndices.at(index);
