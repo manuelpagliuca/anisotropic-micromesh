@@ -524,14 +524,24 @@ void Mesh::updateEdgesSubdivisions()
     edgeIndices.push_back(edges.at(f.edges[1]).subdivisions);
     edgeIndices.push_back(edges.at(f.edges[2]).subdivisions);
 
-    int i = edgeIndices[0];
-    int j = edgeIndices[1];
-    int k = edgeIndices[2];
+    int &i = edgeIndices[0];
+    int &j = edgeIndices[1];
+    int &k = edgeIndices[2];
 
     int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
 
-    if (totalDelta > 2)
-    {
+    if (totalDelta == 4) {
+      if (i == j || j == k || i == k) {
+        if (i == j) { k > i ? k-- : k++; }
+        else if (j == k) { i > j ? i-- : i++; }
+        else if (i == k) { j > i ? j-- : j++; }
+      }
+      else {
+        auto max = std::max_element(edgeIndices.begin(), edgeIndices.end());
+        (*max)--;
+      }
+    }
+    else if (totalDelta > 2) {
       int avgIndex = (i + j + k) / 3;
       edgeIndices[0] = avgIndex;
       edgeIndices[1] = avgIndex;
@@ -851,8 +861,6 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   mesh.updateVertexNormals();
   mesh.updateEdges();
   mesh.updateEdgesSubdivisions();
-
-  qDebug() << mesh.isMicromeshScheme();
 
   return mesh;
 }
