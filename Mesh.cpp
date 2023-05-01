@@ -468,7 +468,7 @@ void Mesh::updateEdges()
 void Mesh::updateEdgesSubdivisions()
 {
     auto subdivisionMap = getEdgeLengthToSubdivisionLevelMap();
-    qDebug() << subdivisionMap;
+
     for (auto &f : faces) {
         int v0 = f.index[0];
         int v1 = f.index[1];
@@ -488,39 +488,23 @@ void Mesh::updateEdgesSubdivisions()
         edgeIndices.push_back(edges.at(f.edges[0]).subdivisions);
         edgeIndices.push_back(edges.at(f.edges[1]).subdivisions);
         edgeIndices.push_back(edges.at(f.edges[2]).subdivisions);
-
-        qDebug() << edgeIndices[0] << " " << edgeIndices[1] << " " << edgeIndices[2];
         
         int i = edgeIndices[0];
         int j = edgeIndices[1];
         int k = edgeIndices[2];
 
         int totalDelta = std::abs(i-j) + std::abs(j-k) + std::abs(i-k);
-        qDebug() << std::abs(i-j) << " " << std::abs(j-k) << " " << std::abs(i-k);
-        qDebug() << "totalDelta: " << totalDelta;
-
-        // vincolo non rispettato da 2 edge
+        
         if (totalDelta > 2) {
-            if (totalDelta > 4) {
-                int avgIndex = (i + j + k) / 3;
-                edgeIndices[0] = avgIndex;
-                edgeIndices[1] = avgIndex;
-                edgeIndices[2] = avgIndex;
-            } else {
-                qDebug() << edgeIndices;
-                // Va gestito il caso in cui ci sono due massimi uguali...
-                auto max = std::max(edgeIndices.begin(), edgeIndices.end());
-                int index = std::distance(edgeIndices.begin(), max);
-//                qDebug() << "Max is " << edgeIndices.at(index);
-            }
+            int avgIndex = (i + j + k) / 3;
+            edgeIndices[0] = avgIndex;
+            edgeIndices[1] = avgIndex;
+            edgeIndices[2] = avgIndex;
         }
 
         edges.at(f.edges[0]).subdivisions = edgeIndices[0];
         edges.at(f.edges[1]).subdivisions = edgeIndices[1];
         edges.at(f.edges[2]).subdivisions = edgeIndices[2];
-
-        qDebug() << "After constraint: " << edges.at(f.edges[0]).subdivisions << " " <<
-        edges.at(f.edges[1]).subdivisions << " " << edges.at(f.edges[2]).subdivisions;
     }
 }
 
