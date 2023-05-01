@@ -78,6 +78,8 @@ public:
   void displaceVertex(int index, float k);
   void displaceFace(float k);
 
+  bool isMicromeshScheme();
+
   std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
 
   static Mesh parseOFF(const std::string &rawOFF);

@@ -576,6 +576,24 @@ void Mesh::displaceFace(float k)
   }
 }
 
+bool Mesh::isMicromeshScheme()
+{
+  int correctFaces = 0;
+  for (auto &f : faces) {
+      int i = edges.at(f.edges[0]).subdivisions;
+      int j = edges.at(f.edges[0]).subdivisions;
+      int k = edges.at(f.edges[0]).subdivisions;
+
+      int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
+
+      if (totalDelta <= 2) {
+        correctFaces++;
+      }
+  }
+
+  return correctFaces == faces.size();
+}
+
 std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(const Mesh &targetMesh)
 {
   int index = 0;
@@ -833,6 +851,8 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   mesh.updateVertexNormals();
   mesh.updateEdges();
   mesh.updateEdgesSubdivisions();
+
+  qDebug() << mesh.isMicromeshScheme();
 
   return mesh;
 }
