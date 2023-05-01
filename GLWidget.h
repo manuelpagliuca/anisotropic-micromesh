@@ -14,41 +14,40 @@
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
 
-
 class GLWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
-	Q_OBJECT
+  Q_OBJECT
 
 public:
-    explicit GLWidget(QWidget* parent);
+  explicit GLWidget(QWidget *parent);
 
-    void loadMeshData(const Mesh& mesh);
-    void updateMeshData(const Mesh& mesh);
-    void unloadMeshData();
+  void loadMeshData(const Mesh &mesh);
+  void updateMeshData(const Mesh &mesh);
+  void unloadMeshData();
 
-    void wireframePaint();
-    void saveLastModel();
-    TrackBall trackBall;
+  void wireframePaint();
+  void saveLastModel();
+  TrackBall trackBall;
 
 protected:
-	void paintGL() override;
-	void initializeGL() override;
+  void paintGL() override;
+  void initializeGL() override;
 
 private:
-    void initShaders();
+  void initShaders();
 
-    GLuint createShader(GLenum type, const GLchar* source);
-    std::string readFile(const char* fileLocation) const;
+  GLuint createShader(GLenum type, const GLchar *source);
+  std::string readFile(const char *fileLocation) const;
 
-	GLuint VAO, VBO, EBO;
-    GLuint shaderProgram;
-    GLint modelLocation;
-    GLint wireLocation;
-    glm::mat4 model;
+  GLuint VAO, VBO, EBO;
+  GLuint shaderProgram;
+  GLint modelLocation;
+  GLint wireLocation;
+  glm::mat4 model;
 
-    bool flag = false;
+  bool flag = false;
 
-    bool wireframeMode = false;
-    std::vector<float> vertices;
-    std::vector<unsigned int> faces;
+  bool wireframeMode = false;
+  std::vector<float> vertices;
+  std::vector<unsigned int> faces;
 };

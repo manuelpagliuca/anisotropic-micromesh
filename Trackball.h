@@ -13,25 +13,25 @@
 class TrackBall
 {
 public:
-    TrackBall();
-    void setFistClick(QPoint point);
-    void trackMousePositions(QPoint currPos, int openGLWWidth, int openGLWHeight);
-    void trackWheelIncrement(float angleDelta);
-    glm::mat4 getRotationMatrix();
-    glm::mat4 getScalingMatrix();
+  TrackBall();
+  void setFistClick(QPoint point);
+  void trackMousePositions(QPoint currPos, int openGLWWidth, int openGLWHeight);
+  void trackWheelIncrement(float angleDelta);
+  glm::mat4 getRotationMatrix();
+  glm::mat4 getScalingMatrix();
 
-    void printf() const;
+  void printf() const;
 
 private:
-    glm::vec3 getTrackBallVector(QPoint pos, int openGLWWidth, int openGLWHeight);
-    glm::vec3 op1, op2;
-    QPoint prevPos;
-    glm::vec3 rotAxis;
-    float rotAngle = 0.0f;
-    float sensitivity = 0.05f;
-    bool rotation = false;
+  glm::vec3 getTrackBallVector(QPoint pos, int openGLWWidth, int openGLWHeight);
+  glm::vec3 op1, op2;
+  QPoint prevPos;
+  glm::vec3 rotAxis;
+  float rotAngle = 0.0f;
+  float sensitivity = 0.05f;
+  bool rotation = false;
 
-    float scalingFactor = 1.0f;
+  float scalingFactor = 1.0f;
 };
 
 #endif // TRACKBALL_H
