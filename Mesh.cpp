@@ -498,59 +498,31 @@ void Mesh::updateEdges()
   }
 }
 
-void Mesh::updateEdgesSubdivisions()
+void Mesh::setInitialEdgeSubdivisions()
 {
-  auto subdivisionMap = getEdgeLengthToSubdivisionLevelMap();
-
   for (auto &f : faces)
   {
     int v0 = f.index[0];
     int v1 = f.index[1];
     int v2 = f.index[2];
 
-    int l0 = glm::round(glm::length(vertices.at(v1).pos - vertices.at(v0).pos));
-    int l1 = glm::round(glm::length(vertices.at(v2).pos - vertices.at(v1).pos));
-    int l2 = glm::round(glm::length(vertices.at(v0).pos - vertices.at(v2).pos));
+    float l0 = glm::length(vertices.at(v1).pos - vertices.at(v0).pos);
+    float l1 = glm::length(vertices.at(v2).pos - vertices.at(v1).pos);
+    float l2 = glm::length(vertices.at(v0).pos - vertices.at(v2).pos);
 
-    edges.at(f.edges[0]).subdivisions = subdivisionMap[l0];
-    edges.at(f.edges[1]).subdivisions = subdivisionMap[l1];
-    edges.at(f.edges[2]).subdivisions = subdivisionMap[l2];
+    edges.at(f.edges[0]).subdivisions = nearesPow2(l0);
+    edges.at(f.edges[1]).subdivisions = nearesPow2(l1);
+    edges.at(f.edges[2]).subdivisions = nearesPow2(l2);
   }
+}
+
+void Mesh::updateEdgesSubdivisions()
+{
+  setInitialEdgeSubdivisions();
 
   for (auto &f : faces)
   {
-    std::vector<int> edgeIndices;
-    edgeIndices.push_back(edges.at(f.edges[0]).subdivisions);
-    edgeIndices.push_back(edges.at(f.edges[1]).subdivisions);
-    edgeIndices.push_back(edges.at(f.edges[2]).subdivisions);
-
-    int &i = edgeIndices[0];
-    int &j = edgeIndices[1];
-    int &k = edgeIndices[2];
-
-    int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
-
-    if (totalDelta == 4) {
-      if (i == j || j == k || i == k) {
-        if (i == j) { k > i ? k-- : k++; }
-        else if (j == k) { i > j ? i-- : i++; }
-        else if (i == k) { j > i ? j-- : j++; }
-      }
-      else {
-        auto max = std::max_element(edgeIndices.begin(), edgeIndices.end());
-        (*max)--;
-      }
-    }
-    else if (totalDelta > 2) {
-      int avgIndex = (i + j + k) / 3;
-      edgeIndices[0] = avgIndex;
-      edgeIndices[1] = avgIndex;
-      edgeIndices[2] = avgIndex;
-    }
-
-    edges.at(f.edges[0]).subdivisions = edgeIndices[0];
-    edges.at(f.edges[1]).subdivisions = edgeIndices[1];
-    edges.at(f.edges[2]).subdivisions = edgeIndices[2];
+    enforceMaxOneDiff(f);
   }
 }
 
@@ -586,7 +558,7 @@ void Mesh::displaceFace(float k)
   }
 }
 
-bool Mesh::isMicromeshScheme()
+bool Mesh::isMicromeshScheme() const
 {
   int correctFaces = 0;
   for (auto &f : faces) {
@@ -676,6 +648,46 @@ std::vector<unsigned int> Mesh::getFacesVector() const
     indices.push_back(f.index[2]);
   }
   return indices;
+}
+
+int Mesh::nearesPow2(float edgeLength) const
+{
+  int exponent = std::log2(edgeLength);
+  return std::round(exponent);
+}
+
+int Mesh::maxInt3(int a, int b, int c) const
+{
+  if (a >= b)
+  {
+    if (a >= c) return a;
+    else return c;
+  }
+  else
+  {
+    if (b >= c) return b;
+    else return c;
+  }
+}
+
+void Mesh::enforceMaxOneDiff(const Face &f) const
+{
+  int edgeSubdivision[3] = {
+    edges.at(f.edges[0]).subdivisions,
+    edges.at(f.edges[1]).subdivisions,
+    edges.at(f.edges[2]).subdivisions
+  };
+
+  int max = maxInt3(edgeSubdivision[0], edgeSubdivision[1], edgeSubdivision[2]);
+
+  for (int &eSub : edgeSubdivision)
+  {
+    if (eSub <= max) eSub = max - 1;
+  }
+
+  edges.at(f.edges[0]).subdivisions = edgeSubdivision[0];
+  edges.at(f.edges[1]).subdivisions = edgeSubdivision[1];
+  edges.at(f.edges[2]).subdivisions = edgeSubdivision[2];
 }
 
 void Mesh::draw(bool wireframe)

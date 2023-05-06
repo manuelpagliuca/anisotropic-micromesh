@@ -61,6 +61,8 @@ public:
   std::vector<float> getDeviationsFromAvgFaceDoubleArea() const;
   std::vector<float> getDeviationsFromAvgEdge() const;
 
+  void setInitialEdgeSubdivisions();
+
   void draw(bool wireframe);
   void drawDirect();
 
@@ -74,11 +76,15 @@ public:
   void updateEdges();
   void updateEdgesSubdivisions();
   void updateBoundingBox();
+
   void displaceVertices(float k);
   void displaceVertex(int index, float k);
   void displaceFace(float k);
 
-  bool isMicromeshScheme();
+  bool isMicromeshScheme() const;
+  int nearesPow2(float edgeLength) const;
+  int maxInt3(int a, int b, int c) const;
+  void enforceMaxOneDiff(const Face &f) const;
 
   std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
 
