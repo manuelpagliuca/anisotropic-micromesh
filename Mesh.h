@@ -40,6 +40,7 @@ class Mesh : protected QOpenGLExtraFunctions
 public:
   Mesh();
   ~Mesh();
+
   BoundingBox bbox;
   std::vector<Vertex> vertices;
   std::vector<Face> faces;
@@ -84,7 +85,8 @@ public:
   bool isMicromeshScheme() const;
   int nearesPow2(float edgeLength) const;
   int maxInt3(int a, int b, int c) const;
-  void enforceMaxOneDiff(const Face &f) const;
+  void enforceMicromeshFace(const Face &f);
+  void enforceMacromesh(const Face &f);
 
   std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
 

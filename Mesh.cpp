@@ -522,7 +522,7 @@ void Mesh::updateEdgesSubdivisions()
 
   for (auto &f : faces)
   {
-    enforceMaxOneDiff(f);
+    enforceMicromeshFace(f);
   }
 }
 
@@ -670,7 +670,7 @@ int Mesh::maxInt3(int a, int b, int c) const
   }
 }
 
-void Mesh::enforceMaxOneDiff(const Face &f) const
+void Mesh::enforceMicromeshFace(const Face &f)
 {
   int edgeSubdivision[3] = {
     edges.at(f.edges[0]).subdivisions,
@@ -685,9 +685,9 @@ void Mesh::enforceMaxOneDiff(const Face &f) const
     if (eSub <= max) eSub = max - 1;
   }
 
-  edges.at(f.edges[0]).subdivisions = edgeSubdivision[0];
-  edges.at(f.edges[1]).subdivisions = edgeSubdivision[1];
-  edges.at(f.edges[2]).subdivisions = edgeSubdivision[2];
+  edges[f.edges[0]].subdivisions = edgeSubdivision[0];
+  edges[f.edges[1]].subdivisions = edgeSubdivision[1];
+  edges[f.edges[2]].subdivisions = edgeSubdivision[2];
 }
 
 void Mesh::draw(bool wireframe)
