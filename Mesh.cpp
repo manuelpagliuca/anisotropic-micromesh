@@ -667,7 +667,23 @@ int Mesh::maxInt3(int a, int b, int c) const
   {
     if (b >= c) return b;
     else return c;
+    }
+}
+
+int Mesh::maxIntIndex(int arr[]) const
+{
+  int maxIdx = 0;
+  int max = arr[0];
+  size_t length = sizeof(arr) / sizeof(arr[0]);
+
+  for (int i = 0; i < length; i++) {
+    if (arr[i] > max) {
+      max = arr[i];
+      maxIdx = i;
+    }
   }
+
+  return maxIdx;
 }
 
 void Mesh::enforceMicromeshFace(const Face &f)
@@ -682,8 +698,38 @@ void Mesh::enforceMicromeshFace(const Face &f)
 
   for (int &eSub : edgeSubdivision)
   {
-    if (eSub <= max) eSub = max - 1;
+    if (eSub < max - 1) eSub = max - 1;
   }
+
+  edges[f.edges[0]].subdivisions = edgeSubdivision[0];
+  edges[f.edges[1]].subdivisions = edgeSubdivision[1];
+  edges[f.edges[2]].subdivisions = edgeSubdivision[2];
+}
+
+void Mesh::enforceMacromesh(const Face &f)
+{
+  std::vector<int> edgeSubdivisions = {
+    edges.at(f.edges[0]).subdivisions,
+    edges.at(f.edges[1]).subdivisions,
+    edges.at(f.edges[2]).subdivisions
+  };
+
+  int max = *std::max_element(edgeSubdivisions.begin(), edgeSubdivisions.end());
+  int maxCount = 0;
+
+  std::vector<int> edgeMinors;
+
+  for (int e : edgeSubdivisions)
+  {
+    if (e == max) maxCount++;
+    else edgeMinors.push_back(e);
+  }
+
+  if (maxCount > 1) return;
+
+  int maxEdgeMinor = *std::max_element(edgeMinors.begin(), edgeMinors.end());
+
+  for (int &e : edgeSubdivisions) if (e == maxEdgeMinor) e = max;
 
   edges[f.edges[0]].subdivisions = edgeSubdivision[0];
   edges[f.edges[1]].subdivisions = edgeSubdivision[1];
