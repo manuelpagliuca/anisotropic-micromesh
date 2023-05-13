@@ -86,7 +86,7 @@ public:
   int nearesPow2(float edgeLength) const;
   int maxInt3(int a, int b, int c) const;
   int maxIntIndex(int arr[]) const;
-  void enforceMicromeshFace(const Face &f);
+  void enforceMicromesh(const Face &f);
   void enforceMacromesh(const Face &f);
 
   std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
@@ -99,4 +99,5 @@ public:
   void updateGL();
 
   void print() const;
+  void printEdgeSubdivisions() const;
 };

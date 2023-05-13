@@ -42,14 +42,22 @@ int Mesh::addEdge(int i0, int i1, int s0, int s1)
 void Mesh::print() const
 {
   std::cout << vertices.size() << " " << faces.size() << "\n";
-  for (auto &v : vertices)
-    std::cout << glm::to_string(v.pos) << "\n";
+  for (auto &v : vertices) std::cout << glm::to_string(v.pos) << "\n";
   std::cout << std::endl;
-  for (auto &f : faces)
-    std::cout << f.index[0] << f.index[1] << f.index[2] << "\n";
+  for (auto &f : faces) std::cout << f.index[0] << f.index[1] << f.index[2] << "\n";
   std::cout << std::endl;
-  for (auto &e : edges)
-    std::cout << e.faces[0] << e.faces[1] << "\n";
+  for (auto &e : edges) std::cout << e.faces[0] << e.faces[1] << "\n";
+}
+
+void Mesh::printEdgeSubdivisions() const
+{
+  for (const Face &f : faces)
+  {
+    qDebug()
+      << edges.at(f.index[0]).subdivisions << "/"
+      << edges.at(f.index[1]).subdivisions << "/"
+      << edges.at(f.index[2]).subdivisions;
+  }
 }
 
 Mesh Mesh::subdivide()
@@ -100,19 +108,19 @@ Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
 
     for (int i = 0; i < subdivisions; i++) {
         for (int j = 0; j < subdivisions - i; j++) {
-            glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
-            glm::vec3 t2 = t1 + delta2;
-            glm::vec3 t3 = t2 + delta1;
+          glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
+          glm::vec3 t2 = t1 + delta2;
+          glm::vec3 t3 = t2 + delta1;
 
-            int m1 = subdivided.addVertex(t1);
-            int m2 = subdivided.addVertex(t2);
-            int m3 = subdivided.addVertex(t3);
+          int m1 = subdivided.addVertex(t1);
+          int m2 = subdivided.addVertex(t2);
+          int m3 = subdivided.addVertex(t3);
 
-            subdivided.addFace(m1, m3, m2);
-            if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
+          subdivided.addFace(m1, m3, m2);
+          if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
 
-            stored[0] = m2;
-            stored[1] = m3;
+          stored[0] = m2;
+          stored[1] = m3;
         }
     }
   }
@@ -518,15 +526,14 @@ void Mesh::updateEdgesSubdivisions()
 
   for (auto &f : faces)
   {
-    enforceMicromeshFace(f);
+    enforceMicromesh(f);
   }
 }
 
 void Mesh::updateBoundingBox()
 {
   bbox.init(vertices[0].pos);
-  for (Vertex &v : vertices)
-    bbox.includeAnotherPoint(v.pos);
+  for (Vertex &v : vertices) bbox.includeAnotherPoint(v.pos);
 }
 
 void Mesh::displaceVertices(float k)
@@ -682,7 +689,7 @@ int Mesh::maxIntIndex(int arr[]) const
   return maxIdx;
 }
 
-void Mesh::enforceMicromeshFace(const Face &f)
+void Mesh::enforceMicromesh(const Face &f)
 {
   unsigned int edgeSubdivision[3] = {
     edges.at(f.edges[0]).subdivisions,
@@ -713,17 +720,17 @@ void Mesh::enforceMacromesh(const Face &f)
   int max = *std::max_element(edgeSubdivisions.begin(), edgeSubdivisions.end());
   int maxCount = 0;
 
-  std::vector<int> edgeMinors;
+  std::vector<int> edgeSubdivisionsLowerThenMax;
 
   for (unsigned int e : edgeSubdivisions)
   {
     if (e == max) maxCount++;
-    else edgeMinors.push_back(e);
+    else if (e < max) edgeSubdivisionsLowerThenMax.push_back(e);
   }
 
   if (maxCount > 1) return;
 
-  int maxEdgeMinor = *std::max_element(edgeMinors.begin(), edgeMinors.end());
+  int maxEdgeMinor = *std::max_element(edgeSubdivisionsLowerThenMax.begin(), edgeSubdivisionsLowerThenMax.end());
 
   for (unsigned int &e : edgeSubdivisions) if (e == maxEdgeMinor) e = max;
 
