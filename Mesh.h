@@ -31,7 +31,7 @@ struct Edge
 {
   unsigned int faces[2];
   unsigned int side[2];
-  unsigned int subdivisions = -1;
+  unsigned int subdivisions = 0;
   bool locked = false;
 };
 

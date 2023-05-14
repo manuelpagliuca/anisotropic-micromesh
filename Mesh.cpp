@@ -526,7 +526,15 @@ void Mesh::updateEdgesSubdivisions()
 
   for (auto &f : faces)
   {
+      qDebug()<< "Before: "
+              << edges[f.edges[0]].subdivisions << ", "
+              << edges[f.edges[1]].subdivisions << ","
+              << edges[f.edges[2]].subdivisions;
     enforceMicromesh(f);
+    qDebug()<< "After: "
+            << edges[f.edges[0]].subdivisions << ", "
+            << edges[f.edges[1]].subdivisions << ","
+            << edges[f.edges[2]].subdivisions;
   }
 }
 
@@ -655,8 +663,7 @@ std::vector<unsigned int> Mesh::getFacesVector() const
 
 int Mesh::nearesPow2(float edgeLength) const
 {
-  int exponent = std::log2(edgeLength);
-  return std::round(exponent);
+  return round(abs(log2(edgeLength)));
 }
 
 int Mesh::maxInt3(int a, int b, int c) const
@@ -698,6 +705,8 @@ void Mesh::enforceMicromesh(const Face &f)
   };
 
   int max = maxInt3(edgeSubdivision[0], edgeSubdivision[1], edgeSubdivision[2]);
+
+  if (max == 0) return;
 
   for (unsigned int &eSub : edgeSubdivision)
   {
