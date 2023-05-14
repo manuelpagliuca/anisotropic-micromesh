@@ -530,7 +530,7 @@ void Mesh::updateEdgesSubdivisions()
               << edges[f.edges[0]].subdivisions << ", "
               << edges[f.edges[1]].subdivisions << ","
               << edges[f.edges[2]].subdivisions;
-    enforceMicromesh(f);
+    enforceMacromesh(f);
     qDebug()<< "After: "
             << edges[f.edges[0]].subdivisions << ", "
             << edges[f.edges[1]].subdivisions << ","
@@ -666,6 +666,12 @@ int Mesh::nearesPow2(float edgeLength) const
   return round(abs(log2(edgeLength)));
 }
 
+int Mesh::maxInt2(int a, int b) const
+{
+  if (a >= b) return a;
+  else return b;
+}
+
 int Mesh::maxInt3(int a, int b, int c) const
 {
   if (a >= b)
@@ -720,28 +726,34 @@ void Mesh::enforceMicromesh(const Face &f)
 
 void Mesh::enforceMacromesh(const Face &f)
 {
-  std::vector<unsigned int> edgeSubdivisions = {
+  unsigned int edgeSubdivisions[3] = {
     edges.at(f.edges[0]).subdivisions,
     edges.at(f.edges[1]).subdivisions,
     edges.at(f.edges[2]).subdivisions
   };
 
-  int max = *std::max_element(edgeSubdivisions.begin(), edgeSubdivisions.end());
+  int max = maxInt3(edgeSubdivisions[0], edgeSubdivisions[1], edgeSubdivisions[2]);
   int maxCount = 0;
 
-  std::vector<int> edgeSubdivisionsLowerThenMax;
+  int edgeSubdivisionsLowerThenMax[2] = {0, 0};
+  int i = 0;
 
   for (unsigned int e : edgeSubdivisions)
   {
     if (e == max) maxCount++;
-    else if (e < max) edgeSubdivisionsLowerThenMax.push_back(e);
+    else if (e < max) edgeSubdivisionsLowerThenMax[i++] = e;
   }
 
   if (maxCount > 1) return;
 
-  int maxEdgeMinor = *std::max_element(edgeSubdivisionsLowerThenMax.begin(), edgeSubdivisionsLowerThenMax.end());
+  int maxEdgeMinor = maxInt2(edgeSubdivisionsLowerThenMax[0], edgeSubdivisionsLowerThenMax[1]);
 
-  for (unsigned int &e : edgeSubdivisions) if (e == maxEdgeMinor) e = max;
+  for (unsigned int &e : edgeSubdivisions) {
+    if (e == maxEdgeMinor) {
+      e = max;
+      break;
+    }
+  }
 
   edges[f.edges[0]].subdivisions = edgeSubdivisions[0];
   edges[f.edges[1]].subdivisions = edgeSubdivisions[1];

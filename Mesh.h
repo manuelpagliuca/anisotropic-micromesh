@@ -84,6 +84,7 @@ public:
 
   bool isMicromeshScheme() const;
   int nearesPow2(float edgeLength) const;
+  int maxInt2(int a, int b) const;
   int maxInt3(int a, int b, int c) const;
   int maxIntIndex(int arr[]) const;
   void enforceMicromesh(const Face &f);
