@@ -92,27 +92,60 @@ Mesh Mesh::subdivide()
   return subdivided;
 }
 
+Vertex Mesh::surfacePoint(const Face &f, glm::vec3 bary) const
+{
+  int v0 = f.index[0];
+  int v1 = f.index[1];
+  int v2 = f.index[2];
+
+  Vertex v;
+  v.pos = vertices[v0].pos * bary[0] +
+          vertices[v1].pos * bary[1] +
+          vertices[v2].pos * bary[2];
+
+  v.norm = vertices[v0].norm * bary[0] +
+           vertices[v1].norm * bary[1] +
+           vertices[v2].norm * bary[2];
+
+  return v;
+}
+
 Mesh Mesh::adaptiveSubdivide()
 {
   Mesh subdivided = Mesh();
-  subdivided.vertices = this->vertices;
 
   for (const Face& f: faces) {
-    int v0 = f.index[0];
-    int v1 = f.index[1];
-    int v2 = f.index[2];
+    int n = 1 << maxInt3(edges[f.edges[0]].subdivisions, edges[f.edges[1]].subdivisions, edges[f.edges[2]].subdivisions);
+    int k = subdivided.vertices.size();
 
-    int n = maxInt3(edges[v0].subdivisions, edges[v1].subdivisions, edges[v2].subdivisions);
+    // add microvertices
+    for (int vy = 0; vy <= n; vy++) {
+      for (int vx = 0; vx <= vy; vx++) { // vx+vy < n
+        float c = vx / float(n);
+        float a = vy / float(n);
 
-    for (int i = 0; i <= n; i++) {
-      for (int j = 0; j <= n; j++) {
-        float a0 = i / static_cast<float>(n);
-        float a1 = j / static_cast<float>(n);
-        float a2 = (3 - i - j) / static_cast<float>(n);
+        glm::vec3 bary = glm::vec3((1-a), (a-c), c);
 
-        glm::vec3 pos = a0 * vertices[v0].pos + a1 * vertices[v1].pos + a2 * vertices[v2].pos;
+        subdivided.vertices.push_back(surfacePoint(f, bary));
+      }
+    }
 
-        subdivided.addVertex(pos);
+    // add microfaces
+    for (int fy = 0; fy < n; fy++) {
+      for (int fx = 0; fx < n; fx++) {
+        glm::ivec2 v0(fx, fy), v1(fx, fy + 1), v2(fx + 1, fy + 1);
+
+        if (fx > fy) { // flip "red" triangle
+          v0 = glm::ivec2(n, n) - v0;
+          v1 = glm::ivec2(n, n) - v1;
+          v2 = glm::ivec2(n, n) - v2;
+        }
+
+        subdivided.addFace(
+          k + v0.y * (v0.y + 1) / 2 + v0.x,
+          k + v1.y * (v1.y + 1) / 2 + v1.x,
+          k + v2.y * (v2.y + 1) / 2 + v2.x
+        );
       }
     }
   }
@@ -168,6 +201,8 @@ Mesh Mesh::nSubdivide(int n)
 
   return subdivided;
 }
+
+
 
 std::map<int, int> Mesh::getDoubleAreaToSubdivisionLevelMap() const
 {

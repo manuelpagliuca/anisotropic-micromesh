@@ -50,6 +50,7 @@ public:
   int addFace(int i0, int i1, int i2);
   int addEdge(int i0, int i1, int s0, int s1);
 
+
   std::vector<float> getPositionsVector() const;
   std::vector<unsigned int> getFacesVector() const;
 
@@ -69,6 +70,8 @@ public:
 
   Mesh subdivide();
   Mesh nSubdivide(int subdivision);
+  Vertex surfacePoint(const Face &f, glm::vec3 bary) const;
+
   Mesh adaptiveSubdivide();
   Mesh micromeshSubdivide();
 
