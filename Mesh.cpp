@@ -14,7 +14,9 @@ int Mesh::addVertex(glm::vec3 pos)
   Vertex v;
   v.pos = pos;
   v.norm = glm::vec3(0, 0, 0);
+
   vertices.push_back(v);
+
   return static_cast<int>(vertices.size() - 1);
 }
 
@@ -24,7 +26,9 @@ int Mesh::addFace(int i0, int i1, int i2)
   f.index[0] = i0;
   f.index[1] = i1;
   f.index[2] = i2;
+
   faces.push_back(f);
+
   return static_cast<int>(faces.size() - 1);
 }
 
@@ -35,18 +39,22 @@ int Mesh::addEdge(int i0, int i1, int s0, int s1)
   e.faces[1] = i1;
   e.side[0] = s0;
   e.side[1] = s1;
+
   edges.push_back(e);
+
   return static_cast<int>(edges.size() - 1);
 }
 
 void Mesh::print() const
 {
   std::cout << vertices.size() << " " << faces.size() << "\n";
-  for (auto &v : vertices) std::cout << glm::to_string(v.pos) << "\n";
+  for (const Vertex &v : vertices) std::cout << glm::to_string(v.pos) << "\n";
+
   std::cout << std::endl;
-  for (auto &f : faces) std::cout << f.index[0] << f.index[1] << f.index[2] << "\n";
+  for (const Face &f : faces) std::cout << f.index[0] << f.index[1] << f.index[2] << "\n";
+
   std::cout << std::endl;
-  for (auto &e : edges) std::cout << e.faces[0] << e.faces[1] << "\n";
+  for (const Edge &e : edges) std::cout << e.faces[0] << e.faces[1] << "\n";
 }
 
 void Mesh::printEdgeSubdivisions() const
@@ -84,7 +92,7 @@ Mesh Mesh::subdivide()
   return subdivided;
 }
 
-Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
+Mesh Mesh::adaptiveSubdivide()
 {
   Mesh subdivided = Mesh();
   subdivided.vertices = this->vertices;
@@ -96,9 +104,9 @@ Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
 
     glm::vec3 v01 = (vertices.at(v1).pos - vertices.at(v0).pos);
     glm::vec3 v12 = (vertices.at(v2).pos - vertices.at(v1).pos);
-    int faceDoubleArea = std::round(glm::length(glm::cross(v01, v12)));
 
-    int subdivisions = areaToSubdivisionMap[faceDoubleArea];
+    float doubleArea = glm::length(glm::cross(v01, v12));
+    int subdivisions = nearestCeilPow2(doubleArea);
 
     glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(subdivisions);
     glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(subdivisions);
@@ -107,21 +115,21 @@ Mesh Mesh::adaptiveSubdivide(std::map<int, int> areaToSubdivisionMap)
     int stored [2];
 
     for (int i = 0; i < subdivisions; i++) {
-        for (int j = 0; j < subdivisions - i; j++) {
-          glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
-          glm::vec3 t2 = t1 + delta2;
-          glm::vec3 t3 = t2 + delta1;
+      for (int j = 0; j < subdivisions - i; j++) {
+        glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
+        glm::vec3 t2 = t1 + delta2;
+        glm::vec3 t3 = t2 + delta1;
 
-          int m1 = subdivided.addVertex(t1);
-          int m2 = subdivided.addVertex(t2);
-          int m3 = subdivided.addVertex(t3);
+        int m1 = subdivided.addVertex(t1);
+        int m2 = subdivided.addVertex(t2);
+        int m3 = subdivided.addVertex(t3);
 
-          subdivided.addFace(m1, m3, m2);
-          if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
+        subdivided.addFace(m1, m3, m2);
+        if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
 
-          stored[0] = m2;
-          stored[1] = m3;
-        }
+        stored[0] = m2;
+        stored[1] = m3;
+      }
     }
   }
 
@@ -345,13 +353,13 @@ void Mesh::exportOFF(const std::string &fileName) const
       << faces.size() << " "
       << 0 << std::endl; // todo: atm the # of edges is 0
 
-  for (const auto &v : vertices)
+  for (const Vertex &v : vertices)
     fileStream
         << v.pos.x << " "
         << v.pos.y << " "
         << v.pos.z << std::endl;
 
-  for (const auto &f : faces)
+  for (const Face &f : faces)
     fileStream
         << 3
         << " " << f.index[0]
@@ -394,9 +402,7 @@ void Mesh::exportOBJ(const std::string &fName) const
   fileStream.close();
 }
 
-void Mesh::updateGL()
-{
-}
+void Mesh::updateGL() {}
 
 void Mesh::updateFaceNormals()
 {
@@ -424,8 +430,7 @@ void Mesh::updateVertexNormals()
     v2.norm += f.norm;
   }
 
-  for (Vertex &v : vertices)
-    v.norm = glm::normalize(v.norm);
+  for (Vertex &v : vertices) v.norm = glm::normalize(v.norm);
 }
 
 void Mesh::updateEdges()
@@ -473,7 +478,7 @@ void Mesh::updateEdges()
 
       if (it != matingPool.end())
       {
-        auto matchingEdgeLocation = it->second;
+        EdgeLocalLocation matchingEdgeLocation = it->second;
         int edgeIndex = addEdge(faceIndex, matchingEdgeLocation.faceIndex, w, matchingEdgeLocation.edgeId);
         f.edges[w] = edgeIndex;
         matingPool.erase(it);
@@ -496,7 +501,7 @@ void Mesh::updateEdges()
 
   for (auto &openEdge : matingPool)
   {
-    auto openEdgeLocation = openEdge.second;
+    EdgeLocalLocation openEdgeLocation = openEdge.second;
     int edgeIndex = addEdge(openEdgeLocation.faceIndex, -1, openEdgeLocation.edgeId, -1);
     faces.at(openEdgeLocation.faceIndex).edges[openEdgeLocation.edgeId] = edgeIndex;
   }
@@ -504,7 +509,7 @@ void Mesh::updateEdges()
 
 void Mesh::setInitialEdgeSubdivisions()
 {
-  for (auto &f : faces)
+  for (Face &f : faces)
   {
     int v0 = f.index[0];
     int v1 = f.index[1];
@@ -514,28 +519,16 @@ void Mesh::setInitialEdgeSubdivisions()
     float l1 = glm::length(vertices.at(v2).pos - vertices.at(v1).pos);
     float l2 = glm::length(vertices.at(v0).pos - vertices.at(v2).pos);
 
-    edges.at(f.edges[0]).subdivisions = nearesPow2(l0);
-    edges.at(f.edges[1]).subdivisions = nearesPow2(l1);
-    edges.at(f.edges[2]).subdivisions = nearesPow2(l2);
+    edges.at(f.edges[0]).subdivisions = nearestRoundPow2(l0);
+    edges.at(f.edges[1]).subdivisions = nearestRoundPow2(l1);
+    edges.at(f.edges[2]).subdivisions = nearestRoundPow2(l2);
   }
 }
 
 void Mesh::updateEdgesSubdivisions()
 {
   setInitialEdgeSubdivisions();
-
-  for (auto &f : faces)
-  {
-      qDebug()<< "Before: "
-              << edges[f.edges[0]].subdivisions << ", "
-              << edges[f.edges[1]].subdivisions << ","
-              << edges[f.edges[2]].subdivisions;
-    enforceMacromesh(f);
-    qDebug()<< "After: "
-            << edges[f.edges[0]].subdivisions << ", "
-            << edges[f.edges[1]].subdivisions << ","
-            << edges[f.edges[2]].subdivisions;
-  }
+  for (Face &f : faces) enforceMacromesh(f);
 }
 
 void Mesh::updateBoundingBox()
@@ -572,16 +565,16 @@ void Mesh::displaceFace(float k)
 bool Mesh::isMicromeshScheme() const
 {
   int correctFaces = 0;
-  for (auto &f : faces) {
-      int i = edges.at(f.edges[0]).subdivisions;
-      int j = edges.at(f.edges[0]).subdivisions;
-      int k = edges.at(f.edges[0]).subdivisions;
+  for (const Face &f : faces) {
+    int i = edges.at(f.edges[0]).subdivisions;
+    int j = edges.at(f.edges[0]).subdivisions;
+    int k = edges.at(f.edges[0]).subdivisions;
 
-      int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
+    int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
 
-      if (totalDelta <= 2) {
-        correctFaces++;
-      }
+    if (totalDelta <= 2) {
+      correctFaces++;
+    }
   }
 
   return correctFaces == faces.size();
@@ -592,13 +585,13 @@ std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(cons
   int index = 0;
   std::vector<std::tuple<int, float>> displacements;
 
-  for (auto &v : vertices)
+  for (const Vertex &v : vertices)
   {
     glm::vec3 rayOrigin = v.pos;
     glm::vec3 rayDirection = glm::normalize(v.norm);
     float tMin = FLT_MAX;
 
-    for (auto &f : targetMesh.faces)
+    for (const Face &f : targetMesh.faces)
     {
       // Triangle processing
       glm::vec3 v0 = targetMesh.vertices[f.index[0]].pos;
@@ -640,30 +633,38 @@ std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(cons
 std::vector<float> Mesh::getPositionsVector() const
 {
   std::vector<float> pos;
-  for (auto &v : vertices)
+
+  for (const Vertex &v : vertices)
   {
     pos.push_back(v.pos[0]);
     pos.push_back(v.pos[1]);
     pos.push_back(v.pos[2]);
   }
+
   return pos;
 }
 
 std::vector<unsigned int> Mesh::getFacesVector() const
 {
   std::vector<unsigned int> indices;
-  for (auto &f : faces)
+  for (const Face &f : faces)
   {
     indices.push_back(f.index[0]);
     indices.push_back(f.index[1]);
     indices.push_back(f.index[2]);
   }
+
   return indices;
 }
 
-int Mesh::nearesPow2(float edgeLength) const
+int Mesh::nearestRoundPow2(float edgeLength) const
 {
   return round(abs(log2(edgeLength)));
+}
+
+int Mesh::nearestCeilPow2(float edgeLength) const
+{
+  return ceil(abs(log2(edgeLength)));
 }
 
 int Mesh::maxInt2(int a, int b) const
@@ -683,7 +684,7 @@ int Mesh::maxInt3(int a, int b, int c) const
   {
     if (b >= c) return b;
     else return c;
-    }
+  }
 }
 
 int Mesh::maxIntIndex(int arr[]) const
@@ -692,8 +693,10 @@ int Mesh::maxIntIndex(int arr[]) const
   int max = arr[0];
   size_t length = sizeof(arr) / sizeof(arr[0]);
 
-  for (int i = 0; i < length; i++) {
-    if (arr[i] > max) {
+  for (int i = 0; i < length; i++)
+  {
+    if (arr[i] > max)
+    {
       max = arr[i];
       maxIdx = i;
     }
@@ -704,7 +707,8 @@ int Mesh::maxIntIndex(int arr[]) const
 
 void Mesh::enforceMicromesh(const Face &f)
 {
-  unsigned int edgeSubdivision[3] = {
+  unsigned int edgeSubdivision[3] =
+  {
     edges.at(f.edges[0]).subdivisions,
     edges.at(f.edges[1]).subdivisions,
     edges.at(f.edges[2]).subdivisions
@@ -726,7 +730,8 @@ void Mesh::enforceMicromesh(const Face &f)
 
 void Mesh::enforceMacromesh(const Face &f)
 {
-  unsigned int edgeSubdivisions[3] = {
+  unsigned int edgeSubdivisions[3] =
+  {
     edges.at(f.edges[0]).subdivisions,
     edges.at(f.edges[1]).subdivisions,
     edges.at(f.edges[2]).subdivisions
@@ -773,7 +778,7 @@ void Mesh::drawDirect()
   initializeOpenGLFunctions();
   glBegin(GL_TRIANGLES);
 
-  for (const auto &f : faces)
+  for (const Face &f : faces)
   {
     glm::vec3 v0 = vertices[f.index[0]].pos;
     glm::vec3 v1 = vertices[f.index[1]].pos;
@@ -925,18 +930,16 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
     }
   }
 
-  for (const auto &pos : positions)
-    mesh.addVertex(pos);
+  for (const glm::vec3 &pos : positions) mesh.addVertex(pos);
 
   int i = 0;
-  for (auto &v : mesh.vertices)
+  for (Vertex &v : mesh.vertices)
   {
     v.norm = normals[i];
     i++;
   }
 
-  for (const auto &f : faces)
-    mesh.addFace(f[0], f[1], f[2]);
+  for (const glm::vec3 &f : faces) mesh.addFace(f[0], f[1], f[2]);
 
   mesh.updateBoundingBox();
   mesh.updateFaceNormals();

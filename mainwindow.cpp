@@ -46,20 +46,13 @@ void Mainwindow::wheelEvent(QWheelEvent *ev)
 
 void Mainwindow::keyPressEvent(QKeyEvent *ev)
 {
-  if (ev->key() == Qt::Key_Escape)
-    exit(1);
-  else if (ev->key() == Qt::Key_W)
-    ui.openGLWidget->wireframePaint();
-  else if (ev->key() == Qt::Key_E)
-    on_actionExtract_displacements_triggered();
-  else if (ev->key() == Qt::Key_S)
-    on_actionSubdivide_triggered();
-  else if (ev->key() == Qt::Key_O)
-    on_actionSubdivision_surfaces_Uniform_triggered();
-  else if (ev->key() == Qt::Key_L)
-    on_actionLoad_triggered();
-  else if (ev->key() == Qt::Key_U)
-    on_actionUnload_triggered();
+  if (ev->key() == Qt::Key_Escape) exit(1);
+  else if (ev->key() == Qt::Key_W) ui.openGLWidget->wireframePaint();
+  else if (ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
+  else if (ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
+  else if (ev->key() == Qt::Key_O) on_actionSubdivision_surfaces_Uniform_triggered();
+  else if (ev->key() == Qt::Key_L) on_actionLoad_triggered();
+  else if (ev->key() == Qt::Key_U) on_actionUnload_triggered();
 }
 
 void Mainwindow::on_actionSave_triggered()
@@ -74,18 +67,18 @@ void Mainwindow::on_actionSave_triggered()
     std::string fileNameExt = filePath.mid(filePath.lastIndexOf("/")).toStdString();
     std::string fileName = fileNameExt.substr(1, fileNameExt.size() - 5);
 
-    if (ext == ".off")
-      baseMesh.exportOFF(fileName);
-    else if (ext == ".obj")
-      baseMesh.exportOBJ(fileName);
+    if (ext == ".off") baseMesh.exportOFF(fileName);
+    else if (ext == ".obj") baseMesh.exportOBJ(fileName);
   }
 }
 
 void Mainwindow::on_actionLoad_triggered()
 {
-  QString filePath = QFileDialog::getOpenFileName(this,
-                                                  tr("Load Mesh"), ".\\mesh",
-                                                  tr("3D Mesh(*.off *.obj);;OFF Files (*.off);; OBJ Files (*.obj)"));
+  QString filePath = QFileDialog::getOpenFileName(
+    this,
+    tr("Load Mesh"), ".\\mesh",
+    tr("3D Mesh(*.off *.obj);;OFF Files (*.off);; OBJ Files (*.obj)"));
+
   if (!filePath.isEmpty())
   {
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
@@ -118,10 +111,11 @@ void Mainwindow::on_actionVertex_displacement_triggered()
 {
   bool isValid;
   double k = QInputDialog::getDouble(
-      this,
-      tr("Insert vertex displacement factor"),
-      tr("Amount:"), 0.0, -3.0, 5.0, 4, &isValid,
-      this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+    this,
+    tr("Insert vertex displacement factor"),
+    tr("Amount:"), 0.0, -3.0, 5.0, 4, &isValid,
+    this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+
   if (isValid)
   {
     baseMesh.displaceVertices(k);
@@ -157,22 +151,19 @@ void Mainwindow::on_actionExtract_displacements_triggered()
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
-    if (ext == ".off")
-      targetMesh = Mesh::parseOFF(file);
-    else if (ext == ".obj")
-      targetMesh = Mesh::parseOBJ(file);
+    if (ext == ".off") targetMesh = Mesh::parseOFF(file);
+    else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
     bool isValid;
     int k = QInputDialog::getInt(
-        this,
-        tr("Insert the number of subdivision to perform"),
-        tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
-        this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+      this,
+      tr("Insert the number of subdivision to perform"),
+      tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
+      this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
     if (isValid)
     {
-      for (int i = 0; i < k; i++)
-        baseMesh = baseMesh.subdivide();
+      for (int i = 0; i < k; i++) baseMesh = baseMesh.subdivide();
       ui.openGLWidget->updateMeshData(baseMesh);
     }
 
@@ -239,9 +230,10 @@ std::string Mainwindow::readFile(const char *file_loc)
 void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
 {
   bool isValid;
-  int subdivisions = QInputDialog::getInt(this, tr("Insert the number of subdivision to perform"),
-                                          tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
-                                          this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+  int subdivisions = QInputDialog::getInt(
+                      this, tr("Insert the number of subdivision to perform"),
+                      tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
+                      this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
   if (isValid)
   {
@@ -253,8 +245,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
 
 void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
 {
-  auto subdivisionMap = baseMesh.getDoubleAreaToSubdivisionLevelMap();
-  baseMesh = baseMesh.adaptiveSubdivide(subdivisionMap);
+  baseMesh = baseMesh.adaptiveSubdivide();
   ui.openGLWidget->updateMeshData(baseMesh);
 }
 

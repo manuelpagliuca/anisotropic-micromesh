@@ -29,18 +29,14 @@ glm::mat4 TrackBall::getRotationMatrix()
     rotation = false;
     return glm::rotate(glm::degrees(rotAngle), rotAxis);
   }
-  else
-    return glm::mat4(1.f);
+  else return glm::mat4(1.f);
 }
 
 void TrackBall::trackWheelIncrement(float angleDelta)
 {
-  if (angleDelta > 0.f)
-    scalingFactor *= 1.1f;
-  else if (angleDelta < 0.f)
-    scalingFactor /= 1.1f;
-  else
-    scalingFactor = 1.f;
+  if (angleDelta > 0.f) scalingFactor *= 1.1f;
+  else if (angleDelta < 0.f) scalingFactor /= 1.1f;
+  else scalingFactor = 1.f;
 }
 
 glm::mat4 TrackBall::getScalingMatrix()
