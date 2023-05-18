@@ -1,12 +1,22 @@
 #version 460 core
 out vec4 FragColor;
 in vec3 color;
+in vec3 pos;
+
 uniform bool wireframe;
 
-void main() {
-    if (!wireframe)
-        FragColor = vec4(color, 1.0f);
-    else
-        FragColor = vec4(vec3(0.0f), 1.0f);
-
+vec3 flatNormal() {
+    vec3 dx = dFdx(pos);
+    vec3 dy = dFdy(pos);
+    return normalize(cross(dx, dy));
 }
+
+void main() {
+    float diffuse = abs(flatNormal().x);
+
+    if (!wireframe)
+        FragColor = vec4(color * diffuse, 1.0f);
+    else
+        FragColor = vec4(color * 0.5f, 1.0f);
+}
+
