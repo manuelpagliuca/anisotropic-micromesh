@@ -88,8 +88,8 @@ public:
   int maxInt2(int a, int b) const;
   int maxInt3(int a, int b, int c) const;
   int maxIntIndex(int arr[]) const;
-  void enforceMicromesh(const Face &f);
-  void enforceMacromesh(const Face &f);
+  bool enforceMicromesh(const Face &f);
+  bool enforceAnisoMicromesh(const Face &f);
 
   std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
 

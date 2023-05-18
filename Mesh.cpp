@@ -102,33 +102,17 @@ Mesh Mesh::adaptiveSubdivide()
     int v1 = f.index[1];
     int v2 = f.index[2];
 
-    glm::vec3 v01 = (vertices.at(v1).pos - vertices.at(v0).pos);
-    glm::vec3 v12 = (vertices.at(v2).pos - vertices.at(v1).pos);
+    int n = maxInt3(edges[v0].subdivisions, edges[v1].subdivisions, edges[v2].subdivisions);
 
-    float doubleArea = glm::length(glm::cross(v01, v12));
-    int subdivisions = nearestCeilPow2(doubleArea);
+    for (int i = 0; i <= n; i++) {
+      for (int j = 0; j <= n; j++) {
+        float a0 = i / static_cast<float>(n);
+        float a1 = j / static_cast<float>(n);
+        float a2 = (3 - i - j) / static_cast<float>(n);
 
-    glm::vec3 delta0 = (vertices.at(v1).pos - vertices.at(v0).pos) / float(subdivisions);
-    glm::vec3 delta1 = (vertices.at(v1).pos - vertices.at(v2).pos) / float(subdivisions);
-    glm::vec3 delta2 = (vertices.at(v2).pos - vertices.at(v0).pos) / float(subdivisions);
+        glm::vec3 pos = a0 * vertices[v0].pos + a1 * vertices[v1].pos + a2 * vertices[v2].pos;
 
-    int stored [2];
-
-    for (int i = 0; i < subdivisions; i++) {
-      for (int j = 0; j < subdivisions - i; j++) {
-        glm::vec3 t1 = vertices.at(v0).pos + (float(i) * delta0) + (float(j) * delta2);
-        glm::vec3 t2 = t1 + delta2;
-        glm::vec3 t3 = t2 + delta1;
-
-        int m1 = subdivided.addVertex(t1);
-        int m2 = subdivided.addVertex(t2);
-        int m3 = subdivided.addVertex(t3);
-
-        subdivided.addFace(m1, m3, m2);
-        if (j > 0) subdivided.addFace(stored[0], stored[1], m3);
-
-        stored[0] = m2;
-        stored[1] = m3;
+        subdivided.addVertex(pos);
       }
     }
   }
@@ -509,7 +493,7 @@ void Mesh::updateEdges()
 
 void Mesh::setInitialEdgeSubdivisions()
 {
-  for (Face &f : faces)
+  for (const Face &f : faces)
   {
     int v0 = f.index[0];
     int v1 = f.index[1];
@@ -528,7 +512,16 @@ void Mesh::setInitialEdgeSubdivisions()
 void Mesh::updateEdgesSubdivisions()
 {
   setInitialEdgeSubdivisions();
-  for (Face &f : faces) enforceMacromesh(f);
+
+  while (true) {
+    bool changeAnything = false;
+
+    for (Face &f : faces) {
+      changeAnything |= enforceMicromesh(f);
+    }
+
+    if (!changeAnything) break;
+  }
 }
 
 void Mesh::updateBoundingBox()
@@ -705,8 +698,9 @@ int Mesh::maxIntIndex(int arr[]) const
   return maxIdx;
 }
 
-void Mesh::enforceMicromesh(const Face &f)
+bool Mesh::enforceMicromesh(const Face &f)
 {
+  bool changeAnything = false;
   unsigned int edgeSubdivision[3] =
   {
     edges.at(f.edges[0]).subdivisions,
@@ -716,19 +710,24 @@ void Mesh::enforceMicromesh(const Face &f)
 
   int max = maxInt3(edgeSubdivision[0], edgeSubdivision[1], edgeSubdivision[2]);
 
-  if (max == 0) return;
+  if (max == 0) return changeAnything;
 
   for (unsigned int &eSub : edgeSubdivision)
   {
-    if (eSub < max - 1) eSub = max - 1;
+    if (eSub < max - 1) {
+      eSub = max - 1;
+      changeAnything = true;
+    }
   }
 
   edges[f.edges[0]].subdivisions = edgeSubdivision[0];
   edges[f.edges[1]].subdivisions = edgeSubdivision[1];
   edges[f.edges[2]].subdivisions = edgeSubdivision[2];
+
+  return changeAnything;
 }
 
-void Mesh::enforceMacromesh(const Face &f)
+bool Mesh::enforceAnisoMicromesh(const Face &f)
 {
   unsigned int edgeSubdivisions[3] =
   {
@@ -736,6 +735,8 @@ void Mesh::enforceMacromesh(const Face &f)
     edges.at(f.edges[1]).subdivisions,
     edges.at(f.edges[2]).subdivisions
   };
+
+  bool changeAnything = false;
 
   int max = maxInt3(edgeSubdivisions[0], edgeSubdivisions[1], edgeSubdivisions[2]);
   int maxCount = 0;
@@ -749,13 +750,14 @@ void Mesh::enforceMacromesh(const Face &f)
     else if (e < max) edgeSubdivisionsLowerThenMax[i++] = e;
   }
 
-  if (maxCount > 1) return;
+  if (maxCount > 1) return changeAnything;
 
   int maxEdgeMinor = maxInt2(edgeSubdivisionsLowerThenMax[0], edgeSubdivisionsLowerThenMax[1]);
 
   for (unsigned int &e : edgeSubdivisions) {
     if (e == maxEdgeMinor) {
       e = max;
+      changeAnything = true;
       break;
     }
   }
@@ -763,6 +765,8 @@ void Mesh::enforceMacromesh(const Face &f)
   edges[f.edges[0]].subdivisions = edgeSubdivisions[0];
   edges[f.edges[1]].subdivisions = edgeSubdivisions[1];
   edges[f.edges[2]].subdivisions = edgeSubdivisions[2];
+
+  return changeAnything;
 }
 
 void Mesh::draw(bool wireframe)

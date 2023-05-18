@@ -25,7 +25,7 @@ void GLWidget::paintGL()
   // Drawing
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, faces.data());
-
+  // glpoints
   if (wireframeMode)
   {
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
