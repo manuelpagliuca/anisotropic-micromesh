@@ -16,8 +16,8 @@ Mainwindow::Mainwindow(QWidget *parent) : QMainWindow(parent)
 
 void Mainwindow::loadDemoMesh()
 {
-  std::string pallasOBJ2500 = readFile("./mesh/pallas_2500.obj");
-  baseMesh = Mesh::parseOBJ(pallasOBJ2500);
+  std::string pallasOBJ125 = readFile("./mesh/pallas_125.obj");
+  baseMesh = Mesh::parseOBJ(pallasOBJ125);
   ui.openGLWidget->loadMeshData(baseMesh);
   ui.actionSave->setEnabled(true);
   ui.actionSubdivide->setEnabled(true);
@@ -53,6 +53,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
   else if (ev->key() == Qt::Key_O) on_actionSubdivision_surfaces_Uniform_triggered();
   else if (ev->key() == Qt::Key_L) on_actionLoad_triggered();
   else if (ev->key() == Qt::Key_U) on_actionUnload_triggered();
+  else if (ev->key() == Qt::Key_R) ui.openGLWidget->reloadShaders();
 }
 
 void Mainwindow::on_actionSave_triggered()
@@ -245,8 +246,31 @@ void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
 
 void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
 {
-  baseMesh = baseMesh.adaptiveSubdivide();
-  ui.openGLWidget->updateMeshData(baseMesh);
+  QString filePath = QFileDialog::getOpenFileName(
+    this,
+    tr("Load Mesh"), ".\\mesh",
+    tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
+
+  if (!filePath.isEmpty())
+  {
+    std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
+    std::string file = readFile(filePath.toStdString().c_str());
+
+    if (ext == ".off") targetMesh = Mesh::parseOFF(file);
+    else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
+
+    baseMesh = baseMesh.adaptiveSubdivide();
+    ui.openGLWidget->updateMeshData(baseMesh);
+
+    Mesh tmpMesh = baseMesh;
+    auto displacements = tmpMesh.displaceVerticesTowardsTargetMesh(targetMesh);
+
+    morphDialog = new MorphDialog(this);
+    morphDialog->show();
+    morphDialog->setMesh(baseMesh);
+    morphDialog->setGLWidget(ui.openGLWidget);
+    morphDialog->setDisplacementsDelta(displacements);
+  }
 }
 
 void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()

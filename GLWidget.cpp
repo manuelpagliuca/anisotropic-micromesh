@@ -44,35 +44,41 @@ void GLWidget::initializeGL()
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_POLYGON_OFFSET_FILL);
   glPolygonOffset(1, 1);
-  initShaders();
+  initializeShaders();
 }
 
-void GLWidget::initShaders()
+void GLWidget::reloadShaders()
+{
+  glUseProgram(0);
+  glDeleteProgram(shaderProgram);
+  initializeGL();
+}
+
+void GLWidget::initializeShaders()
 {
   std::string vertexShaderSrc = readFile("./shaders/shader.vert");
   std::string fragShaderSrc = readFile("./shaders/shader.frag");
 
-  GLuint vert = createShader(GL_VERTEX_SHADER, vertexShaderSrc.c_str());
-  GLuint frag = createShader(GL_FRAGMENT_SHADER, fragShaderSrc.c_str());
-  GLuint prg = glCreateProgram();
+  vShader = createShader(GL_VERTEX_SHADER, vertexShaderSrc.c_str());
+  fShader = createShader(GL_FRAGMENT_SHADER, fragShaderSrc.c_str());
+  shaderProgram = glCreateProgram();
 
-  glAttachShader(prg, vert);
-  glAttachShader(prg, frag);
-  glLinkProgram(prg);
+  glAttachShader(shaderProgram, vShader);
+  glAttachShader(shaderProgram, fShader);
+  glLinkProgram(shaderProgram);
 
   GLint success;
-  glGetProgramiv(prg, GL_LINK_STATUS, &success);
+  glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 
   if (!success)
   {
     GLchar infoLog[512];
-    glGetProgramInfoLog(prg, 512, nullptr, infoLog);
+    glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
     std::cout << "error： program link failed: " << infoLog << std::endl;
   }
-  shaderProgram = prg;
 
-  glDeleteShader(vert);
-  glDeleteShader(frag);
+  glDeleteShader(vShader);
+  glDeleteShader(fShader);
 
   modelLocation = glGetUniformLocation(shaderProgram, "model");
   wireLocation = glGetUniformLocation(shaderProgram, "wireframe");
@@ -150,3 +156,5 @@ void GLWidget::wireframePaint()
   wireframeMode = !wireframeMode;
   update();
 }
+
+

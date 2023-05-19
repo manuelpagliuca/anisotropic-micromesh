@@ -29,18 +29,21 @@ public:
   void saveLastModel();
   TrackBall trackBall;
 
+  void reloadShaders();
+
 protected:
   void paintGL() override;
   void initializeGL() override;
 
 private:
-  void initShaders();
+  void initializeShaders();
 
   GLuint createShader(GLenum type, const GLchar *source);
   std::string readFile(const char *fileLocation) const;
 
   GLuint VAO, VBO, EBO;
   GLuint shaderProgram;
+  GLuint vShader, fShader;
   GLint modelLocation;
   GLint wireLocation;
   glm::mat4 model;
