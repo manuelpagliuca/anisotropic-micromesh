@@ -26,8 +26,12 @@ void GLWidget::paintGL()
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
   glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, faces.data());
   glEnable(GL_LIGHTING);
+
   if (wireframeMode)
   {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glLineWidth(2.f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glUniform1i(wireLocation, 1); // wire on
     glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, faces.data());

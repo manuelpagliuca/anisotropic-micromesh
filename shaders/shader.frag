@@ -13,10 +13,11 @@ vec3 flatNormal() {
 
 void main() {
     float diffuse = abs(flatNormal().x);
+    diffuse = mix(diffuse, 1.0f, 0.3f);
 
     if (!wireframe)
         FragColor = vec4(color * diffuse, 1.0f);
     else
-        FragColor = vec4(color * 0.5f, 1.0f);
+        FragColor = vec4(0.0f, 0.0f, 0.0f, 0.2f);
 }
 

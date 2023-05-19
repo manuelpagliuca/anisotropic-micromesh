@@ -62,9 +62,10 @@ void Mesh::printEdgeSubdivisions() const
   for (const Face &f : faces)
   {
     qDebug()
+      << "f(" << f.index[0] << " - " << f.index[1] << " - " << f.index[2] << "), s("
       << edges.at(f.index[0]).subdivisions << "/"
       << edges.at(f.index[1]).subdivisions << "/"
-      << edges.at(f.index[2]).subdivisions;
+      << edges.at(f.index[2]).subdivisions << ")";
   }
 }
 
@@ -114,8 +115,14 @@ Mesh Mesh::adaptiveSubdivide()
 {
   Mesh subdivided = Mesh();
 
+  printEdgeSubdivisions();
+
   for (const Face& f: faces) {
-    int n = 1 << maxInt3(edges[f.edges[0]].subdivisions, edges[f.edges[1]].subdivisions, edges[f.edges[2]].subdivisions);
+    int e0 = edges[f.edges[0]].subdivisions;
+    int e1 = edges[f.edges[1]].subdivisions;
+    int e2 = edges[f.edges[2]].subdivisions;
+
+    int n = 1 << maxInt3(e0, e1, e2);
     int k = subdivided.vertices.size();
 
     // add microvertices
@@ -148,7 +155,37 @@ Mesh Mesh::adaptiveSubdivide()
         );
       }
     }
+
+    if ((1 << e0) < n) {
+      int vy = n;
+
+      for (int vx = 1; vx < n; vx += 2) {
+        int vxb = vx + 1;
+        subdivided.vertices[k + vy * (vy + 1) / 2 + vx] = subdivided.vertices[k + vy * (vy + 1) / 2 + vxb];
+      }
+    }
+
+//    if ((1 << e1) < n) {
+//      int vy = n;
+
+//      for (int vx = 1; vx < n; vx += 2) {
+//        int vxb = vx + 1;
+////        int vxb = vx + ((vx > n / 2) ? +1 : -1);
+//        subdivided.vertices[k + vy * (vy + 1) / 2 + vx] = subdivided.vertices[k + vy * (vy + 1) / 2 + vxb];
+
+//      }
+//    }
+
+
   }
+
+
+
+  subdivided.updateBoundingBox();
+  subdivided.updateEdges();
+//  subdivided.updateEdgesSubdivisions();
+  subdivided.updateFaceNormals();
+  subdivided.updateVertexNormals();
 
   return subdivided;
 }

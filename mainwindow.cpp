@@ -143,9 +143,9 @@ void Mainwindow::on_actionFace_displacement_triggered()
 void Mainwindow::on_actionExtract_displacements_triggered()
 {
   QString filePath = QFileDialog::getOpenFileName(
-      this,
-      tr("Load Mesh"), ".\\mesh",
-      tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
+    this,
+    tr("Load Mesh"), ".\\mesh",
+    tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty())
   {
