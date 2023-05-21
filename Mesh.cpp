@@ -115,8 +115,6 @@ Mesh Mesh::adaptiveSubdivide()
 {
   Mesh subdivided = Mesh();
 
-  printEdgeSubdivisions();
-
   for (const Face& f: faces) {
     int e0 = edges[f.edges[0]].subdivisions;
     int e1 = edges[f.edges[1]].subdivisions;
@@ -130,9 +128,7 @@ Mesh Mesh::adaptiveSubdivide()
       for (int vx = 0; vx <= vy; vx++) { // vx+vy < n
         float c = vx / float(n);
         float a = vy / float(n);
-
         glm::vec3 bary = glm::vec3((1-a), (a-c), c);
-
         subdivided.vertices.push_back(surfacePoint(f, bary));
       }
     }
@@ -156,14 +152,14 @@ Mesh Mesh::adaptiveSubdivide()
       }
     }
 
-    if ((1 << e0) < n) {
-      int vy = n;
+//    if ((1 << e0) < n) {
+//      int vx = n;
 
-      for (int vx = 1; vx < n; vx += 2) {
-        int vxb = vx + 1;
-        subdivided.vertices[k + vy * (vy + 1) / 2 + vx] = subdivided.vertices[k + vy * (vy + 1) / 2 + vxb];
-      }
-    }
+//      for (int vy = 1; vy < n; vy += 2) {
+//        int vyb = vy + 1;
+//        subdivided.vertices[k + vx * (vx + 1) / 2 + vy] = subdivided.vertices[k + vx * (vx + 1) / 2 + vyb];
+//      }
+//    }
 
 //    if ((1 << e1) < n) {
 //      int vy = n;
@@ -176,7 +172,13 @@ Mesh Mesh::adaptiveSubdivide()
 //      }
 //    }
 
+    if ((1 << e2) < n) {
+      int vxy = n;
 
+      for (int vxy = 1; vxy < n; vxy+=2) {
+        int vxyb = vxy + 1;
+      }
+    }
   }
 
 

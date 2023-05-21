@@ -9,8 +9,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>795</width>
-    <height>800</height>
+    <width>1163</width>
+    <height>887</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -25,7 +25,23 @@
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="GLWidget" name="openGLWidget"/>
+     <widget class="GLWidget" name="openGLWidget">
+      <property name="minimumSize">
+       <size>
+        <width>800</width>
+        <height>800</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>800</width>
+        <height>800</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item>
+     <widget class="QWidget" name="widget" native="true"/>
     </item>
    </layout>
   </widget>
@@ -34,8 +50,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>795</width>
-     <height>22</height>
+     <width>1163</width>
+     <height>26</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSome">
