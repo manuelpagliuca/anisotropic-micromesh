@@ -41,7 +41,268 @@
      </widget>
     </item>
     <item>
-     <widget class="QWidget" name="widget" native="true"/>
+     <widget class="QWidget" name="widget" native="true">
+      <widget class="QCheckBox" name="checkBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>40</y>
+         <width>76</width>
+         <height>20</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Wireframe</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="demo125faces">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>75</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>125 Faces</string>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>200</y>
+         <width>321</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Subdivisions</string>
+       </property>
+       <widget class="QPushButton" name="midpoint_subdivision">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>71</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Midpoint</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="uniform_subdivision">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>20</y>
+          <width>71</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Uniform</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="micromesh_subdivision">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>20</y>
+          <width>81</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Micro-mesh</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="anisotropic_micromesh_subdivision">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>141</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Anisotropic Micro-mesh</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QPushButton" name="demo250faces">
+       <property name="geometry">
+        <rect>
+         <x>90</x>
+         <y>10</y>
+         <width>75</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>250 Faces</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="demo500faces">
+       <property name="geometry">
+        <rect>
+         <x>170</x>
+         <y>10</y>
+         <width>75</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>500 Faces</string>
+       </property>
+      </widget>
+      <widget class="QPushButton" name="demo1000faces">
+       <property name="geometry">
+        <rect>
+         <x>250</x>
+         <y>10</y>
+         <width>75</width>
+         <height>24</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>1000 Faces</string>
+       </property>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_2">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>60</y>
+         <width>321</width>
+         <height>131</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Displacements</string>
+       </property>
+       <widget class="QSlider" name="vertexDisplacementSlider">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>40</y>
+          <width>291</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QSlider" name="faceDisplacementSlider">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>90</y>
+          <width>291</width>
+          <height>22</height>
+         </rect>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Vertex displacement</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_2">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>70</y>
+          <width>121</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Face displacement</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QGroupBox" name="groupBox_3">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>300</y>
+         <width>321</width>
+         <height>91</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Morphing</string>
+       </property>
+       <widget class="QPushButton" name="midpoint_subdivision_3">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>20</y>
+          <width>71</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Midpoint</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="uniform_subdivision_4">
+        <property name="geometry">
+         <rect>
+          <x>90</x>
+          <y>20</y>
+          <width>71</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Uniform</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="uniform_subdivision_5">
+        <property name="geometry">
+         <rect>
+          <x>170</x>
+          <y>20</y>
+          <width>81</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Micro-mesh</string>
+        </property>
+       </widget>
+       <widget class="QPushButton" name="uniform_subdivision_6">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>141</width>
+          <height>24</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Anisotropic Micro-mesh</string>
+        </property>
+       </widget>
+      </widget>
+     </widget>
     </item>
    </layout>
   </widget>
@@ -51,7 +312,7 @@
      <x>0</x>
      <y>0</y>
      <width>1163</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuSome">

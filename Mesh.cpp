@@ -199,6 +199,13 @@ Mesh Mesh::micromeshSubdivide()
   return subdivided;
 }
 
+Mesh Mesh::anisotropicMicromeshSubdivide()
+{
+  Mesh subdivided = Mesh();
+  // to implement
+  return subdivided;
+}
+
 Mesh Mesh::nSubdivide(int n)
 {
   Mesh subdivided = Mesh();
@@ -615,7 +622,7 @@ void Mesh::displaceVertex(int index, float k)
   vertices[index].pos = vertices[index].pos + (k * vertices[index].norm);
 }
 
-void Mesh::displaceFace(float k)
+void Mesh::displaceFaces(float k)
 {
   for (Face &f : faces)
   {

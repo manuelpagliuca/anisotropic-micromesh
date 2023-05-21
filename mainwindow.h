@@ -41,26 +41,31 @@ private:
 
 public slots:
   void on_actionLoad_triggered();
-public slots:
   void on_actionUnload_triggered();
-public slots:
   void on_actionSave_triggered();
-public slots:
   void on_actionExit_triggered();
-public slots:
   void on_actionWireframe_triggered();
-public slots:
   void on_actionSubdivide_triggered();
-public slots:
   void on_actionVertex_displacement_triggered();
-public slots:
   void on_actionFace_displacement_triggered();
-public slots:
   void on_actionExtract_displacements_triggered();
-public slots:
   void on_actionSubdivision_surfaces_Uniform_triggered();
-public slots:
   void on_actionSubdivision_surfaces_Adaptive_triggered();
-public slots:
   void on_actionSubdivision_surfaces_Micromesh_triggered();
+  void on_demo125faces_clicked();
+  void on_demo250faces_clicked();
+  void on_demo500faces_clicked();
+  void on_demo1000faces_clicked();
+private slots:
+  void on_checkBox_stateChanged(int arg1);
+  void on_midpoint_subdivision_clicked();
+  void on_uniform_subdivision_clicked();
+  void on_micromesh_subdivision_clicked();
+  void on_anisotropic_micromesh_subdivision_clicked();
+  void on_horizontalSlider_sliderMoved(int position);
+  void on_horizontalSlider_valueChanged(int value);
+  void on_vertexDisplacementSlider_valueChanged(int value);
+  void on_vertexDisplacementSlider_rangeChanged(int min, int max);
+  void on_faceDisplacementSlider_sliderMoved(int position);
+  void on_faceDisplacementSlider_valueChanged(int value);
 };

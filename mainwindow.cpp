@@ -12,6 +12,7 @@ Mainwindow::Mainwindow(QWidget *parent) : QMainWindow(parent)
   ui.actionUnload->setEnabled(false);
   ui.actionWireframe->setEnabled(false);
   ui.actionVertex_displacement->setEnabled(false);
+  ui.vertexDisplacementSlider->setRange(-5, 5);
 }
 
 void Mainwindow::loadDemoMesh()
@@ -47,7 +48,11 @@ void Mainwindow::wheelEvent(QWheelEvent *ev)
 void Mainwindow::keyPressEvent(QKeyEvent *ev)
 {
   if (ev->key() == Qt::Key_Escape) exit(1);
-  else if (ev->key() == Qt::Key_W) ui.openGLWidget->wireframePaint();
+  else if (ev->key() == Qt::Key_W)
+  {
+//    ui.openGLWidget->wireframePaint();
+    ui.checkBox->toggle();
+  }
   else if (ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
   else if (ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
   else if (ev->key() == Qt::Key_O) on_actionSubdivision_surfaces_Uniform_triggered();
@@ -135,7 +140,7 @@ void Mainwindow::on_actionFace_displacement_triggered()
 
   if (isValid)
   {
-    baseMesh.displaceFace(k);
+    baseMesh.displaceFaces(k);
     ui.openGLWidget->updateMeshData(baseMesh);
   }
 }
@@ -191,7 +196,8 @@ void Mainwindow::on_actionUnload_triggered()
 
 void Mainwindow::on_actionWireframe_triggered()
 {
-  ui.openGLWidget->wireframePaint();
+//  ui.openGLWidget->wireframePaint();
+  ui.checkBox->toggle();
 }
 
 void Mainwindow::on_actionSubdivide_triggered()
@@ -278,3 +284,123 @@ void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()
   baseMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(baseMesh);
 }
+
+
+void Mainwindow::on_demo125faces_clicked()
+{
+  std::string pallasOBJ125 = readFile("./mesh/pallas_125.obj");
+  baseMesh = Mesh::parseOBJ(pallasOBJ125);
+  ui.openGLWidget->loadMeshData(baseMesh);
+  ui.actionSave->setEnabled(true);
+  ui.actionSubdivide->setEnabled(true);
+  ui.actionWireframe->setEnabled(true);
+  ui.actionUnload->setEnabled(true);
+  ui.actionVertex_displacement->setEnabled(true);
+}
+
+void Mainwindow::on_demo250faces_clicked()
+{
+  std::string pallasOBJ250 = readFile("./mesh/pallas_250.obj");
+  baseMesh = Mesh::parseOBJ(pallasOBJ250);
+  ui.openGLWidget->loadMeshData(baseMesh);
+  ui.actionSave->setEnabled(true);
+  ui.actionSubdivide->setEnabled(true);
+  ui.actionWireframe->setEnabled(true);
+  ui.actionUnload->setEnabled(true);
+  ui.actionVertex_displacement->setEnabled(true);
+}
+
+void Mainwindow::on_demo500faces_clicked()
+{
+  std::string pallasOBJ500 = readFile("./mesh/pallas_500.obj");
+  baseMesh = Mesh::parseOBJ(pallasOBJ500);
+  ui.openGLWidget->loadMeshData(baseMesh);
+  ui.actionSave->setEnabled(true);
+  ui.actionSubdivide->setEnabled(true);
+  ui.actionWireframe->setEnabled(true);
+  ui.actionUnload->setEnabled(true);
+  ui.actionVertex_displacement->setEnabled(true);
+}
+
+void Mainwindow::on_demo1000faces_clicked()
+{
+  std::string pallasOBJ1000 = readFile("./mesh/pallas_1000.obj");
+  baseMesh = Mesh::parseOBJ(pallasOBJ1000);
+  ui.openGLWidget->loadMeshData(baseMesh);
+  ui.actionSave->setEnabled(true);
+  ui.actionSubdivide->setEnabled(true);
+  ui.actionWireframe->setEnabled(true);
+  ui.actionUnload->setEnabled(true);
+  ui.actionVertex_displacement->setEnabled(true);
+}
+
+void Mainwindow::on_checkBox_stateChanged(int arg1)
+{
+  ui.openGLWidget->wireframePaint();
+}
+
+
+void Mainwindow::on_midpoint_subdivision_clicked()
+{
+  baseMesh = baseMesh.subdivide();
+  ui.openGLWidget->updateMeshData(baseMesh);
+}
+
+
+void Mainwindow::on_uniform_subdivision_clicked()
+{
+  bool isValid;
+  int subdivisions = QInputDialog::getInt(
+                      this, tr("Insert the number of subdivision to perform"),
+                      tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
+                      this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+
+  if (isValid)
+  {
+    baseMesh = baseMesh.nSubdivide(subdivisions);
+    ui.openGLWidget->updateMeshData(baseMesh);
+    ui.openGLWidget->updateMeshData(baseMesh);
+  }
+}
+
+
+void Mainwindow::on_micromesh_subdivision_clicked()
+{
+  baseMesh = baseMesh.adaptiveSubdivide();
+  ui.openGLWidget->updateMeshData(baseMesh);
+}
+
+
+void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
+{
+  baseMesh = baseMesh.anisotropicMicromeshSubdivide();
+  ui.openGLWidget->updateMeshData(baseMesh);
+}
+
+
+void Mainwindow::on_vertexDisplacementSlider_valueChanged(int value)
+{
+  baseMesh.displaceVertices(value);
+  ui.openGLWidget->updateMeshData(baseMesh);
+}
+
+void Mainwindow::on_horizontalSlider_sliderMoved(int value) {}
+
+void Mainwindow::on_horizontalSlider_valueChanged(int value) {}
+
+void Mainwindow::on_vertexDisplacementSlider_rangeChanged(int min, int max)
+{
+  qDebug() << min << " "<< max;
+}
+
+void Mainwindow::on_faceDisplacementSlider_sliderMoved(int position)
+{
+
+}
+
+void Mainwindow::on_faceDisplacementSlider_valueChanged(int value)
+{
+  baseMesh.displaceFaces(value);
+  ui.openGLWidget->updateMeshData(baseMesh);
+}
+

@@ -74,6 +74,7 @@ public:
 
   Mesh adaptiveSubdivide();
   Mesh micromeshSubdivide();
+  Mesh anisotropicMicromeshSubdivide();
 
   void updateFaceNormals();
   void updateVertexNormals();
@@ -83,7 +84,7 @@ public:
 
   void displaceVertices(float k);
   void displaceVertex(int index, float k);
-  void displaceFace(float k);
+  void displaceFaces(float k);
 
   bool isMicromeshScheme() const;
   int nearestRoundPow2(float edgeLength) const;
