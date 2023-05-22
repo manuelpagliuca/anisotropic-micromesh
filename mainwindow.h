@@ -19,6 +19,7 @@ public:
   Mainwindow(QWidget *parent = nullptr);
   ~Mainwindow(){};
   void loadDemoMesh();
+  void setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements);
 
 protected:
   void mousePressEvent(QMouseEvent *ev);
@@ -38,6 +39,11 @@ private:
   // Mouse Trackball
   QPoint startPos;
   QPoint newPos;
+
+  // Morphing
+  std::vector<std::tuple<int, float>> displacementsDeltas;
+  int previousValue;
+  int currentValue;
 
 public slots:
   void on_actionLoad_triggered();
@@ -64,8 +70,9 @@ private slots:
   void on_anisotropic_micromesh_subdivision_clicked();
   void on_horizontalSlider_sliderMoved(int position);
   void on_horizontalSlider_valueChanged(int value);
-  void on_vertexDisplacementSlider_valueChanged(int value);
-  void on_vertexDisplacementSlider_rangeChanged(int min, int max);
-  void on_faceDisplacementSlider_sliderMoved(int position);
-  void on_faceDisplacementSlider_valueChanged(int value);
+  void on_morph250faces_clicked();
+  void on_morph500faces_clicked();
+  void on_morph1000faces_clicked();
+  void on_morph2500faces_clicked();
+  void on_morph5000faces_clicked();
 };

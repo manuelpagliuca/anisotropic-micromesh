@@ -6,6 +6,6 @@ int main(int argc, char *argv[])
   QApplication a(argc, argv);
   Mainwindow w;
   w.show();
-  w.loadDemoMesh();
+  w.on_demo125faces_clicked();
   return a.exec();
 }
