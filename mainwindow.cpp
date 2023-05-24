@@ -12,13 +12,15 @@ Mainwindow::Mainwindow(QWidget *parent) : QMainWindow(parent)
   ui.actionUnload->setEnabled(false);
   ui.actionWireframe->setEnabled(false);
   ui.actionVertex_displacement->setEnabled(false);
+  ui.horizontalSlider->setEnabled(false);
   ui.horizontalSlider->setMaximum(99);
   ui.horizontalSlider->setMinimum(0);
   ui.horizontalSlider->setValue(0);
+  ui.checkBox->toggle();
   previousValue = 0;
 }
 
-void Mainwindow::setDisplacementsDelta(std::vector<std::tuple<int, float> > displacements)
+void Mainwindow::setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements)
 {
   displacementsDeltas = displacements;
 
@@ -50,11 +52,7 @@ void Mainwindow::wheelEvent(QWheelEvent *ev)
 void Mainwindow::keyPressEvent(QKeyEvent *ev)
 {
   if (ev->key() == Qt::Key_Escape) exit(1);
-  else if (ev->key() == Qt::Key_W)
-  {
-//    ui.openGLWidget->wireframePaint();
-    ui.checkBox->toggle();
-  }
+  else if (ev->key() == Qt::Key_W) ui.checkBox->toggle();
   else if (ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
   else if (ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
   else if (ev->key() == Qt::Key_O) on_actionSubdivision_surfaces_Uniform_triggered();
@@ -65,7 +63,6 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
   else if (ev->key() == Qt::Key_2) on_demo250faces_clicked();
   else if (ev->key() == Qt::Key_3) on_demo500faces_clicked();
   else if (ev->key() == Qt::Key_4) on_demo1000faces_clicked();
-
 }
 
 void Mainwindow::on_actionSave_triggered()
@@ -163,6 +160,8 @@ void Mainwindow::on_actionExtract_displacements_triggered()
   {
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
+
+    Mesh targetMesh;
 
     if (ext == ".off") targetMesh = Mesh::parseOFF(file);
     else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
@@ -270,6 +269,8 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
+    Mesh targetMesh;
+
     if (ext == ".off") targetMesh = Mesh::parseOFF(file);
     else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
@@ -292,22 +293,6 @@ void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()
 {
   baseMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(baseMesh);
-  ui.morphingGroupBox->setEnabled(true);
-}
-
-void Mainwindow::on_micromesh_subdivision_clicked()
-{
-  baseMesh = baseMesh.adaptiveSubdivide();
-  ui.openGLWidget->updateMeshData(baseMesh);
-  ui.morphingGroupBox->setEnabled(true);
-}
-
-
-void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
-{
-  baseMesh = baseMesh.anisotropicMicromeshSubdivide();
-  ui.openGLWidget->updateMeshData(baseMesh);
-  ui.morphingGroupBox->setEnabled(true);
 }
 
 void Mainwindow::on_demo125faces_clicked()
@@ -322,6 +307,7 @@ void Mainwindow::on_demo125faces_clicked()
   ui.actionVertex_displacement->setEnabled(true);
   ui.morphingGroupBox->setEnabled(false);
   previousValue = 0;
+  ui.subdivisionsGroupBox->setEnabled(true);
 }
 
 void Mainwindow::on_demo250faces_clicked()
@@ -336,6 +322,7 @@ void Mainwindow::on_demo250faces_clicked()
   ui.actionVertex_displacement->setEnabled(true);
   ui.morphingGroupBox->setEnabled(false);
   previousValue = 0;
+  ui.subdivisionsGroupBox->setEnabled(true);
 }
 
 void Mainwindow::on_demo500faces_clicked()
@@ -350,6 +337,7 @@ void Mainwindow::on_demo500faces_clicked()
   ui.actionVertex_displacement->setEnabled(true);
   ui.morphingGroupBox->setEnabled(false);
   previousValue = 0;
+  ui.subdivisionsGroupBox->setEnabled(true);
 }
 
 void Mainwindow::on_demo1000faces_clicked()
@@ -364,11 +352,7 @@ void Mainwindow::on_demo1000faces_clicked()
   ui.actionVertex_displacement->setEnabled(true);
   ui.morphingGroupBox->setEnabled(false);
   previousValue = 0;
-}
-
-void Mainwindow::on_checkBox_stateChanged(int arg1)
-{
-  ui.openGLWidget->wireframePaint();
+  ui.subdivisionsGroupBox->setEnabled(true);
 }
 
 void Mainwindow::on_midpoint_subdivision_clicked()
@@ -376,6 +360,10 @@ void Mainwindow::on_midpoint_subdivision_clicked()
   baseMesh = baseMesh.subdivide();
   ui.openGLWidget->updateMeshData(baseMesh);
   ui.morphingGroupBox->setEnabled(true);
+  ui.horizontalSlider->setEnabled(false);
+  ui.horizontalSlider->setValue(0);
+  previousValue = 0;
+  ui.subdivisionsGroupBox->setEnabled(false);
 }
 
 void Mainwindow::on_uniform_subdivision_clicked()
@@ -391,55 +379,113 @@ void Mainwindow::on_uniform_subdivision_clicked()
     baseMesh = baseMesh.nSubdivide(subdivisions);
     ui.openGLWidget->updateMeshData(baseMesh);
     ui.morphingGroupBox->setEnabled(true);
+    ui.horizontalSlider->setEnabled(false);
+    ui.horizontalSlider->setValue(0);
+    previousValue = 0;
+    ui.subdivisionsGroupBox->setEnabled(false);
   }
 }
 
-void Mainwindow::on_horizontalSlider_sliderMoved(int value) {}
+void Mainwindow::on_micromesh_subdivision_clicked()
+{
+  baseMesh = baseMesh.adaptiveSubdivide();
+  ui.openGLWidget->updateMeshData(baseMesh);
+  ui.morphingGroupBox->setEnabled(true);
+  ui.horizontalSlider->setEnabled(false);
+  ui.horizontalSlider->setValue(0);
+  previousValue = 0;
+  ui.subdivisionsGroupBox->setEnabled(false);
+}
 
-void Mainwindow::on_horizontalSlider_valueChanged(int value) {
-  previousValue = value;
-
-  targetMesh = baseMesh;
-  for (const auto &e : displacementsDeltas)
-  {
-    auto &[index, t] = e;
-    targetMesh.displaceVertex(index, t * value);
-  }
-
-  ui.openGLWidget->updateMeshData(targetMesh);
+void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
+{
+  baseMesh = baseMesh.anisotropicMicromeshSubdivide();
+  ui.openGLWidget->updateMeshData(baseMesh);
+  ui.horizontalSlider->setEnabled(false);
+  ui.morphingGroupBox->setEnabled(true);
+  ui.horizontalSlider->setValue(0);
+  previousValue = 0;
+  ui.subdivisionsGroupBox->setEnabled(false);
 }
 
 void Mainwindow::on_morph250faces_clicked()
 {
   std::string pallasOBJ250 = readFile("./mesh/pallas_250.obj");
-  targetMesh = Mesh::parseOBJ(pallasOBJ250);
+  Mesh targetMesh = Mesh::parseOBJ(pallasOBJ250);
   setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  ui.horizontalSlider->setEnabled(true);
+  if (previousValue != 0) {
+    ui.horizontalSlider->setValue(0);
+    previousValue = 0;
+    ui.openGLWidget->updateMeshData(baseMesh);
+  }
 }
 
 void Mainwindow::on_morph500faces_clicked()
 {
   std::string pallasOBJ500 = readFile("./mesh/pallas_500.obj");
-  targetMesh = Mesh::parseOBJ(pallasOBJ500);
+  Mesh targetMesh = Mesh::parseOBJ(pallasOBJ500);
   setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  ui.horizontalSlider->setEnabled(true);
+  ui.horizontalSlider->setValue(0);
+  previousValue = 0;
 }
 
 void Mainwindow::on_morph1000faces_clicked()
 {
   std::string pallasOBJ1000 = readFile("./mesh/pallas_1000.obj");
-  targetMesh = Mesh::parseOBJ(pallasOBJ1000);
+  Mesh targetMesh = Mesh::parseOBJ(pallasOBJ1000);
   setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  ui.horizontalSlider->setEnabled(true);
+  ui.horizontalSlider->setValue(0);
+  previousValue = 0;
 }
 
 void Mainwindow::on_morph2500faces_clicked()
 {
   std::string pallasOBJ2500 = readFile("./mesh/pallas_2500.obj");
-  targetMesh = Mesh::parseOBJ(pallasOBJ2500);
+  Mesh targetMesh = Mesh ::parseOBJ(pallasOBJ2500);
   setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  ui.horizontalSlider->setEnabled(true);
+
+  ui.horizontalSlider->setValue(0);
+  previousValue = 0;
+  ui.subdivisionsGroupBox->setEnabled(false);
 }
 
 void Mainwindow::on_morph5000faces_clicked()
 {
   std::string pallasOBJ5000 = readFile("./mesh/pallas_5000.obj");
-  targetMesh = Mesh::parseOBJ(pallasOBJ5000);
+  Mesh targetMesh = Mesh::parseOBJ(pallasOBJ5000);
   setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  ui.horizontalSlider->setEnabled(true);
+  ui.horizontalSlider->setValue(0);
+  previousValue = 0;
+}
+
+void Mainwindow::on_horizontalSlider_valueChanged(int value) {
+  if (value == 0) return;
+
+  previousValue = value;
+
+  Mesh targetMesh = baseMesh;
+
+  for (const auto &e : displacementsDeltas)
+  {
+    auto &[index, t] = e;
+    qDebug() << float(t*value) << "\n";
+    targetMesh.displaceVertex(index, float(t * value));
+  }
+
+  ui.openGLWidget->updateMeshData(targetMesh);
+}
+
+void Mainwindow::on_reloadShadersButton_clicked()
+{
+  ui.openGLWidget->reloadShaders();
+}
+
+void Mainwindow::on_checkBox_stateChanged(int arg1)
+{
+  ui.openGLWidget->wireframePaint();
 }

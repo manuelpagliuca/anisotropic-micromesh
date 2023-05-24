@@ -214,7 +214,7 @@
         </property>
        </widget>
       </widget>
-      <widget class="QPushButton" name="demo125faces_2">
+      <widget class="QPushButton" name="reloadShadersButton">
        <property name="geometry">
         <rect>
          <x>10</x>

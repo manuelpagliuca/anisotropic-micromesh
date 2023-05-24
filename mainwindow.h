@@ -34,7 +34,6 @@ private:
 
   // Mesh loading
   Mesh baseMesh;
-  Mesh targetMesh;
 
   // Mouse Trackball
   QPoint startPos;
@@ -62,17 +61,16 @@ public slots:
   void on_demo250faces_clicked();
   void on_demo500faces_clicked();
   void on_demo1000faces_clicked();
-private slots:
   void on_checkBox_stateChanged(int arg1);
   void on_midpoint_subdivision_clicked();
   void on_uniform_subdivision_clicked();
   void on_micromesh_subdivision_clicked();
   void on_anisotropic_micromesh_subdivision_clicked();
-  void on_horizontalSlider_sliderMoved(int position);
   void on_horizontalSlider_valueChanged(int value);
   void on_morph250faces_clicked();
   void on_morph500faces_clicked();
   void on_morph1000faces_clicked();
   void on_morph2500faces_clicked();
   void on_morph5000faces_clicked();
+  void on_reloadShadersButton_clicked();
 };

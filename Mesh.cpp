@@ -619,7 +619,10 @@ void Mesh::displaceVertices(float k)
 
 void Mesh::displaceVertex(int index, float k)
 {
+//  std::cout << "k: " << k << std::endl;
+//  std::cout << "Before" << glm::to_string(vertices[index].pos) << std::endl;
   vertices[index].pos = vertices[index].pos + (k * vertices[index].norm);
+//  std::cout << "After" << glm::to_string(vertices[index].pos) << std::endl;
 }
 
 void Mesh::displaceFaces(float k)

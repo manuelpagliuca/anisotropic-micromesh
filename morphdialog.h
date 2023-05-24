@@ -26,12 +26,10 @@ private slots:
 
 private:
   Ui::MorphWindows *ui;
-  Mesh baseMesh;
-  Mesh targetMesh;
+  Mesh baseMesh, targetMesh;
   GLWidget *glWidget;
   std::vector<std::tuple<int, float>> displacementsDeltas;
-  int previousValue;
-  int currentValue;
+  int previousValue, currentValue;
 };
 
 #endif // MORPHDIALOG_H
