@@ -152,33 +152,33 @@ Mesh Mesh::adaptiveSubdivide()
       }
     }
 
-//    if ((1 << e0) < n) {
-//      int vx = n;
+    if ((1 << e0) < n) {
+      int vx = n;
 
-//      for (int vy = 1; vy < n; vy += 2) {
-//        int vyb = vy + 1;
-//        subdivided.vertices[k + vx * (vx + 1) / 2 + vy] = subdivided.vertices[k + vx * (vx + 1) / 2 + vyb];
-//      }
-//    }
-
-//    if ((1 << e1) < n) {
-//      int vy = n;
-
-//      for (int vx = 1; vx < n; vx += 2) {
-//        int vxb = vx + 1;
-////        int vxb = vx + ((vx > n / 2) ? +1 : -1);
-//        subdivided.vertices[k + vy * (vy + 1) / 2 + vx] = subdivided.vertices[k + vy * (vy + 1) / 2 + vxb];
-
-//      }
-//    }
-
-    if ((1 << e2) < n) {
-      int vxy = n;
-
-      for (int vxy = 1; vxy < n; vxy+=2) {
-        int vxyb = vxy + 1;
+      for (int vy = 1; vy < n; vy += 2) {
+        int vyb = vy + 1;
+        subdivided.vertices[k + vx * (vx + 1) / 2 + vy] = subdivided.vertices[k + vx * (vx + 1) / 2 + vyb];
       }
     }
+
+    if ((1 << e1) < n) {
+      int vy = n;
+
+      for (int vx = 1; vx < n; vx += 2) {
+        int vxb = vx + 1;
+        subdivided.vertices[k + vx * (vx + 1) / 2 + vy] = subdivided.vertices[k + vxb * (vxb + 1) / 2 + vy];
+      }
+    }
+
+    if ((1 << e2) < n) {
+      int vx = n;
+
+      for (int vy = 1; vy < n; vy += 2) {
+        int vyb = vy + 1;
+        subdivided.vertices[k + vx * (vx + 1) / 2 + vy] = subdivided.vertices[k + vx * (vx + 1) / 2 + vyb];
+      }
+    }
+
   }
 
 

@@ -473,7 +473,6 @@ void Mainwindow::on_horizontalSlider_valueChanged(int value) {
   for (const auto &e : displacementsDeltas)
   {
     auto &[index, t] = e;
-    qDebug() << float(t*value) << "\n";
     targetMesh.displaceVertex(index, float(t * value));
   }
 
