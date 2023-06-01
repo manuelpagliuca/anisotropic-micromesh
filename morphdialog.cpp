@@ -24,8 +24,7 @@ void MorphDialog::setDisplacementsDelta(std::vector<std::tuple<int, float>> disp
 {
   displacementsDeltas = displacements;
 
-  for (auto &e : displacementsDeltas)
-  {
+  for (auto &e : displacementsDeltas) {
     auto &[index, t] = e;
     t = t / 100.f;
   }
@@ -41,8 +40,7 @@ void MorphDialog::on_horizontalSlider_valueChanged(int value)
   previousValue = value;
 
   targetMesh = baseMesh;
-  for (const auto &e : displacementsDeltas)
-  {
+  for (const auto &e : displacementsDeltas) {
     auto &[index, t] = e;
     targetMesh.displaceVertex(index, t * value);
   }

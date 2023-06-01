@@ -24,8 +24,7 @@ void Mainwindow::setDisplacementsDelta(std::vector<std::tuple<int, float>> displ
 {
   displacementsDeltas = displacements;
 
-  for (auto &e : displacementsDeltas)
-  {
+  for (auto &e : displacementsDeltas) {
     auto &[index, t] = e;
     t = t / 100.f;
   }
@@ -89,13 +88,12 @@ void Mainwindow::on_actionLoad_triggered()
     tr("Load Mesh"), ".\\mesh",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);; OBJ Files (*.obj)"));
 
-  if (!filePath.isEmpty())
-  {
+  if (!filePath.isEmpty()) {
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
     baseMesh = Mesh();
-    if (ext == ".off")
-    {
+
+    if (ext == ".off") {
       baseMesh = Mesh::parseOFF(file);
       ui.openGLWidget->loadMeshData(baseMesh);
       ui.actionSave->setEnabled(true);
@@ -103,9 +101,7 @@ void Mainwindow::on_actionLoad_triggered()
       ui.actionWireframe->setEnabled(true);
       ui.actionUnload->setEnabled(true);
       ui.actionVertex_displacement->setEnabled(true);
-    }
-    else if (ext == ".obj")
-    {
+    } else if (ext == ".obj") {
       baseMesh = Mesh::parseOBJ(file);
       ui.openGLWidget->loadMeshData(baseMesh);
       ui.actionSave->setEnabled(true);
@@ -126,8 +122,7 @@ void Mainwindow::on_actionVertex_displacement_triggered()
     tr("Amount:"), 0.0, -3.0, 5.0, 4, &isValid,
     this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-  if (isValid)
-  {
+  if (isValid) {
     baseMesh.displaceVertices(k);
     ui.openGLWidget->updateMeshData(baseMesh);
   }
@@ -142,8 +137,7 @@ void Mainwindow::on_actionFace_displacement_triggered()
       tr("Amount:"), 0.0, -3.0, 5.0, 4, &isValid,
       this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-  if (isValid)
-  {
+  if (isValid) {
     baseMesh.displaceFaces(k);
     ui.openGLWidget->updateMeshData(baseMesh);
   }
@@ -156,8 +150,7 @@ void Mainwindow::on_actionExtract_displacements_triggered()
     tr("Load Mesh"), ".\\mesh",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
-  if (!filePath.isEmpty())
-  {
+  if (!filePath.isEmpty()) {
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
@@ -173,8 +166,7 @@ void Mainwindow::on_actionExtract_displacements_triggered()
       tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
       this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-    if (isValid)
-    {
+    if (isValid) {
       for (int i = 0; i < k; i++) baseMesh = baseMesh.subdivide();
       ui.openGLWidget->updateMeshData(baseMesh);
     }
@@ -222,16 +214,14 @@ std::string Mainwindow::readFile(const char *file_loc)
   std::string content;
   std::ifstream file_stream(file_loc, std::ios::in);
 
-  if (!file_stream.is_open())
-  {
+  if (!file_stream.is_open()) {
     printf("Failed to read %s! File doesn't exist.", file_loc);
     return "";
   }
 
   std::string line = "";
 
-  while (!file_stream.eof())
-  {
+  while (!file_stream.eof()) {
     std::getline(file_stream, line);
     content.append(line + "\n");
   }
@@ -248,8 +238,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
                       tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
                       this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-  if (isValid)
-  {
+  if (isValid) {
     baseMesh = baseMesh.nSubdivide(subdivisions);
     ui.openGLWidget->updateMeshData(baseMesh);
     ui.openGLWidget->updateMeshData(baseMesh);
@@ -264,8 +253,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
     tr("Load Mesh"), ".\\mesh",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
-  if (!filePath.isEmpty())
-  {
+  if (!filePath.isEmpty()) {
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
@@ -274,7 +262,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
     if (ext == ".off") targetMesh = Mesh::parseOFF(file);
     else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
-    baseMesh = baseMesh.adaptiveSubdivide();
+    baseMesh = baseMesh.micromeshSubdivide();
     ui.openGLWidget->updateMeshData(baseMesh);
 
     Mesh tmpMesh = baseMesh;
@@ -374,8 +362,7 @@ void Mainwindow::on_uniform_subdivision_clicked()
                       tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
                       this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
-  if (isValid)
-  {
+  if (isValid) {
     baseMesh = baseMesh.nSubdivide(subdivisions);
     ui.openGLWidget->updateMeshData(baseMesh);
     ui.morphingGroupBox->setEnabled(true);
@@ -388,7 +375,7 @@ void Mainwindow::on_uniform_subdivision_clicked()
 
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
-  baseMesh = baseMesh.adaptiveSubdivide();
+  baseMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(baseMesh);
   ui.morphingGroupBox->setEnabled(true);
   ui.horizontalSlider->setEnabled(false);
@@ -414,6 +401,7 @@ void Mainwindow::on_morph250faces_clicked()
   Mesh targetMesh = Mesh::parseOBJ(pallasOBJ250);
   setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
   ui.horizontalSlider->setEnabled(true);
+
   if (previousValue != 0) {
     ui.horizontalSlider->setValue(0);
     previousValue = 0;
@@ -447,7 +435,6 @@ void Mainwindow::on_morph2500faces_clicked()
   Mesh targetMesh = Mesh ::parseOBJ(pallasOBJ2500);
   setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
   ui.horizontalSlider->setEnabled(true);
-
   ui.horizontalSlider->setValue(0);
   previousValue = 0;
   ui.subdivisionsGroupBox->setEnabled(false);
@@ -470,8 +457,7 @@ void Mainwindow::on_horizontalSlider_valueChanged(int value) {
 
   Mesh targetMesh = baseMesh;
 
-  for (const auto &e : displacementsDeltas)
-  {
+  for (const auto &e : displacementsDeltas) {
     auto &[index, t] = e;
     targetMesh.displaceVertex(index, float(t * value));
   }
@@ -484,7 +470,7 @@ void Mainwindow::on_reloadShadersButton_clicked()
   ui.openGLWidget->reloadShaders();
 }
 
-void Mainwindow::on_checkBox_stateChanged(int arg1)
+void Mainwindow::on_checkBox_stateChanged()
 {
   ui.openGLWidget->wireframePaint();
 }

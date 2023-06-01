@@ -9,6 +9,7 @@ INCLUDEPATH += $$PWD/dependencies
 
 SOURCES += \
     GLWidget.cpp \
+    Utility.cpp \
     main.cpp \
     BoundingBox.cpp \
     Mainwindow.cpp \
@@ -26,6 +27,7 @@ HEADERS += \
     Mesh.h \
     Shader.h \
     Trackball.h \
+    Utility.h \
     morphdialog.h
 
 FORMS += \

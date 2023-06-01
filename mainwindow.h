@@ -61,7 +61,7 @@ public slots:
   void on_demo250faces_clicked();
   void on_demo500faces_clicked();
   void on_demo1000faces_clicked();
-  void on_checkBox_stateChanged(int arg1);
+  void on_checkBox_stateChanged();
   void on_midpoint_subdivision_clicked();
   void on_uniform_subdivision_clicked();
   void on_micromesh_subdivision_clicked();

@@ -18,16 +18,14 @@ std::string Shader::readFile(const char *filePath) const
   std::string content;
   std::ifstream fileStream(filePath, std::ios::in);
 
-  if (!fileStream.is_open())
-  {
+  if (!fileStream.is_open()) {
     printf("Failed to read %s! File doesn't exist.", filePath);
     return "";
   }
 
   std::string line = "";
 
-  while (!fileStream.eof())
-  {
+  while (!fileStream.eof()) {
     std::getline(fileStream, line);
     content.append(line + "\n");
   }
@@ -54,8 +52,7 @@ void Shader::compile(const char *vertexCode, const char *fragmentCode)
 {
   id = glCreateProgram();
 
-  if (!id)
-  {
+  if (!id) {
     std::cerr << "Error creating shader program!" << std::endl;
     return;
   }
@@ -69,8 +66,7 @@ void Shader::compile(const char *vertexCode, const char *fragmentCode)
   glLinkProgram(id);
   glGetProgramiv(id, GL_LINK_STATUS, &result);
 
-  if (!result)
-  {
+  if (!result) {
     glGetProgramInfoLog(id, sizeof(eLog), NULL, eLog);
     printf("Error linking program: '%s'\n", eLog);
     return;
@@ -79,8 +75,7 @@ void Shader::compile(const char *vertexCode, const char *fragmentCode)
   glValidateProgram(id);
   glGetProgramiv(id, GL_VALIDATE_STATUS, &result);
 
-  if (!result)
-  {
+  if (!result) {
     glGetProgramInfoLog(id, sizeof(eLog), NULL, eLog);
     printf("Error validating program: '%s'\n", eLog);
     return;
@@ -94,7 +89,7 @@ void Shader::addShader(const unsigned int &program, const char *shaderCode, cons
 {
   GLuint shader = glCreateShader(shaderType);
 
-  int codeLength = static_cast<int>(strlen(shaderCode));
+  int codeLength = int(strlen(shaderCode));
 
   glShaderSource(shader, 1, &shaderCode, &codeLength);
   glCompileShader(shader);
@@ -104,8 +99,7 @@ void Shader::addShader(const unsigned int &program, const char *shaderCode, cons
 
   glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
 
-  if (!result)
-  {
+  if (!result) {
     glGetShaderInfoLog(shader, sizeof(eLog), NULL, eLog);
     std::cerr << "Error compiling the " << shaderType << "shader: " << eLog << "\n";
     return;

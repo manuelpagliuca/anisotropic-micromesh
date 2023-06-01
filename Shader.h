@@ -11,8 +11,7 @@
 class Shader : protected QOpenGLExtraFunctions
 {
 public:
-  Shader()
-  {
+  Shader() {
     id = -1;
     uniformModelMatrix = 0;
     uniformWireframeMode = 0;

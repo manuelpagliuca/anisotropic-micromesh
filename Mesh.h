@@ -10,29 +10,63 @@
 #include <GLM/gtx/string_cast.hpp>
 #include <map>
 #include <utility>
-
+#include "Utility.h"
 #include "BoundingBox.h"
+
+using namespace glm;
 
 struct Vertex
 {
-  glm::vec3 pos;
-  glm::vec3 norm;
-  glm::vec2 tex;
+  vec3 pos;
+  vec3 norm;
+  vec2 tex;
 };
 
 struct Face
 {
-  unsigned int index[3];
-  unsigned int edges[3];
-  glm::vec3 norm;
+  uint index[3];
+  uint edges[3]; // 0, 1 and 2
+  vec3 norm;
 };
 
 struct Edge
 {
-  unsigned int faces[2];
-  unsigned int side[2];
-  unsigned int subdivisions = 0;
-  bool locked = false;
+  uint faces[2];
+  uint side[2]; // 0 and 1 (l and r)
+  uint subdivisions = 0;
+};
+
+struct AvailableEdge
+{
+  uint startVertexIndex;
+  uint endVertexIndex;
+
+  AvailableEdge(uint a, uint b) : startVertexIndex(a), endVertexIndex(b) {}
+
+  bool operator==(const AvailableEdge &o) const
+  {
+    return startVertexIndex == o.startVertexIndex && endVertexIndex == o.endVertexIndex;
+  }
+
+  bool operator<(const AvailableEdge &o) const
+  {
+    return startVertexIndex < o.startVertexIndex || (startVertexIndex == o.startVertexIndex && endVertexIndex < o.endVertexIndex);
+  }
+
+  bool operator>(const AvailableEdge &o) const
+  {
+    return startVertexIndex > o.startVertexIndex || (startVertexIndex == o.startVertexIndex && endVertexIndex > o.endVertexIndex);
+  }
+
+  AvailableEdge flip() const { return AvailableEdge(endVertexIndex, startVertexIndex); }
+};
+
+struct EdgeLocation
+{
+  uint faceIndex;
+  uint sideIndex;
+
+  EdgeLocation(uint a, uint b) : faceIndex(a), sideIndex(b) {}
 };
 
 class Mesh : protected QOpenGLExtraFunctions
@@ -46,54 +80,39 @@ public:
   std::vector<Face> faces;
   std::vector<Edge> edges;
 
-  int addVertex(glm::vec3 pos);
+  int addVertex(vec3 pos);
   int addFace(int i0, int i1, int i2);
-  int addEdge(int i0, int i1, int s0, int s1);
-
-
-  std::vector<float> getPositionsVector() const;
-  std::vector<unsigned int> getFacesVector() const;
-
-  std::map<int, int> getDoubleAreaToSubdivisionLevelMap() const;
-  std::map<int, int> getEdgeLengthToSubdivisionLevelMap() const;
-
-  float getAvgFacesDoubleArea() const;
-  float getAvgEdgeLength() const;
-
-  std::vector<float> getDeviationsFromAvgFaceDoubleArea() const;
-  std::vector<float> getDeviationsFromAvgEdge() const;
-
-  void setInitialEdgeSubdivisions();
-
-  void draw(bool wireframe);
-  void drawDirect();
-
-  Mesh subdivide();
-  Mesh nSubdivide(int subdivision);
-  Vertex surfacePoint(const Face &f, glm::vec3 bary) const;
-
-  Mesh adaptiveSubdivide();
-  Mesh micromeshSubdivide();
-  Mesh anisotropicMicromeshSubdivide();
-
-  void updateFaceNormals();
-  void updateVertexNormals();
-  void updateEdges();
-  void updateEdgesSubdivisions();
-  void updateBoundingBox();
+  int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
 
   void displaceVertices(float k);
   void displaceVertex(int index, float k);
   void displaceFaces(float k);
 
-  bool isMicromeshScheme() const;
-  int nearestRoundPow2(float edgeLength) const;
-  int nearestCeilPow2(float edgeLength) const;
-  int maxInt2(int a, int b) const;
-  int maxInt3(int a, int b, int c) const;
-  int maxIntIndex(int arr[]) const;
+  std::vector<float> getPositionsVector() const;
+  std::vector<uint> getFacesVector() const;
+
+  float getAvgFacesDoubleArea() const;
+  float getAvgEdgeLength() const;
+
+  Mesh subdivide();
+  Mesh nSubdivide(int subdivision);
+  Mesh micromeshSubdivide();
+  Mesh anisotropicMicromeshSubdivide();
+
+  void updateFaceNormals();
+  void updateVertexNormals();
+  void updateBoundingBox();
+  void updateEdges();
+  void setInitialEdgeSubdivisionLevels();
+  void setInitialEdgeSubdivisionLevelsTest();
+  void updateEdgesSubdivisionLevels();
+  void sanityCheckEdge();
+
   bool enforceMicromesh(const Face &f);
-  bool enforceAnisoMicromesh(const Face &f);
+  bool enforceAnisotropicMicromesh(const Face &f);
+
+  bool isMicromeshScheme() const;
+  Vertex surfacePoint(const Face &f, vec3 bary) const;
 
   std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
 
@@ -102,7 +121,10 @@ public:
   void exportOFF(const std::string &fileName) const;
   void exportOBJ(const std::string &fileName) const;
 
-  void updateGL();
+protected:
+  void updateGL() {}
+  void draw(bool wireframe);
+  void drawDirect();
 
   void print() const;
   void printEdgeSubdivisions() const;

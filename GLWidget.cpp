@@ -1,12 +1,9 @@
 ﻿#include "GLWidget.h"
 
-using namespace std;
-
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
-  VAO = VBO = EBO = 0;
   shaderProgram = modelLocation = 0;
-  model = glm::mat4(1.f);
+  model = mat4(1.f);
 }
 
 void GLWidget::paintGL()
@@ -17,24 +14,23 @@ void GLWidget::paintGL()
 
   model = trackBall.getRotationMatrix() * trackBall.getScalingMatrix() * model;
 
-  glUniformMatrix4fv(modelLocation, 1, GL_FALSE, glm::value_ptr(model));
+  glUniformMatrix4fv(modelLocation, 1, GL_FALSE, value_ptr(model));
   glUniform1i(wireLocation, 0); // wireframe starts disabled
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, vertices.data());
   glEnableVertexAttribArray(0);
 
   // Drawing
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, faces.data());
+  glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(faces.size()), GL_UNSIGNED_INT, faces.data());
   glEnable(GL_LIGHTING);
 
-  if (wireframeMode)
-  {
+  if (wireframeMode) {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glLineWidth(2.f);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glUniform1i(wireLocation, 1); // wire on
-    glDrawElements(GL_TRIANGLES, faces.size(), GL_UNSIGNED_INT, faces.data());
+    glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(faces.size()), GL_UNSIGNED_INT, faces.data());
   }
 
   glDisableVertexAttribArray(0);
@@ -74,8 +70,7 @@ void GLWidget::initializeShaders()
   GLint success;
   glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
 
-  if (!success)
-  {
+  if (!success) {
     GLchar infoLog[512];
     glGetProgramInfoLog(shaderProgram, 512, nullptr, infoLog);
     std::cout << "error： program link failed: " << infoLog << std::endl;
@@ -96,7 +91,7 @@ void GLWidget::loadMeshData(const Mesh &mesh)
   faces.clear();
   vertices = mesh.getPositionsVector();
   faces = mesh.getFacesVector();
-  model = glm::mat4(1.f);
+  model = mat4(1.f);
   model = mesh.bbox.centering();
   update();
 }
@@ -123,8 +118,7 @@ GLuint GLWidget::createShader(GLenum type, const GLchar *source)
   GLint success;
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 
-  if (!success)
-  {
+  if (!success) {
     GLchar infoLog[512];
     glGetShaderInfoLog(shader, 512, nullptr, infoLog);
     std::cout << "error： shader compilation failed: " << infoLog << source << std::endl;
@@ -137,16 +131,14 @@ std::string GLWidget::readFile(const char *fileLocation) const
   std::string content;
   std::ifstream fileStream(fileLocation, std::ios::in);
 
-  if (!fileStream.is_open())
-  {
+  if (!fileStream.is_open()) {
     printf("Failed to read %s! File doesn't exist.", fileLocation);
     return "";
   }
 
   std::string line = "";
 
-  while (!fileStream.eof())
-  {
+  while (!fileStream.eof()) {
     std::getline(fileStream, line);
     content.append(line + "\n");
   }
@@ -160,5 +152,3 @@ void GLWidget::wireframePaint()
   wireframeMode = !wireframeMode;
   update();
 }
-
-
