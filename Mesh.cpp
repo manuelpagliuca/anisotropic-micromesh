@@ -207,6 +207,8 @@ Mesh Mesh::micromeshSubdivide()
     int e1 = edges[f.edges[1]].subdivisions;
     int e2 = edges[f.edges[2]].subdivisions;
 
+//    qDebug() << e0 << " " << e1 << " " << e2;
+
     int eMax = maxInt3(e0, e1, e2);
     int n = 1 << eMax;
     int k = int(subdivided.vertices.size());
@@ -229,7 +231,8 @@ Mesh Mesh::micromeshSubdivide()
         if (fx > fy) { // flip "red" triangle
           v0 = ivec2(n, n) - v0;
           v1 = ivec2(n, n) - v1;
-          v2 = ivec2(n, n) - v2;        }
+          v2 = ivec2(n, n) - v2;
+        }
 
         subdivided.addFace(k + toIndexV(v0), k + toIndexV(v1), k + toIndexV(v2));
       }
@@ -245,7 +248,6 @@ Mesh Mesh::micromeshSubdivide()
     if (e1 < eMax) {
       for (int vx = 1; vx < n; vx += 2) {
         int delta = (vx < n/2) ? -1 : +1;
-
         subdivided.vertices[k + toIndex(vx, n)] = subdivided.vertices[k + toIndex(vx + delta, n)];
       }
     }
@@ -347,15 +349,9 @@ void Mesh::setInitialEdgeSubdivisionLevels()
   }
 }
 
-void Mesh::setInitialEdgeSubdivisionLevelsTest()
-{
-  for (Edge &e : edges) e.subdivisions = 1;
-  edges.at(0).subdivisions = 6;
-}
-
 void Mesh::updateEdgesSubdivisionLevels()
 {
-  setInitialEdgeSubdivisionLevelsTest();
+  setInitialEdgeSubdivisionLevels();
 
   int count = 0;
 
@@ -369,7 +365,7 @@ void Mesh::updateEdgesSubdivisionLevels()
     count++;
     if (!changeAnything) break;
   }
-  qDebug() << count;
+  qDebug() << "Micromesh scheme enforced: " << count << " times.";
 }
 
 void Mesh::sanityCheckEdge()
@@ -401,8 +397,6 @@ void Mesh::updateBoundingBox()
   for (Vertex &v : vertices) bbox.includeAnotherPoint(v.pos);
 }
 
-
-
 bool Mesh::enforceMicromesh(const Face &f)
 {
   bool changeAnything = false;
@@ -415,7 +409,7 @@ bool Mesh::enforceMicromesh(const Face &f)
   uint max = uint(maxInt3(edgeSubdivision[0], edgeSubdivision[1], edgeSubdivision[2]));
 
   for (uint &eSub : edgeSubdivision) {
-    if (eSub < max - 1) {
+    if (eSub < (max - 1) && (max > 0)) {
       eSub = max - 1;
       changeAnything = true;
     }
