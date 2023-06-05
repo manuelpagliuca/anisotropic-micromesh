@@ -73,4 +73,7 @@ public slots:
   void on_morph2500faces_clicked();
   void on_morph5000faces_clicked();
   void on_reloadShadersButton_clicked();
+private slots:
+  void on_loadBaseMesh_clicked();
+  void on_loadTargetMesh_clicked();
 };

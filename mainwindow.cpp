@@ -474,3 +474,58 @@ void Mainwindow::on_checkBox_stateChanged()
 {
   ui.openGLWidget->wireframePaint();
 }
+
+void Mainwindow::on_loadBaseMesh_clicked()
+{
+  QString filePath = QFileDialog::getOpenFileName(
+    this,
+    tr("Load Mesh"), ".\\mesh",
+    tr("3D Mesh(*.off *.obj);;OFF Files (*.off);; OBJ Files (*.obj)"));
+
+  if (!filePath.isEmpty()) {
+    std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
+    std::string file = readFile(filePath.toStdString().c_str());
+    baseMesh = Mesh();
+
+    if (ext == ".off") {
+      baseMesh = Mesh::parseOFF(file);
+      ui.openGLWidget->loadMeshData(baseMesh);
+      ui.actionSave->setEnabled(true);
+      ui.actionSubdivide->setEnabled(true);
+      ui.actionWireframe->setEnabled(true);
+      ui.actionUnload->setEnabled(true);
+      ui.actionVertex_displacement->setEnabled(true);
+    } else if (ext == ".obj") {
+      baseMesh = Mesh::parseOBJ(file);
+      ui.openGLWidget->loadMeshData(baseMesh);
+      ui.actionSave->setEnabled(true);
+      ui.actionSubdivide->setEnabled(true);
+      ui.actionWireframe->setEnabled(true);
+      ui.actionUnload->setEnabled(true);
+      ui.actionVertex_displacement->setEnabled(true);
+    }
+  }
+}
+
+void Mainwindow::on_loadTargetMesh_clicked()
+{
+  QString filePath = QFileDialog::getOpenFileName(
+    this,
+    tr("Load Mesh"), ".\\mesh",
+    tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
+
+  if (!filePath.isEmpty()) {
+    std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
+    std::string file = readFile(filePath.toStdString().c_str());
+
+    Mesh targetMesh;
+
+    if (ext == ".off") targetMesh = Mesh::parseOFF(file);
+    else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
+    setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+    ui.horizontalSlider->setEnabled(true);
+    ui.horizontalSlider->setValue(0);
+    previousValue = 0;
+    ui.subdivisionsGroupBox->setEnabled(false);
+  }
+}
