@@ -540,8 +540,7 @@ std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(cons
 }
 Mesh Mesh::parseOFF(const std::string &rawOFF)
 {
-  if (rawOFF.empty())
-  {
+  if (rawOFF.empty()) {
     Mesh empty = Mesh();
     return empty;
   }
@@ -551,8 +550,7 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
 
   std::getline(iss, line);
 
-  if (line != "OFF")
-  {
+  if (line != "OFF") {
     std::cerr << "Wrong format!" << std::endl;
     Mesh corr_mesh = Mesh();
     return Mesh();
@@ -565,16 +563,12 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
   Mesh mesh = Mesh();
   int nTotal = numVertices + numFaces + 0; // todo: atm no edges
 
-  for (int i = 0; i < nTotal; i++)
-  {
-    if (i < numVertices)
-    {
+  for (int i = 0; i < nTotal; i++) {
+    if (i < numVertices) {
       float x, y, z;
       iss >> x >> y >> z;
       mesh.addVertex(vec3(x, y, z));
-    }
-    else if (i >= numVertices && i < numVertices + numFaces)
-    {
+    } else if (i >= numVertices && i < numVertices + numFaces) {
       int n_vrtx, v1, v2, v3;
       iss >> n_vrtx >> v1 >> v2 >> v3;
       mesh.addFace(v1, v2, v3);
