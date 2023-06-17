@@ -198,6 +198,7 @@ Mesh Mesh::nSubdivide(int n)
 Mesh Mesh::micromeshSubdivide()
 {
   Mesh subdivided = Mesh();
+  subdivided.edges = edges;
 
   auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };
   auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
@@ -207,10 +208,8 @@ Mesh Mesh::micromeshSubdivide()
     int e1 = edges[f.edges[1]].subdivisions;
     int e2 = edges[f.edges[2]].subdivisions;
 
-//    qDebug() << e0 << " " << e1 << " " << e2;
-
     int eMax = maxInt3(e0, e1, e2);
-    int n = 1 << eMax;
+    int n = pow(2, eMax);
     int k = int(subdivided.vertices.size());
 
     // add microvertices
@@ -257,9 +256,10 @@ Mesh Mesh::micromeshSubdivide()
         int delta = (vxy < n/2) ? -1 : +1;
         subdivided.vertices[k + toIndex(vxy, vxy)] = subdivided.vertices[k + toIndex(vxy + delta, vxy + delta)];
       }
-    }
+    }    
   }
 
+  subdivided.fixEdges(); // to implement - still not working
   subdivided.updateBoundingBox();
   subdivided.updateFaceNormals();
   subdivided.updateVertexNormals();
@@ -272,6 +272,28 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
   Mesh subdivided = Mesh();
   // to implement
   return subdivided;
+}
+
+// This function fixes the edges which are downscaled but should be higher scale
+void Mesh::fixEdges()
+{
+  for (Edge &e: edges) {
+    Face f0 = faces.at(e.faces[0]);
+    Face f1 = faces.at(e.faces[1]);
+
+    int e00 = edges.at(f0.edges[0]).subdivisions;
+    int e01 = edges.at(f0.edges[1]).subdivisions;
+    int e02 = edges.at(f0.edges[2]).subdivisions;
+
+    int e10 = edges.at(f1.edges[0]).subdivisions;
+    int e11 = edges.at(f1.edges[1]).subdivisions;
+    int e12 = edges.at(f1.edges[2]).subdivisions;
+
+    int eMax0 = maxInt3(e00, e01, e02);
+    int eMax1 = maxInt3(e10, e11, e12);
+
+    if (eMax0 == eMax1 && e.subdivisions < eMax0) e.subdivisions = eMax0;
+  }
 }
 
 void Mesh::updateFaceNormals()
