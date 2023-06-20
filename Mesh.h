@@ -90,6 +90,7 @@ public:
 
   std::vector<float> getPositionsVector() const;
   std::vector<uint> getFacesVector() const;
+  uint getFaceSubdivisionLevel(int index) const;
 
   float getAvgFacesDoubleArea() const;
   float getAvgEdgeLength() const;
@@ -104,7 +105,6 @@ public:
   void updateBoundingBox();
   void updateEdges();
   void setInitialEdgeSubdivisionLevels();
-  void setInitialEdgeSubdivisionLevelsTest();
   void updateEdgesSubdivisionLevels();
   void sanityCheckEdge();
 

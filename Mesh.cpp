@@ -39,8 +39,8 @@ int Mesh::addEdge(int faceIndex0, int faceIndex1, int side0, int side1)
 
   int edgeIndex = int(edges.size() - 1);
 
-  faces.at(faceIndex0).edges[side0] = edgeIndex;
-  faces.at(faceIndex1).edges[side1] = edgeIndex;
+  if (faceIndex0 != -1) faces.at(faceIndex0).edges[side0] = edgeIndex;
+  if (faceIndex1 != -1) faces.at(faceIndex1).edges[side1] = edgeIndex;
 
   return edgeIndex;
 }
@@ -91,6 +91,15 @@ std::vector<uint> Mesh::getFacesVector() const
   }
 
   return indices;
+}
+
+uint Mesh::getFaceSubdivisionLevel(int index) const
+{
+  uint e0SubdivisionLvl = edges.at(faces.at(index).edges[0]).subdivisions;
+  uint e1SubdivisionLvl = edges.at(faces.at(index).edges[1]).subdivisions;
+  uint e2SubdivisionLvl = edges.at(faces.at(index).edges[2]).subdivisions;
+
+  return uint(maxInt3(e0SubdivisionLvl, e1SubdivisionLvl, e2SubdivisionLvl));
 }
 
 float Mesh::getAvgFacesDoubleArea() const
@@ -198,7 +207,7 @@ Mesh Mesh::nSubdivide(int n)
 Mesh Mesh::micromeshSubdivide()
 {
   Mesh subdivided = Mesh();
-  subdivided.edges = edges;
+  fixEdges();
 
   auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };
   auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
@@ -259,10 +268,10 @@ Mesh Mesh::micromeshSubdivide()
     }    
   }
 
-  subdivided.fixEdges(); // to implement - still not working
   subdivided.updateBoundingBox();
   subdivided.updateFaceNormals();
   subdivided.updateVertexNormals();
+  subdivided.updateEdges();
 
   return subdivided;
 }
@@ -278,21 +287,11 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 void Mesh::fixEdges()
 {
   for (Edge &e: edges) {
-    Face f0 = faces.at(e.faces[0]);
-    Face f1 = faces.at(e.faces[1]);
-
-    int e00 = edges.at(f0.edges[0]).subdivisions;
-    int e01 = edges.at(f0.edges[1]).subdivisions;
-    int e02 = edges.at(f0.edges[2]).subdivisions;
-
-    int e10 = edges.at(f1.edges[0]).subdivisions;
-    int e11 = edges.at(f1.edges[1]).subdivisions;
-    int e12 = edges.at(f1.edges[2]).subdivisions;
-
-    int eMax0 = maxInt3(e00, e01, e02);
-    int eMax1 = maxInt3(e10, e11, e12);
-
-    if (eMax0 == eMax1 && e.subdivisions < eMax0) e.subdivisions = eMax0;
+    if (e.faces[0] == -1 || e.faces[1] == -1) continue;
+    uint eMax0 = getFaceSubdivisionLevel(e.faces[0]);
+    uint eMax1 = getFaceSubdivisionLevel(e.faces[1]);
+    // if the edge is between two triangles N + 1 and it is N
+    if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0) e.subdivisions = eMax0;
   }
 }
 
