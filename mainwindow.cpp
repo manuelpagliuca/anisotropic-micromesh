@@ -172,7 +172,7 @@ void Mainwindow::on_actionExtract_displacements_triggered()
     }
 
     Mesh tmpMesh = baseMesh;
-    auto displacements = tmpMesh.displaceVerticesTowardsTargetMesh(targetMesh);
+    auto displacements = tmpMesh.lineCastVertices(targetMesh);
 
     morphDialog = new MorphDialog(this);
     morphDialog->show();
@@ -266,7 +266,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
     ui.openGLWidget->updateMeshData(baseMesh);
 
     Mesh tmpMesh = baseMesh;
-    auto displacements = tmpMesh.displaceVerticesTowardsTargetMesh(targetMesh);
+    auto displacements = tmpMesh.lineCastVertices(targetMesh);
 
     morphDialog = new MorphDialog(this);
     morphDialog->show();
@@ -399,7 +399,7 @@ void Mainwindow::on_morph250faces_clicked()
 {
   std::string pallasOBJ250 = readFile("./mesh/pallas_250.obj");
   Mesh targetMesh = Mesh::parseOBJ(pallasOBJ250);
-  setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  setDisplacementsDelta(baseMesh.lineCastVertices(targetMesh));
   ui.horizontalSlider->setEnabled(true);
 
   if (previousValue != 0) {
@@ -413,7 +413,7 @@ void Mainwindow::on_morph500faces_clicked()
 {
   std::string pallasOBJ500 = readFile("./mesh/pallas_500.obj");
   Mesh targetMesh = Mesh::parseOBJ(pallasOBJ500);
-  setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  setDisplacementsDelta(baseMesh.lineCastVertices(targetMesh));
   ui.horizontalSlider->setEnabled(true);
   ui.horizontalSlider->setValue(0);
   previousValue = 0;
@@ -423,7 +423,7 @@ void Mainwindow::on_morph1000faces_clicked()
 {
   std::string pallasOBJ1000 = readFile("./mesh/pallas_1000.obj");
   Mesh targetMesh = Mesh::parseOBJ(pallasOBJ1000);
-  setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  setDisplacementsDelta(baseMesh.lineCastVertices(targetMesh));
   ui.horizontalSlider->setEnabled(true);
   ui.horizontalSlider->setValue(0);
   previousValue = 0;
@@ -433,7 +433,7 @@ void Mainwindow::on_morph2500faces_clicked()
 {
   std::string pallasOBJ2500 = readFile("./mesh/pallas_2500.obj");
   Mesh targetMesh = Mesh ::parseOBJ(pallasOBJ2500);
-  setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  setDisplacementsDelta(baseMesh.lineCastVertices(targetMesh));
   ui.horizontalSlider->setEnabled(true);
   ui.horizontalSlider->setValue(0);
   previousValue = 0;
@@ -444,7 +444,7 @@ void Mainwindow::on_morph5000faces_clicked()
 {
   std::string pallasOBJ5000 = readFile("./mesh/pallas_5000.obj");
   Mesh targetMesh = Mesh::parseOBJ(pallasOBJ5000);
-  setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+  setDisplacementsDelta(baseMesh.lineCastVertices(targetMesh));
   ui.horizontalSlider->setEnabled(true);
   ui.horizontalSlider->setValue(0);
   previousValue = 0;
@@ -522,7 +522,7 @@ void Mainwindow::on_loadTargetMesh_clicked()
 
     if (ext == ".off") targetMesh = Mesh::parseOFF(file);
     else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
-    setDisplacementsDelta(baseMesh.displaceVerticesTowardsTargetMesh(targetMesh));
+    setDisplacementsDelta(baseMesh.lineCastVertices(targetMesh));
     ui.horizontalSlider->setEnabled(true);
     ui.horizontalSlider->setValue(0);
     previousValue = 0;

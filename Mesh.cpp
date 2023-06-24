@@ -378,7 +378,7 @@ void Mesh::setInitialEdgeSubdivisionLevelsTest()
 
 void Mesh::updateEdgesSubdivisionLevels()
 {
-  setInitialEdgeSubdivisionLevelsTest();
+  setInitialEdgeSubdivisionLevels();
 
   int count = 0;
 
@@ -522,39 +522,35 @@ Vertex Mesh::surfacePoint(const Face &f, vec3 bary) const
   return v;
 }
 
-std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(const Mesh &targetMesh)
+std::vector<std::tuple<int, float>> Mesh::lineCastVertices(const Mesh &targetMesh)
 {
   int index = 0;
   std::vector<std::tuple<int, float>> displacements;
 
   for (const Vertex &v : vertices) {
-    vec3 rayOrigin = v.pos;
-    vec3 rayDirection = normalize(v.norm);
-    float tMin = FLT_MAX;
+    vec3 origin = v.pos;
+    vec3 direction = normalize(v.norm);
 
     for (const Face &f : targetMesh.faces) {
-      // Triangle processing
       vec3 v0 = targetMesh.vertices[f.index[0]].pos;
       vec3 v1 = targetMesh.vertices[f.index[1]].pos;
       vec3 v2 = targetMesh.vertices[f.index[2]].pos;
-      vec3 v01 = v0 - v1;
-      vec3 v02 = v0 - v2;
-      vec3 planeNormal = normalize(cross(v01, v02));
 
-      // Use v0 for finding the 'd' parameter of the supporting plane
-      float d = dot(planeNormal, v0);
-      // finding 't' parameter of ray
-      float t = (dot(planeNormal, rayOrigin) + d) / dot(planeNormal, rayDirection);
-      // finding the point on the ray
-      vec3 P = rayOrigin + rayDirection * t;
-      // vector vertices acting as barycentric coordinates for highlighting the point
-      float v0P = dot(cross(v1 - v0, P - v1), rayDirection);
-      float v1P = dot(cross(v2 - v1, P - v1), rayDirection);
-      float v2P = dot(cross(v0 - v2, P - v2), rayDirection);
+      glm::vec2 null = glm::vec2(0);
+      float tForward, tBackward;
 
-      if (!(v0P < 0 && v1P < 0 && v2P < 0) && abs(tMin) > abs(t)) tMin = t;
+      intersectRayTriangle(origin, direction, v0, v1, v2, &null, &tForward);
+      intersectRayTriangle(origin, direction, v0, v1, v2, &null, &tBackward);
+
+      if (abs(tForward) < abs(tBackward)) {
+        if (abs(tForward) < abs(displacements[index]))
+          displacements.push_back(std::tuple<int, float>(index, tForward));
+      } else {
+        if (abs(tBackward) < abs(displacements[index]))
+          displacements.push_back(std::tuple<int, float>(index, tBackward));
+      }
     }
-    displacements.push_back(std::tuple<int, float>(index, tMin));
+
     index++;
   }
 
@@ -565,6 +561,7 @@ std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(cons
 
   return displacements;
 }
+
 Mesh Mesh::parseOFF(const std::string &rawOFF)
 {
   if (rawOFF.empty()) {
