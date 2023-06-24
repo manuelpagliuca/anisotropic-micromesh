@@ -104,17 +104,19 @@ public:
   void updateVertexNormals();
   void updateBoundingBox();
   void updateEdges();
+  void updateEdgesSubdivisionLevels();
+
+  void fixEdges();
+  void sanityCheckEdge();
+
   void setInitialEdgeSubdivisionLevels();
   void setInitialEdgeSubdivisionLevelsTest();
-  void updateEdgesSubdivisionLevels();
-  void sanityCheckEdge();
 
   bool enforceMicromesh(const Face &f);
   bool enforceAnisotropicMicromesh(const Face &f);
 
   bool isMicromeshScheme() const;
   Vertex surfacePoint(const Face &f, vec3 bary) const;
-  void fixEdges();
 
   std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
 
@@ -130,4 +132,5 @@ protected:
 
   void print() const;
   void printEdgeSubdivisions() const;
+  void printOpenEdges() const;
 };
