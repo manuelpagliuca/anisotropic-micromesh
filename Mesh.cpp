@@ -262,10 +262,10 @@ Mesh Mesh::micromeshSubdivide()
 
     if (e2 < eMax) {
       for (int vxy = 1; vxy < n; vxy += 2) {
-        int delta = (vxy < n/2) ? -1 : +1;
+        int delta = (vxy < n/2) ? +1 : -1;
         subdivided.vertices[k + toIndex(vxy, vxy)] = subdivided.vertices[k + toIndex(vxy + delta, vxy + delta)];
       }
-    }    
+    }
   }
 
   subdivided.updateBoundingBox();
@@ -367,12 +367,18 @@ void Mesh::setInitialEdgeSubdivisionLevels()
     edges.at(f.edges[0]).subdivisions = nearestRoundPow2(l0);
     edges.at(f.edges[1]).subdivisions = nearestRoundPow2(l1);
     edges.at(f.edges[2]).subdivisions = nearestRoundPow2(l2);
-  }
+    }
+}
+
+void Mesh::setInitialEdgeSubdivisionLevelsTest()
+{
+  for (Edge &e : edges) e.subdivisions = 0;
+  edges.at(0).subdivisions = 6;
 }
 
 void Mesh::updateEdgesSubdivisionLevels()
 {
-  setInitialEdgeSubdivisionLevels();
+  setInitialEdgeSubdivisionLevelsTest();
 
   int count = 0;
 

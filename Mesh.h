@@ -105,6 +105,7 @@ public:
   void updateBoundingBox();
   void updateEdges();
   void setInitialEdgeSubdivisionLevels();
+  void setInitialEdgeSubdivisionLevelsTest();
   void updateEdgesSubdivisionLevels();
   void sanityCheckEdge();
 
