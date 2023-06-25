@@ -20,14 +20,9 @@ void MorphDialog::setGLWidget(GLWidget *glWidget)
   this->glWidget = glWidget;
 }
 
-void MorphDialog::setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements)
+void MorphDialog::setDisplacementsDelta(std::map<int, float> displacements)
 {
   displacementsDeltas = displacements;
-
-  for (auto &e : displacementsDeltas) {
-    auto &[index, t] = e;
-    t = t / 100.f;
-  }
 }
 
 MorphDialog::~MorphDialog()
@@ -38,8 +33,8 @@ MorphDialog::~MorphDialog()
 void MorphDialog::on_horizontalSlider_valueChanged(int value)
 {
   previousValue = value;
-
   targetMesh = baseMesh;
+
   for (const auto &e : displacementsDeltas) {
     auto &[index, t] = e;
     targetMesh.displaceVertex(index, t * value);

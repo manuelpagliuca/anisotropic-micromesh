@@ -47,3 +47,7 @@ int maxIntIndex(int arr[])
 
   return maxIdx;
 }
+
+bool compareFloats(float a, float b, float tolerance) {
+  return std::fabs(a - b) <= tolerance;
+}

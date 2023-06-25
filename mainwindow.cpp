@@ -20,7 +20,7 @@ Mainwindow::Mainwindow(QWidget *parent) : QMainWindow(parent)
   previousValue = 0;
 }
 
-void Mainwindow::setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements)
+void Mainwindow::setDisplacementsDelta(std::map<int, float> displacements)
 {
   displacementsDeltas = displacements;
 

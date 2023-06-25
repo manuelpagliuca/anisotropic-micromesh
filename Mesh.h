@@ -8,7 +8,8 @@
 #include <QtOpenGL>
 #include <GLM/vec3.hpp>
 #include <GLM/gtx/string_cast.hpp>
-#include <glm/gtx/intersect.hpp>
+#include <GLM/glm.hpp>
+#include <GLM/gtx/intersect.hpp>
 #include <map>
 #include <utility>
 #include "Utility.h"
@@ -119,7 +120,7 @@ public:
   bool isMicromeshScheme() const;
   Vertex surfacePoint(const Face &f, vec3 bary) const;
 
-  std::vector<std::tuple<int, float>> lineCastVertices(const Mesh &targetMesh);
+  std::map<int, float> lineCastVertices(const Mesh &targetMesh);
 
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);

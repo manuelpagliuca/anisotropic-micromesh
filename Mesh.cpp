@@ -522,10 +522,10 @@ Vertex Mesh::surfacePoint(const Face &f, vec3 bary) const
   return v;
 }
 
-std::vector<std::tuple<int, float>> Mesh::lineCastVertices(const Mesh &targetMesh)
+std::map<int, float> Mesh::lineCastVertices(const Mesh &targetMesh)
 {
   int index = 0;
-  std::vector<std::tuple<int, float>> displacements;
+  std::map<int, float> displacements;
 
   for (const Vertex &v : vertices) {
     vec3 origin = v.pos;
@@ -535,28 +535,21 @@ std::vector<std::tuple<int, float>> Mesh::lineCastVertices(const Mesh &targetMes
       vec3 v0 = targetMesh.vertices[f.index[0]].pos;
       vec3 v1 = targetMesh.vertices[f.index[1]].pos;
       vec3 v2 = targetMesh.vertices[f.index[2]].pos;
+      vec3 intersectionPoint;
 
-      glm::vec2 null = glm::vec2(0);
-      float tForward, tBackward;
+      intersectLineTriangle(origin, direction, v0, v1, v2, intersectionPoint);
 
-      intersectRayTriangle(origin, direction, v0, v1, v2, &null, &tForward);
-      intersectRayTriangle(origin, direction, v0, v1, v2, &null, &tBackward);
+      vec3 originToPoint = intersectionPoint - origin;
+      float displacement = fabsf(length(originToPoint));
+      int sign = dot(direction, originToPoint) > 0 ? +1 : -1;
 
-      if (abs(tForward) < abs(tBackward)) {
-        if (abs(tForward) < abs(displacements[index]))
-          displacements.push_back(std::tuple<int, float>(index, tForward));
+      if (displacements[index] && fabsf(displacements[index]) > displacement) {
+        displacements[index] = sign * displacement;
       } else {
-        if (abs(tBackward) < abs(displacements[index]))
-          displacements.push_back(std::tuple<int, float>(index, tBackward));
+        displacements[index] = sign * displacement;
       }
     }
-
     index++;
-  }
-
-  for (const auto &e : displacements) {
-    auto &[index, t] = e;
-    displaceVertex(index, t);
   }
 
   return displacements;

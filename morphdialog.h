@@ -18,7 +18,7 @@ public:
   explicit MorphDialog(QWidget *parent = nullptr);
   void setMesh(Mesh &mesh);
   void setGLWidget(GLWidget *glWidget);
-  void setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements);
+  void setDisplacementsDelta(std::map<int, float> displacements);
   ~MorphDialog();
 
 private slots:
@@ -28,7 +28,7 @@ private:
   Ui::MorphWindows *ui;
   Mesh baseMesh, targetMesh;
   GLWidget *glWidget;
-  std::vector<std::tuple<int, float>> displacementsDeltas;
+  std::map<int, float> displacementsDeltas;
   int previousValue, currentValue;
 };
 

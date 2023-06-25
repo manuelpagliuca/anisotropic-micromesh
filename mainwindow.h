@@ -19,7 +19,7 @@ public:
   Mainwindow(QWidget *parent = nullptr);
   ~Mainwindow(){};
   void loadDemoMesh();
-  void setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements);
+  void setDisplacementsDelta(std::map<int, float> displacements);
 
 protected:
   void mousePressEvent(QMouseEvent *ev);
@@ -40,7 +40,7 @@ private:
   QPoint newPos;
 
   // Morphing
-  std::vector<std::tuple<int, float>> displacementsDeltas;
+  std::map<int, float> displacementsDeltas;
   int previousValue;
   int currentValue;
 
