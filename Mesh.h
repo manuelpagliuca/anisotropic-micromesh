@@ -118,7 +118,6 @@ public:
 
   bool isMicromeshScheme() const;
   Vertex surfacePoint(const Face &f, vec3 bary) const;
-  void fixEdges();
   void removeDuplicateVertices();
 
   bool rayTriangleIntersect(const vec3 &rayOrigin, const vec3 &rayDirection, const vec3 &v0, const vec3 &v1, const vec3 &v2, float &t);
