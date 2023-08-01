@@ -105,9 +105,13 @@ public:
   void updateVertexNormals();
   void updateBoundingBox();
   void updateEdges();
-  void setInitialEdgeSubdivisionLevels();
   void updateEdgesSubdivisionLevels();
+
+  void fixEdges();
   void sanityCheckEdge();
+
+  void setInitialEdgeSubdivisionLevels();
+  void setInitialEdgeSubdivisionLevelsTest();
 
   bool enforceMicromesh(const Face &f);
   bool enforceAnisotropicMicromesh(const Face &f);
@@ -133,4 +137,5 @@ protected:
 
   void print() const;
   void printEdgeSubdivisions() const;
+  void printOpenEdges() const;
 };

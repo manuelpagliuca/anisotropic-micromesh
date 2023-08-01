@@ -213,12 +213,12 @@ Mesh Mesh::micromeshSubdivide()
   auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
 
   for (const Face& f: faces) {
-    int e0 = edges[f.edges[0]].subdivisions;
-    int e1 = edges[f.edges[1]].subdivisions;
-    int e2 = edges[f.edges[2]].subdivisions;
+    int subLvlEdge0 = edges[f.edges[0]].subdivisions;
+    int subLvlEdge1 = edges[f.edges[1]].subdivisions;
+    int subLvlEdge2 = edges[f.edges[2]].subdivisions;
 
-    int eMax = maxInt3(e0, e1, e2);
-    int n = pow(2, eMax);
+    int subLvlMax = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
+    int n = pow(2, subLvlMax);
     int k = int(subdivided.vertices.size());
 
     // add microvertices
@@ -246,26 +246,26 @@ Mesh Mesh::micromeshSubdivide()
       }
     }
 
-    if (e0 < eMax) {
+    if (subLvlEdge0 < subLvlMax) {
       for (int vy = 1; vy < n; vy += 2) {
         int delta = (vy < n/2) ? -1 : +1;
         subdivided.vertices[k + toIndex(0, vy)] = subdivided.vertices[k + toIndex(0, vy + delta)];
       }
     }
 
-    if (e1 < eMax) {
+    if (subLvlEdge1 < subLvlMax) {
       for (int vx = 1; vx < n; vx += 2) {
         int delta = (vx < n/2) ? -1 : +1;
         subdivided.vertices[k + toIndex(vx, n)] = subdivided.vertices[k + toIndex(vx + delta, n)];
       }
     }
 
-    if (e2 < eMax) {
+    if (subLvlEdge2 < subLvlMax) {
       for (int vxy = 1; vxy < n; vxy += 2) {
-        int delta = (vxy < n/2) ? -1 : +1;
+        int delta = (vxy < n/2) ? +1 : -1;
         subdivided.vertices[k + toIndex(vxy, vxy)] = subdivided.vertices[k + toIndex(vxy + delta, vxy + delta)];
       }
-    }    
+    }
   }
 
   subdivided.updateBoundingBox();
@@ -397,12 +397,18 @@ void Mesh::setInitialEdgeSubdivisionLevels()
     edges.at(f.edges[0]).subdivisions = nearestRoundPow2(l0);
     edges.at(f.edges[1]).subdivisions = nearestRoundPow2(l1);
     edges.at(f.edges[2]).subdivisions = nearestRoundPow2(l2);
-  }
+    }
+}
+
+void Mesh::setInitialEdgeSubdivisionLevelsTest()
+{
+  for (Edge &e : edges) e.subdivisions = 0;
+  edges.at(0).subdivisions = 6;
 }
 
 void Mesh::updateEdgesSubdivisionLevels()
 {
-  setInitialEdgeSubdivisionLevels();
+  setInitialEdgeSubdivisionLevelsTest();
 
   int count = 0;
 
@@ -875,5 +881,24 @@ void Mesh::printEdgeSubdivisions() const
       << edges.at(f.index[0]).subdivisions << "/"
       << edges.at(f.index[1]).subdivisions << "/"
       << edges.at(f.index[2]).subdivisions << ")";
+    }
+}
+
+void Mesh::printOpenEdges() const
+{
+  uint nOpenEdges = 0;
+  for (const Edge &e: edges) {
+    if (e.side[1] == -1) {
+      Vertex v0 = vertices.at(faces.at(e.faces[0]).index[0]);
+      Vertex v1 = vertices.at(faces.at(e.faces[0]).index[1]);
+      Vertex v2 = vertices.at(faces.at(e.faces[0]).index[2]);
+
+      PRINT_VECTOR(v0.pos);
+      PRINT_VECTOR(v1.pos);
+      PRINT_VECTOR(v2.pos);
+
+      nOpenEdges++;
+    }
   }
+  qDebug() << "In total there are " << nOpenEdges << " open edges.";
 }
