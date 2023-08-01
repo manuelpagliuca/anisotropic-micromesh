@@ -8,6 +8,7 @@
 #include <QtOpenGL>
 #include <GLM/vec3.hpp>
 #include <GLM/gtx/string_cast.hpp>
+#include <GLM/gtx/intersect.hpp>
 #include <map>
 #include <utility>
 #include "Utility.h"
@@ -114,8 +115,11 @@ public:
   bool isMicromeshScheme() const;
   Vertex surfacePoint(const Face &f, vec3 bary) const;
   void fixEdges();
+  void removeDuplicateVertices();
 
-  std::vector<std::tuple<int, float>> displaceVerticesTowardsTargetMesh(const Mesh &targetMesh);
+  bool rayTriangleIntersect(const vec3 &rayOrigin, const vec3 &rayDirection, const vec3 &v0, const vec3 &v1, const vec3 &v2, float &t);
+  float intersectRay(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh);
+  std::vector<float> getDisplacements(const Mesh &targetMesh);
 
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);

@@ -9,7 +9,6 @@
 #include <QFileDialog>
 
 #include "Mesh.h"
-#include "morphdialog.h"
 
 class Mainwindow : public QMainWindow
 {
@@ -17,9 +16,9 @@ class Mainwindow : public QMainWindow
 
 public:
   Mainwindow(QWidget *parent = nullptr);
-  ~Mainwindow(){};
+  ~Mainwindow() {}
   void loadDemoMesh();
-  void setDisplacementsDelta(std::vector<std::tuple<int, float>> displacements);
+  void setDisplacementsDelta(std::vector<float> displacements);
 
 protected:
   void mousePressEvent(QMouseEvent *ev);
@@ -30,7 +29,6 @@ protected:
 private:
   Ui::mainWindowClass ui;
   std::string readFile(const char *file_loc);
-  MorphDialog *morphDialog;
 
   // Mesh loading
   Mesh baseMesh;
@@ -40,8 +38,7 @@ private:
   QPoint newPos;
 
   // Morphing
-  std::vector<std::tuple<int, float>> displacementsDeltas;
-  int previousValue;
+  std::vector<float> displacementsDeltas;
   int currentValue;
 
 public slots:
@@ -49,6 +46,7 @@ public slots:
   void on_actionUnload_triggered();
   void on_actionSave_triggered();
   void on_actionExit_triggered();
+
   void on_actionWireframe_triggered();
   void on_actionSubdivide_triggered();
   void on_actionVertex_displacement_triggered();
@@ -57,6 +55,7 @@ public slots:
   void on_actionSubdivision_surfaces_Uniform_triggered();
   void on_actionSubdivision_surfaces_Adaptive_triggered();
   void on_actionSubdivision_surfaces_Micromesh_triggered();
+
   void on_demo125faces_clicked();
   void on_demo250faces_clicked();
   void on_demo500faces_clicked();
@@ -76,4 +75,5 @@ public slots:
 private slots:
   void on_loadBaseMesh_clicked();
   void on_loadTargetMesh_clicked();
+  void on_anisotropic_micromesh_subdivision_2_clicked();
 };

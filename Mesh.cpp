@@ -269,9 +269,10 @@ Mesh Mesh::micromeshSubdivide()
   }
 
   subdivided.updateBoundingBox();
-  subdivided.updateFaceNormals();
-  subdivided.updateVertexNormals();
+//  subdivided.updateFaceNormals();
+//  subdivided.updateVertexNormals();
   subdivided.updateEdges();
+  subdivided.removeDuplicateVertices();
 
   return subdivided;
 }
@@ -280,7 +281,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 {
   Mesh subdivided = Mesh();
   // to implement
-  return subdivided;
+  return *this;
 }
 
 // This function fixes the edges which are downscaled but should be higher scale
@@ -293,6 +294,35 @@ void Mesh::fixEdges()
     // if the edge is between two triangles N + 1 and it is N
     if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0) e.subdivisions = eMax0;
   }
+}
+
+void Mesh::removeDuplicateVertices()
+{
+//  std::unordered_map<glm::vec3, uint> vertexMap;
+//  std::vector<Vertex> newVertices;
+//  std::vector<Face> newFaces;
+
+//  for (const Face &f : faces) {
+//    Face newFace = f;
+
+//    for (int i = 0; i < 3; i++) {
+//      glm::vec3 vertexPos = vertices[f.index[i]].pos;
+
+//      if (vertexMap.find(vertexPos) == vertexMap.end()) {
+//        vertexMap[vertexPos] = static_cast<uint>(newVertices.size());
+//        newVertices.push_back(vertices[f.index[i]]);
+//      }
+
+//      newFace.index[i] = vertexMap[vertexPos];
+//    }
+//    newFaces.push_back(newFace);
+//  }
+
+//  vertices = newVertices;
+//  faces = newFaces;
+
+//  updateFaceNormals();
+//  updateVertexNormals();
 }
 
 void Mesh::updateFaceNormals()
@@ -516,49 +546,77 @@ Vertex Mesh::surfacePoint(const Face &f, vec3 bary) const
   return v;
 }
 
-std::vector<std::tuple<int, float>> Mesh::displaceVerticesTowardsTargetMesh(const Mesh &targetMesh)
+bool Mesh::rayTriangleIntersect(const vec3& rayOrigin, const vec3& rayDirection, const vec3& v0, const vec3& v1, const vec3& v2, float& t) {
+  const float EPSILON = 0.000001f;
+
+  vec3 edge1, edge2, h, s, q;
+  float a, f, u, v;
+
+  edge1 = v1 - v0;
+  edge2 = v2 - v0;
+  h = glm::cross(rayDirection, edge2);
+  a = glm::dot(edge1, h);
+
+  if (a > -EPSILON && a < EPSILON)
+    return false; // Ray parallel to the triangle
+
+  f = 1.0f / a;
+  s = rayOrigin - v0;
+  u = f * glm::dot(s, h);
+
+  if (u < 0.0f || u > 1.0f)
+    return false;
+
+  q = glm::cross(s, edge1);
+  v = f * glm::dot(rayDirection, q);
+
+  if (v < 0.0f || u + v > 1.0f)
+    return false;
+
+  t = f * glm::dot(edge2, q);
+  return t > EPSILON;
+}
+
+float Mesh::intersectRay(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh)
 {
-  int index = 0;
-  std::vector<std::tuple<int, float>> displacements;
+  int minDisp = +INF;
 
-  for (const Vertex &v : vertices) {
-    vec3 rayOrigin = v.pos;
-    vec3 rayDirection = normalize(v.norm);
-    float tMin = FLT_MAX;
+  for (const Face &f : targetMesh.faces) {
+    vec3 v0 = targetMesh.vertices[f.index[0]].pos;
+    vec3 v1 = targetMesh.vertices[f.index[1]].pos;
+    vec3 v2 = targetMesh.vertices[f.index[2]].pos;
 
-    for (const Face &f : targetMesh.faces) {
-      // Triangle processing
-      vec3 v0 = targetMesh.vertices[f.index[0]].pos;
-      vec3 v1 = targetMesh.vertices[f.index[1]].pos;
-      vec3 v2 = targetMesh.vertices[f.index[2]].pos;
-      vec3 v01 = v0 - v1;
-      vec3 v02 = v0 - v2;
-      vec3 planeNormal = normalize(cross(v01, v02));
+    float disp0, disp1;
 
-      // Use v0 for finding the 'd' parameter of the supporting plane
-      float d = dot(planeNormal, v0);
-      // finding 't' parameter of ray
-      float t = (dot(planeNormal, rayOrigin) + d) / dot(planeNormal, rayDirection);
-      // finding the point on the ray
-      vec3 P = rayOrigin + rayDirection * t;
-      // vector vertices acting as barycentric coordinates for highlighting the point
-      float v0P = dot(cross(v1 - v0, P - v1), rayDirection);
-      float v1P = dot(cross(v2 - v1, P - v1), rayDirection);
-      float v2P = dot(cross(v0 - v2, P - v2), rayDirection);
+    bool intersect0 = rayTriangleIntersect(rayOrigin, rayDirection,
+                                           v0, v1, v2,
+                                           disp0);
+    bool intersect1 = rayTriangleIntersect(rayOrigin, -rayDirection,
+                                           v0, v1, v2,
+                                           disp1);
 
-      if (!(v0P < 0 && v1P < 0 && v2P < 0) && abs(tMin) > abs(t)) tMin = t;
-    }
-    displacements.push_back(std::tuple<int, float>(index, tMin));
-    index++;
+    if (intersect0 && intersect1) minDisp = (std::abs(disp0) < std::abs(disp1)) ? disp0 : -std::abs(disp1);
+    else if (intersect0) minDisp = disp0;
+    else if (intersect1) minDisp = -std::abs(disp1);
   }
 
-  for (const auto &e : displacements) {
-    auto &[index, t] = e;
-    displaceVertex(index, t);
+  return minDisp;
+}
+
+std::vector<float> Mesh::getDisplacements(const Mesh &target)
+{
+  std::vector<float> displacements;
+
+  for (int vertexIdx = 0; vertexIdx < vertices.size(); vertexIdx++) {
+    Vertex &v = vertices[vertexIdx];
+    vec3 rayOrig = v.pos;
+    vec3 rayDir = v.norm;
+    displacements.push_back(intersectRay(rayOrig, rayDir, target));
   }
 
   return displacements;
 }
+
 Mesh Mesh::parseOFF(const std::string &rawOFF)
 {
   if (rawOFF.empty()) {

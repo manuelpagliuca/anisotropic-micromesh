@@ -16,8 +16,7 @@ SOURCES += \
     Mesh.cpp \
     Shader.cpp \
     Main.cpp \
-    Trackball.cpp \
-    morphdialog.cpp
+    Trackball.cpp
 
 HEADERS += \
     BoundingBox.h \
@@ -27,12 +26,10 @@ HEADERS += \
     Mesh.h \
     Shader.h \
     Trackball.h \
-    Utility.h \
-    morphdialog.h
+    Utility.h
 
 FORMS += \
-    mainwindow.ui \
-    morphdialog.ui
+    mainwindow.ui
 
 DISTFILES += \
     shaders/shader.frag \
