@@ -272,7 +272,7 @@ Mesh Mesh::micromeshSubdivide()
 //  subdivided.updateFaceNormals();
 //  subdivided.updateVertexNormals();
   subdivided.updateEdges();
-  subdivided.removeDuplicateVertices();
+//  subdivided.removeDuplicateVertices();
 
   return subdivided;
 }
@@ -292,7 +292,8 @@ void Mesh::fixEdges()
     uint eMax0 = getFaceSubdivisionLevel(e.faces[0]);
     uint eMax1 = getFaceSubdivisionLevel(e.faces[1]);
     // if the edge is between two triangles N + 1 and it is N
-    if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0) e.subdivisions = eMax0;
+    if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0)
+      e.subdivisions = eMax0;
   }
 }
 
@@ -408,7 +409,7 @@ void Mesh::setInitialEdgeSubdivisionLevelsTest()
 
 void Mesh::updateEdgesSubdivisionLevels()
 {
-  setInitialEdgeSubdivisionLevelsTest();
+  setInitialEdgeSubdivisionLevels();
 
   int count = 0;
 

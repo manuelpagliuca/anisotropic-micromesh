@@ -469,7 +469,8 @@ void Mainwindow::on_loadBaseMesh_clicked()
     ui.actionWireframe->setEnabled(true);
     ui.actionUnload->setEnabled(true);
     ui.actionVertex_displacement->setEnabled(true);
-    ui.morphingGroupBox->setEnabled(true);
+    ui.morphingGroupBox->setEnabled(false);
+    ui.subdivisionsGroupBox->setEnabled(true);
   }
 }
 
