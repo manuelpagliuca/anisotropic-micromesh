@@ -21,12 +21,16 @@ struct Vertex
   vec3 pos;
   vec3 norm;
   vec2 tex;
+
+  bool operator==(const Vertex &v) const {
+    return v.pos == pos && v.norm == norm && v.tex == tex;
+  }
 };
 
 struct Face
 {
   uint index[3];
-  uint edges[3]; // 0, 1 and 2
+  uint edgesIndices[3]; // 0, 1 and 2
   vec3 norm;
 };
 
@@ -118,7 +122,7 @@ public:
 
   bool isMicromeshScheme() const;
   Vertex surfacePoint(const Face &f, vec3 bary) const;
-  void removeDuplicateVertices();
+  void removeDuplicatedVertices();
 
   bool rayTriangleIntersect(const vec3 &rayOrigin, const vec3 &rayDirection, const vec3 &v0, const vec3 &v1, const vec3 &v2, float &t);
   float minimumDisplacement(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh);

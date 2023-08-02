@@ -39,8 +39,8 @@ int Mesh::addEdge(int faceIndex0, int faceIndex1, int side0, int side1)
 
   int edgeIndex = int(edges.size() - 1);
 
-  if (faceIndex0 != -1) faces.at(faceIndex0).edges[side0] = edgeIndex;
-  if (faceIndex1 != -1) faces.at(faceIndex1).edges[side1] = edgeIndex;
+  if (faceIndex0 != -1) faces.at(faceIndex0).edgesIndices[side0] = edgeIndex;
+  if (faceIndex1 != -1) faces.at(faceIndex1).edgesIndices[side1] = edgeIndex;
 
   return edgeIndex;
 }
@@ -95,9 +95,9 @@ std::vector<uint> Mesh::getFacesVector() const
 
 uint Mesh::getFaceSubdivisionLevel(int index) const
 {
-  uint e0SubdivisionLvl = edges.at(faces.at(index).edges[0]).subdivisions;
-  uint e1SubdivisionLvl = edges.at(faces.at(index).edges[1]).subdivisions;
-  uint e2SubdivisionLvl = edges.at(faces.at(index).edges[2]).subdivisions;
+  uint e0SubdivisionLvl = edges.at(faces.at(index).edgesIndices[0]).subdivisions;
+  uint e1SubdivisionLvl = edges.at(faces.at(index).edgesIndices[1]).subdivisions;
+  uint e2SubdivisionLvl = edges.at(faces.at(index).edgesIndices[2]).subdivisions;
 
   return uint(maxInt3(e0SubdivisionLvl, e1SubdivisionLvl, e2SubdivisionLvl));
 }
@@ -213,9 +213,9 @@ Mesh Mesh::micromeshSubdivide()
   auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
 
   for (const Face& f: faces) {
-    int subLvlEdge0 = edges[f.edges[0]].subdivisions;
-    int subLvlEdge1 = edges[f.edges[1]].subdivisions;
-    int subLvlEdge2 = edges[f.edges[2]].subdivisions;
+    int subLvlEdge0 = edges[f.edgesIndices[0]].subdivisions;
+    int subLvlEdge1 = edges[f.edgesIndices[1]].subdivisions;
+    int subLvlEdge2 = edges[f.edgesIndices[2]].subdivisions;
 
     int subLvlMax = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
     int n = pow(2, subLvlMax);
@@ -272,7 +272,7 @@ Mesh Mesh::micromeshSubdivide()
 //  subdivided.updateFaceNormals();
 //  subdivided.updateVertexNormals();
   subdivided.updateEdges();
-//  subdivided.removeDuplicateVertices();
+  subdivided.removeDuplicatedVertices();
 
   return subdivided;
 }
@@ -297,33 +297,34 @@ void Mesh::fixEdges()
   }
 }
 
-void Mesh::removeDuplicateVertices()
+void Mesh::removeDuplicatedVertices()
 {
-//  std::unordered_map<glm::vec3, uint> vertexMap;
-//  std::vector<Vertex> newVertices;
-//  std::vector<Face> newFaces;
+  std::vector<Vertex> newVertices;
+  std::vector<Face> newFaces;
 
-//  for (const Face &f : faces) {
-//    Face newFace = f;
+  for (const Vertex &v : vertices)
+    if (std::find(newVertices.begin(), newVertices.end(), v) == newVertices.end())
+      newVertices.push_back(v);
 
-//    for (int i = 0; i < 3; i++) {
-//      glm::vec3 vertexPos = vertices[f.index[i]].pos;
+  for (Face &f : faces) {
+    auto it0 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[0]));
+    auto it1 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[1]));
+    auto it2 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[2]));
 
-//      if (vertexMap.find(vertexPos) == vertexMap.end()) {
-//        vertexMap[vertexPos] = static_cast<uint>(newVertices.size());
-//        newVertices.push_back(vertices[f.index[i]]);
-//      }
+    uint newIndex0 = uint(std::distance(newVertices.begin(), it0));
+    uint newIndex1 = uint(std::distance(newVertices.begin(), it1));
+    uint newIndex2 = uint(std::distance(newVertices.begin(), it2));
 
-//      newFace.index[i] = vertexMap[vertexPos];
-//    }
-//    newFaces.push_back(newFace);
-//  }
+    f.index[0] = newIndex0;
+    f.index[1] = newIndex1;
+    f.index[2] = newIndex2;
+  }
 
-//  vertices = newVertices;
-//  faces = newFaces;
+  qDebug() << faces.size();
+  qDebug() << newVertices.size() << " " << vertices.size();
+  qDebug() << faces.size();
 
-//  updateFaceNormals();
-//  updateVertexNormals();
+  vertices = newVertices;
 }
 
 void Mesh::updateFaceNormals()
@@ -380,7 +381,7 @@ void Mesh::updateEdges()
   for (auto &openEdge : matingPool) {
     EdgeLocation openEdgeLocation = openEdge.second;
     int edgeIndex = addEdge(openEdgeLocation.faceIndex, -1, openEdgeLocation.sideIndex, -1);
-    faces.at(openEdgeLocation.faceIndex).edges[openEdgeLocation.sideIndex] = edgeIndex;
+    faces.at(openEdgeLocation.faceIndex).edgesIndices[openEdgeLocation.sideIndex] = edgeIndex;
   }
 }
 
@@ -395,9 +396,9 @@ void Mesh::setInitialEdgeSubdivisionLevels()
     float l1 = length(vertices.at(v2).pos - vertices.at(v1).pos);
     float l2 = length(vertices.at(v0).pos - vertices.at(v2).pos);
 
-    edges.at(f.edges[0]).subdivisions = nearestRoundPow2(l0);
-    edges.at(f.edges[1]).subdivisions = nearestRoundPow2(l1);
-    edges.at(f.edges[2]).subdivisions = nearestRoundPow2(l2);
+    edges.at(f.edgesIndices[0]).subdivisions = nearestRoundPow2(l0);
+    edges.at(f.edgesIndices[1]).subdivisions = nearestRoundPow2(l1);
+    edges.at(f.edgesIndices[2]).subdivisions = nearestRoundPow2(l2);
     }
 }
 
@@ -434,7 +435,7 @@ void Mesh::sanityCheckEdge()
     for (int edgeSide = 0; edgeSide < 2; edgeSide++) {
       int faceIndex = e.faces[edgeSide];
       int faceSide = e.side[edgeSide];
-      assert(faces[faceIndex].edges[faceSide] == edgeIndex);
+      assert(faces[faceIndex].edgesIndices[faceSide] == edgeIndex);
     }
   }
 
@@ -442,7 +443,7 @@ void Mesh::sanityCheckEdge()
     Face f = faces[faceIndex];
 
     for (int faceEdge = 0; faceEdge < 3; faceEdge++) {
-      int edgeIndex = f.edges[faceEdge];
+      int edgeIndex = f.edgesIndices[faceEdge];
       Edge e = edges[edgeIndex];
       assert(e.faces[0] == faceIndex || e.faces[1] == faceIndex);
     }
@@ -459,9 +460,9 @@ bool Mesh::enforceMicromesh(const Face &f)
 {
   bool changeAnything = false;
   uint edgeSubdivision[3] = {
-    edges.at(f.edges[0]).subdivisions,
-    edges.at(f.edges[1]).subdivisions,
-    edges.at(f.edges[2]).subdivisions
+    edges.at(f.edgesIndices[0]).subdivisions,
+    edges.at(f.edgesIndices[1]).subdivisions,
+    edges.at(f.edgesIndices[2]).subdivisions
   };
 
   uint max = uint(maxInt3(edgeSubdivision[0], edgeSubdivision[1], edgeSubdivision[2]));
@@ -473,9 +474,9 @@ bool Mesh::enforceMicromesh(const Face &f)
     }
   }
 
-  edges[f.edges[0]].subdivisions = edgeSubdivision[0];
-  edges[f.edges[1]].subdivisions = edgeSubdivision[1];
-  edges[f.edges[2]].subdivisions = edgeSubdivision[2];
+  edges[f.edgesIndices[0]].subdivisions = edgeSubdivision[0];
+  edges[f.edgesIndices[1]].subdivisions = edgeSubdivision[1];
+  edges[f.edgesIndices[2]].subdivisions = edgeSubdivision[2];
 
   return changeAnything;
 }
@@ -483,9 +484,9 @@ bool Mesh::enforceMicromesh(const Face &f)
 bool Mesh::enforceAnisotropicMicromesh(const Face &f)
 {
   uint edgeSubdivisions[3] = {
-    edges.at(f.edges[0]).subdivisions,
-    edges.at(f.edges[1]).subdivisions,
-    edges.at(f.edges[2]).subdivisions
+    edges.at(f.edgesIndices[0]).subdivisions,
+    edges.at(f.edgesIndices[1]).subdivisions,
+    edges.at(f.edgesIndices[2]).subdivisions
   };
 
   bool changeAnything = false;
@@ -513,9 +514,9 @@ bool Mesh::enforceAnisotropicMicromesh(const Face &f)
     }
   }
 
-  edges[f.edges[0]].subdivisions = edgeSubdivisions[0];
-  edges[f.edges[1]].subdivisions = edgeSubdivisions[1];
-  edges[f.edges[2]].subdivisions = edgeSubdivisions[2];
+  edges[f.edgesIndices[0]].subdivisions = edgeSubdivisions[0];
+  edges[f.edgesIndices[1]].subdivisions = edgeSubdivisions[1];
+  edges[f.edgesIndices[2]].subdivisions = edgeSubdivisions[2];
 
   return changeAnything;
 }
@@ -525,9 +526,9 @@ bool Mesh::isMicromeshScheme() const
   int correctFaces = 0;
 
   for (const Face &f : faces) {
-    int i = edges.at(f.edges[0]).subdivisions;
-    int j = edges.at(f.edges[0]).subdivisions;
-    int k = edges.at(f.edges[0]).subdivisions;
+    int i = edges.at(f.edgesIndices[0]).subdivisions;
+    int j = edges.at(f.edgesIndices[0]).subdivisions;
+    int k = edges.at(f.edgesIndices[0]).subdivisions;
     int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
     if (totalDelta <= 2) correctFaces++;
   }
