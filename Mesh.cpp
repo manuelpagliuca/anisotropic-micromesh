@@ -320,10 +320,6 @@ void Mesh::removeDuplicatedVertices()
     f.index[2] = newIndex2;
   }
 
-  qDebug() << faces.size();
-  qDebug() << newVertices.size() << " " << vertices.size();
-  qDebug() << faces.size();
-
   vertices = newVertices;
 }
 

@@ -18,13 +18,18 @@ public:
   Mainwindow(QWidget *parent = nullptr);
   ~Mainwindow() {}
   void loadDemoMesh();
-  void setDisplacementsDelta(std::vector<float> displacements);
 
 protected:
   void mousePressEvent(QMouseEvent *ev);
   void mouseMoveEvent(QMouseEvent *ev);
   void wheelEvent(QWheelEvent *ev);
   void keyPressEvent(QKeyEvent *ev);
+
+  void initUI();
+  void setTargetMeshAndResetSlider(const Mesh &targetMesh);
+  void setBaseMeshAndUI(const Mesh &mesh);
+  void updateBaseMeshAndDisableSubdivisionsBox();
+  void setDisplacementsDelta(std::vector<float> displacements);
 
 private:
   Ui::mainWindowClass ui;
@@ -72,8 +77,10 @@ public slots:
   void on_morph2500faces_clicked();
   void on_morph5000faces_clicked();
   void on_reloadShadersButton_clicked();
+
 private slots:
   void on_loadBaseMesh_clicked();
   void on_loadTargetMesh_clicked();
   void on_anisotropic_micromesh_subdivision_2_clicked();
+
 };
