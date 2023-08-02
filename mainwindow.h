@@ -82,5 +82,4 @@ private slots:
   void on_loadBaseMesh_clicked();
   void on_loadTargetMesh_clicked();
   void on_anisotropic_micromesh_subdivision_2_clicked();
-
 };

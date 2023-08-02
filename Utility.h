@@ -4,6 +4,7 @@
 #include <cmath>
 #include <iostream>
 #include <GLM/gtx/string_cast.hpp>
+#include "Mesh.h"
 
 #define PRINT_VECTOR(x) std::cout << #x << ": " << glm::to_string(x) << std::endl;
 
@@ -14,7 +15,5 @@ int nearestCeilPow2(float edgeLength);
 int maxInt2(int a, int b);
 int maxInt3(int a, int b, int c);
 int maxIntIndex(int arr[]);
-
-
 
 #endif // UTILITY_H

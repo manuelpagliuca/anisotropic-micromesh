@@ -269,8 +269,6 @@ Mesh Mesh::micromeshSubdivide()
   }
 
   subdivided.updateBoundingBox();
-//  subdivided.updateFaceNormals();
-//  subdivided.updateVertexNormals();
   subdivided.updateEdges();
   subdivided.removeDuplicatedVertices();
 
@@ -525,7 +523,9 @@ bool Mesh::isMicromeshScheme() const
     int i = edges.at(f.edgesIndices[0]).subdivisions;
     int j = edges.at(f.edgesIndices[0]).subdivisions;
     int k = edges.at(f.edgesIndices[0]).subdivisions;
+
     int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
+
     if (totalDelta <= 2) correctFaces++;
   }
 
@@ -550,62 +550,30 @@ Vertex Mesh::surfacePoint(const Face &f, vec3 bary) const
   return v;
 }
 
-bool Mesh::rayTriangleIntersect(const vec3& rayOrigin, const vec3& rayDirection, const vec3& v0, const vec3& v1, const vec3& v2, float& t) {
-  const float EPSILON = 0.000001f;
-
-  vec3 edge1, edge2, h, s, q;
-  float a, f, u, v;
-
-  edge1 = v1 - v0;
-  edge2 = v2 - v0;
-  h = glm::cross(rayDirection, edge2);
-  a = glm::dot(edge1, h);
-
-  if (a > -EPSILON && a < EPSILON)
-    return false; // Ray parallel to the triangle
-
-  f = 1.0f / a;
-  s = rayOrigin - v0;
-  u = f * glm::dot(s, h);
-
-  if (u < 0.0f || u > 1.0f)
-    return false;
-
-  q = glm::cross(s, edge1);
-  v = f * glm::dot(rayDirection, q);
-
-  if (v < 0.0f || u + v > 1.0f)
-    return false;
-
-  t = f * glm::dot(edge2, q);
-  return t > EPSILON;
-}
-
-float Mesh::minimumDisplacement(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh)
+float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, const Mesh &target)
 {
   float minDisp = INF;
 
-  for (const Face &f : targetMesh.faces) {
-    vec3 v0 = targetMesh.vertices[f.index[0]].pos;
-    vec3 v1 = targetMesh.vertices[f.index[1]].pos;
-    vec3 v2 = targetMesh.vertices[f.index[2]].pos;
+  for (const Face &f : target.faces) {
+    vec3 v0 = target.vertices[f.index[0]].pos;
+    vec3 v1 = target.vertices[f.index[1]].pos;
+    vec3 v2 = target.vertices[f.index[2]].pos;
+
+    Ray forwardRay = Ray(origin, direction);
+    Ray backwardRay = Ray(origin, -direction);
 
     float forwardDisp, backDisp;
 
-    bool forwardIntersect  = rayTriangleIntersect(rayOrigin, rayDirection,
-                                           v0, v1, v2,
-                                           forwardDisp);
-    bool backwardIntersect = rayTriangleIntersect(rayOrigin, -rayDirection,
-                                           v0, v1, v2,
-                                           backDisp);
+    bool forwardIntersect = forwardRay.intersectTriangle(v0, v1, v2, forwardDisp);
+    bool backwardIntersect = backwardRay.intersectTriangle(v0, v1, v2, backDisp);
 
     if (forwardIntersect && backwardIntersect) {
-      float smallerDisp = std::abs(backDisp) < std::abs(forwardDisp) ? backDisp : forwardDisp;
-      minDisp = std::abs(minDisp) < std::abs(smallerDisp) ? minDisp : smallerDisp;
+      float smallerDisp = (abs(backDisp) < abs(forwardDisp)) ? backDisp : forwardDisp;
+      minDisp = (abs(minDisp) < abs(smallerDisp)) ? minDisp : smallerDisp;
     } else if (forwardIntersect) {
-      minDisp = std::min(minDisp, forwardDisp);
+      minDisp = min(minDisp, forwardDisp);
     } else if (backwardIntersect) {
-      minDisp = std::abs(minDisp) < std::abs(backDisp) ? minDisp : backDisp;
+      minDisp = (abs(minDisp) < abs(backDisp)) ? minDisp : backDisp;
     }
   }
 
@@ -616,162 +584,10 @@ std::vector<float> Mesh::getDisplacements(const Mesh &target)
 {
   std::vector<float> displacements;
 
-  for (int vertexIdx = 0; vertexIdx < vertices.size(); vertexIdx++) {
-    Vertex &v = vertices[vertexIdx];
-    vec3 rayOrig = v.pos;
-    vec3 rayDir = v.norm;
-    displacements.push_back(minimumDisplacement(rayOrig, rayDir, target));
-  }
+  for (const Vertex &v : vertices)
+    displacements.push_back(minimumDisplacement(v.pos, v.norm, target));
 
   return displacements;
-}
-
-Mesh Mesh::parseOFF(const std::string &rawOFF)
-{
-  if (rawOFF.empty()) {
-    Mesh empty = Mesh();
-    return empty;
-  }
-
-  std::istringstream iss(rawOFF);
-  std::string line;
-
-  std::getline(iss, line);
-
-  if (line != "OFF") {
-    std::cerr << "Wrong format!" << std::endl;
-    Mesh corr_mesh = Mesh();
-    return Mesh();
-  }
-
-  int numVertices, numFaces, numEdges;
-  iss >> numVertices >> numFaces >> numEdges;
-  std::getline(iss, line);
-
-  Mesh mesh = Mesh();
-  int nTotal = numVertices + numFaces + 0; // todo: atm no edges
-
-  for (int i = 0; i < nTotal; i++) {
-    if (i < numVertices) {
-      float x, y, z;
-      iss >> x >> y >> z;
-      mesh.addVertex(vec3(x, y, z));
-    } else if (i >= numVertices && i < numVertices + numFaces) {
-      int n_vrtx, v1, v2, v3;
-      iss >> n_vrtx >> v1 >> v2 >> v3;
-      mesh.addFace(v1, v2, v3);
-    }
-    // else
-    //{
-    //	 TODO: no edge atm
-    //	 std::vector<uint> idx_edge = std::vector<uint>(4);
-    //	 iss >> idx_edge[0] >> idx_edge[1] >> idx_edge[2] >> idx_edge[3];
-    //	 mesh.edges.push_back(idx_edge);
-    // }
-    std::getline(iss, line);
-  }
-
-  mesh.updateBoundingBox();
-  mesh.updateFaceNormals();
-  mesh.updateVertexNormals();
-  mesh.updateEdges();
-  mesh.updateEdgesSubdivisionLevels();
-
-  return mesh;
-}
-
-/*
- * Still missing some cases
- * - vp 0.310000 3.210000 2.100000 (Parameter space vertices)
- * - f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 ... (Vertex normal indices)
- * - f v1//vn1 v2//vn2 v3//vn3 ... (Vertex normal indices without texture coordinate indices)
- * - l v1 v2 v3 v4 v5 v6 ... (Line elements)
- *
- * Materials are still not handled.
- */
-
-Mesh Mesh::parseOBJ(const std::string &raw_obj)
-{
-  Mesh mesh = Mesh();
-
-  if (raw_obj.empty()) {
-    std::cerr << "The .obj file is empty, a null mesh has been returned." << std::endl;
-    return mesh;
-  }
-
-  std::istringstream in(raw_obj);
-  std::string line;
-
-  std::vector<vec3> positions;
-  std::vector<vec2> texels;
-  std::vector<vec3> normals;
-  std::vector<uvec3> faces;
-
-  while (std::getline(in, line)) {
-    if (line.substr(0, 2) == "v ")
-    {
-      std::istringstream is(line.substr(2));
-      vec3 vpos;
-      float x, y, z;
-      is >> x;
-      is >> y;
-      is >> z;
-      vpos = vec3(x, y, z);
-      positions.push_back(vpos);
-    }
-
-    if (line.substr(0, 3) == "vt ") {
-      std::istringstream is(line.substr(3));
-      vec2 tex;
-      float u, v;
-      is >> u;
-      is >> v;
-      tex = vec2(u, v);
-      texels.push_back(tex);
-    }
-
-    if (line.substr(0, 3) == "vn ") {
-      std::istringstream is(line.substr(3));
-      vec3 normal;
-      float x, y, z;
-      is >> x;
-      is >> y;
-      is >> z;
-      normal = vec3(x, y, z);
-      normals.push_back(normal);
-    }
-
-    if (line.substr(0, 2) == "f ") {
-      // TODO: atm not considering textures, vn indices, ...
-      std::istringstream is(line.substr(2));
-      std::string dump;
-      int i1, i2, i3;
-      is >> i1;
-      is >> dump;
-      is >> i2;
-      is >> dump;
-      is >> i3;
-      faces.push_back(uvec3(--i1, --i2, --i3));
-    }
-  }
-
-  for (const vec3 &pos : positions) mesh.addVertex(pos);
-
-  int i = 0;
-  for (Vertex &v : mesh.vertices) {
-    v.norm = normals[i];
-    i++;
-  }
-
-  for (const vec3 &f : faces) mesh.addFace(f[0], f[1], f[2]);
-
-  mesh.updateBoundingBox();
-  mesh.updateFaceNormals();
-  mesh.updateVertexNormals();
-  mesh.updateEdges();
-  mesh.updateEdgesSubdivisionLevels();
-
-  return mesh;
 }
 
 void Mesh::exportOFF(const std::string &fileName) const

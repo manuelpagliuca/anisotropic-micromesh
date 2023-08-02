@@ -1,5 +1,6 @@
 #include "Trackball.h"
 #include <iostream>
+
 TrackBall::TrackBall() {}
 
 void TrackBall::trackMousePositions(QPoint currPos, int openGLWWidth, int openGLWHeight)
@@ -10,7 +11,6 @@ void TrackBall::trackMousePositions(QPoint currPos, int openGLWWidth, int openGL
   if (op1 != op2) {
     rotAngle = std::acosf(std::min(1.0f, glm::dot(op1, op2))) * sensitivity;
     rotAxis = glm::cross(op1, op2);
-
     prevPos = currPos;
     rotation = true;
   }
@@ -63,8 +63,10 @@ glm::vec3 TrackBall::getTrackBallVector(QPoint clickedPoint, int openGLWWidth, i
 
   float xySquared = std::powf(originPoint.x, 2.f) + std::powf(originPoint.y, 2.f);
 
-  if (xySquared <= 1.f * 1.f) originPoint.z = std::sqrtf(1.f * 1.f - xySquared);
-  else originPoint = glm::normalize(originPoint);
+  if (xySquared <= 1.f * 1.f)
+    originPoint.z = std::sqrtf(1.f * 1.f - xySquared);
+  else
+    originPoint = glm::normalize(originPoint);
 
   return originPoint;
 }

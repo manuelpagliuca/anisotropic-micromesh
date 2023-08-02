@@ -12,67 +12,14 @@
 #include <map>
 #include <utility>
 #include "Utility.h"
+
+#include "Edge.h"
+#include "Vertex.h"
+#include "Face.h"
 #include "BoundingBox.h"
+#include "Ray.h"
 
 using namespace glm;
-
-struct Vertex
-{
-  vec3 pos;
-  vec3 norm;
-  vec2 tex;
-
-  bool operator==(const Vertex &v) const {
-    return v.pos == pos && v.norm == norm && v.tex == tex;
-  }
-};
-
-struct Face
-{
-  uint index[3];
-  uint edgesIndices[3]; // 0, 1 and 2
-  vec3 norm;
-};
-
-struct Edge
-{
-  uint faces[2];
-  uint side[2]; // 0 and 1 (l and r)
-  uint subdivisions = 0;
-};
-
-struct AvailableEdge
-{
-  uint startVertexIndex;
-  uint endVertexIndex;
-
-  AvailableEdge(uint a, uint b) : startVertexIndex(a), endVertexIndex(b) {}
-
-  bool operator==(const AvailableEdge &o) const
-  {
-    return startVertexIndex == o.startVertexIndex && endVertexIndex == o.endVertexIndex;
-  }
-
-  bool operator<(const AvailableEdge &o) const
-  {
-    return startVertexIndex < o.startVertexIndex || (startVertexIndex == o.startVertexIndex && endVertexIndex < o.endVertexIndex);
-  }
-
-  bool operator>(const AvailableEdge &o) const
-  {
-    return startVertexIndex > o.startVertexIndex || (startVertexIndex == o.startVertexIndex && endVertexIndex > o.endVertexIndex);
-  }
-
-  AvailableEdge flip() const { return AvailableEdge(endVertexIndex, startVertexIndex); }
-};
-
-struct EdgeLocation
-{
-  uint faceIndex;
-  uint sideIndex;
-
-  EdgeLocation(uint a, uint b) : faceIndex(a), sideIndex(b) {}
-};
 
 class Mesh : protected QOpenGLExtraFunctions
 {
@@ -80,10 +27,10 @@ public:
   Mesh();
   ~Mesh();
 
-  BoundingBox bbox;
   std::vector<Vertex> vertices;
   std::vector<Face> faces;
   std::vector<Edge> edges;
+  BoundingBox bbox;
 
   int addVertex(vec3 pos);
   int addFace(int i0, int i1, int i2);
@@ -93,10 +40,12 @@ public:
   void displaceVertex(int index, float k);
   void displaceFaces(float k);
 
+  // Data
   std::vector<float> getPositionsVector() const;
   std::vector<uint> getFacesVector() const;
-  uint getFaceSubdivisionLevel(int index) const;
 
+  // Utils
+  uint getFaceSubdivisionLevel(int index) const;
   float getAvgFacesDoubleArea() const;
   float getAvgEdgeLength() const;
 
@@ -124,9 +73,8 @@ public:
   Vertex surfacePoint(const Face &f, vec3 bary) const;
   void removeDuplicatedVertices();
 
-  bool rayTriangleIntersect(const vec3 &rayOrigin, const vec3 &rayDirection, const vec3 &v0, const vec3 &v1, const vec3 &v2, float &t);
-  float minimumDisplacement(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh);
-  std::vector<float> getDisplacements(const Mesh &targetMesh);
+  float minimumDisplacement(const vec3 &origin, const vec3 &direction, const Mesh &target);
+  std::vector<float> getDisplacements(const Mesh &target);
 
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);

@@ -8,32 +8,36 @@ CONFIG += c++17 console
 INCLUDEPATH += $$PWD/dependencies
 
 SOURCES += \
-    GLWidget.cpp \
-    Utility.cpp \
-    main.cpp \
-    BoundingBox.cpp \
-    Mainwindow.cpp \
-    Mesh.cpp \
-    Shader.cpp \
-    Main.cpp \
-    Trackball.cpp
+  GLWidget.cpp \
+  Ray.cpp \
+  Utility.cpp \
+  BoundingBox.cpp \
+  Mainwindow.cpp \
+  Mesh.cpp \
+  Shader.cpp \
+  Main.cpp \
+  Trackball.cpp
 
 HEADERS += \
-    BoundingBox.h \
-    Debug.h \
-    GLWidget.h \
-    Mainwindow.h \
-    Mesh.h \
-    Shader.h \
-    Trackball.h \
-    Utility.h
+  BoundingBox.h \
+  Debug.h \
+  Edge.h \
+  Face.h \
+  GLWidget.h \
+  Mainwindow.h \
+  Mesh.h \
+  Ray.h \
+  Shader.h \
+  Trackball.h \
+  Utility.h \
+  Vertex.h
 
 FORMS += \
-    mainwindow.ui
+  mainwindow.ui
 
 DISTFILES += \
-    shaders/shader.frag \
-    shaders/shader.vert
+  shaders/shader.frag \
+  shaders/shader.vert
 
 LIBS += opengl32.lib user32.lib
 
