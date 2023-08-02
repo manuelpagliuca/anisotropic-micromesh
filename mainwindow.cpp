@@ -296,25 +296,25 @@ void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()
 
 void Mainwindow::on_demo125faces_clicked()
 {
-  std::string pallasOBJ125 = readFile("./mesh/pallas_125.obj");
+  std::string pallasOBJ125 = readFile("./samples/pallas_125.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
 }
 
 void Mainwindow::on_demo250faces_clicked()
 {
-  std::string pallasOBJ250 = readFile("./mesh/pallas_250.obj");
+  std::string pallasOBJ250 = readFile("./samples/pallas_250.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
 }
 
 void Mainwindow::on_demo500faces_clicked()
 {
-  std::string pallasOBJ500 = readFile("./mesh/pallas_500.obj");
+  std::string pallasOBJ500 = readFile("./samples/pallas_500.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
 }
 
 void Mainwindow::on_demo1000faces_clicked()
 {
-  std::string pallasOBJ1000 = readFile("./mesh/pallas_1000.obj");
+  std::string pallasOBJ1000 = readFile("./samples/pallas_1000.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
 }
 
@@ -352,31 +352,31 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 
 void Mainwindow::on_morph250faces_clicked()
 {
-  std::string pallasOBJ250 = readFile("./mesh/pallas_250.obj");
+  std::string pallasOBJ250 = readFile("./samples/pallas_250.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ250));
 }
 
 void Mainwindow::on_morph500faces_clicked()
 {
-  std::string pallasOBJ500 = readFile("./mesh/pallas_500.obj");
+  std::string pallasOBJ500 = readFile("./samples/pallas_500.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ500));
 }
 
 void Mainwindow::on_morph1000faces_clicked()
 {
-  std::string pallasOBJ1000 = readFile("./mesh/pallas_1000.obj");
+  std::string pallasOBJ1000 = readFile("./samples/pallas_1000.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ1000));
 }
 
 void Mainwindow::on_morph2500faces_clicked()
 {
-  std::string pallasOBJ2500 = readFile("./mesh/pallas_2500.obj");
+  std::string pallasOBJ2500 = readFile("./samples/pallas_2500.obj");
   setTargetMeshAndResetSlider(Mesh ::parseOBJ(pallasOBJ2500));
 }
 
 void Mainwindow::on_morph5000faces_clicked()
 {
-  std::string pallasOBJ5000 = readFile("./mesh/pallas_5000.obj");
+  std::string pallasOBJ5000 = readFile("./samples/pallas_5000.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ5000));
 }
 

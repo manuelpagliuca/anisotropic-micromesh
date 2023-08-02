@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MESH_H
+#define MESH_H
 
 #include <iostream>
 #include <fstream>
@@ -96,8 +97,11 @@ private:
   void setInitialEdgeSubdivisionLevelsTest();
   void sanityCheckEdge();
   bool isMicromeshScheme() const;
+
   // Debug
   void print() const;
   void printEdgeSubdivisions() const;
   void printOpenEdges() const;
 };
+
+#endif MESH_H

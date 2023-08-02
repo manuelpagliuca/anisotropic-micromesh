@@ -1,4 +1,5 @@
-#pragma once
+#ifndef BOUNDING_BOX_H
+#define BOUNDING_BOX_H
 
 #include <GLM/gtc/type_ptr.hpp>
 #include <GLM/gtx/transform.hpp>
@@ -27,3 +28,5 @@ private:
   vec3 minPoint;
   vec3 maxPoint;
 };
+
+#endif // BOUNDING_BOX_H

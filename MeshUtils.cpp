@@ -218,7 +218,7 @@ void Mesh::exportOFF(const std::string &fileName) const
 {
   std::ostringstream oss;
   std::string fileNameExt = fileName + ".off";
-  std::ofstream fileStream(".\\mesh\\" + fileNameExt, std::ios::out);
+  std::ofstream fileStream(".\\samples\\" + fileNameExt, std::ios::out);
 
   if (!fileStream.is_open()) {
     printf("Failed to open \'%s\'. File doesn't exist.", fileNameExt.c_str());
@@ -252,7 +252,7 @@ void Mesh::exportOBJ(const std::string &fName) const
 {
   std::ostringstream oss;
   std::string fileNameExt = fName + ".obj";
-  std::ofstream fileStream(".\\mesh\\" + fileNameExt, std::ios::out);
+  std::ofstream fileStream(".\\samples\\" + fileNameExt, std::ios::out);
 
   if (!fileStream.is_open()) {
     printf("Failed to open \'%s\'. File doesn't exist.", fileNameExt.c_str());

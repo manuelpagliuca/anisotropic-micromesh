@@ -1,4 +1,5 @@
-#pragma once
+#ifndef GL_WIDGET_H
+#define GL_WIDGET_H
 
 #include <QtOpenGL>
 #include <QtOpenGLWidgets>
@@ -52,3 +53,5 @@ private:
 
   bool wireframeMode = false;
 };
+
+#endif // GL_WIDGET_H

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
 #include "ui_mainwindow.h"
 
@@ -83,3 +84,5 @@ private slots:
   void on_loadTargetMesh_clicked();
   void on_anisotropic_micromesh_subdivision_2_clicked();
 };
+
+#endif // MAIN_WINDOW_H

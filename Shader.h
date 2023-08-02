@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SHADER_H
+#define SHADER_H
 
 #include <iostream>
 #include <fstream>
@@ -35,3 +36,5 @@ private:
   unsigned int uniformModelMatrix;
   unsigned int uniformWireframeMode;
 };
+
+#endif // SHADER_H
