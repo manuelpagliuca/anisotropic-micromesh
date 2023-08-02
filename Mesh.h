@@ -23,59 +23,64 @@ using namespace glm;
 
 class Mesh : protected QOpenGLExtraFunctions
 {
+private:
+  std::vector<Vertex> vertices;
+  std::vector<Face> faces;
+  std::vector<Edge> edges;
+
+public:
+  BoundingBox bbox;
+
 public:
   Mesh();
   ~Mesh();
 
-  std::vector<Vertex> vertices;
-  std::vector<Face> faces;
-  std::vector<Edge> edges;
-  BoundingBox bbox;
-
+  // Vertex
   int addVertex(vec3 pos);
-  int addFace(int i0, int i1, int i2);
-  int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
-
-  void displaceVertices(float k);
   void displaceVertex(int index, float k);
-  void displaceFaces(float k);
+  void displaceVertices(float k);
+  Vertex getSurfaceVertex(const Face &f, vec3 bary) const;
 
-  // Data
+  // Face
+  int addFace(int i0, int i1, int i2);
+  void displaceFace(int index, float k);
+  void displaceFaces(float k);
+  uint getFaceSubdivisionLevel(int index) const;
+  float getAvgFacesDoubleArea() const;
+
+
+  // Edge
+  int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
+  float getAvgEdgeLength() const;
+  void fixEdgesSubdivisionLevels();
+  void setInitialEdgeSubdivisionLevels();
+
+  // Get
   std::vector<float> getPositionsVector() const;
   std::vector<uint> getFacesVector() const;
 
-  // Utils
-  uint getFaceSubdivisionLevel(int index) const;
-  float getAvgFacesDoubleArea() const;
-  float getAvgEdgeLength() const;
 
+  // Subdivision
   Mesh subdivide();
-  Mesh nSubdivide(int subdivision);
+  Mesh subdivideNtimes(int n);
   Mesh micromeshSubdivide();
   Mesh anisotropicMicromeshSubdivide();
 
+  // Subdivision scheme
+  bool enforceMicromesh(const Face &f);
+  bool enforceAnisotropicMicromesh(const Face &f);
+
+  // Update
   void updateFaceNormals();
   void updateVertexNormals();
   void updateBoundingBox();
   void updateEdges();
   void updateEdgesSubdivisionLevels();
 
-  void fixEdges();
-  void sanityCheckEdge();
-
-  void setInitialEdgeSubdivisionLevels();
-  void setInitialEdgeSubdivisionLevelsTest();
-
-  bool enforceMicromesh(const Face &f);
-  bool enforceAnisotropicMicromesh(const Face &f);
-
-  bool isMicromeshScheme() const;
-  Vertex surfacePoint(const Face &f, vec3 bary) const;
+  // Utils
   void removeDuplicatedVertices();
-
   float minimumDisplacement(const vec3 &origin, const vec3 &direction, const Mesh &target);
   std::vector<float> getDisplacements(const Mesh &target);
-
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);
   void exportOFF(const std::string &fileName) const;
@@ -86,6 +91,12 @@ protected:
   void draw(bool wireframe);
   void drawDirect();
 
+private:
+  // Test
+  void setInitialEdgeSubdivisionLevelsTest();
+  void sanityCheckEdge();
+  bool isMicromeshScheme() const;
+  // Debug
   void print() const;
   void printEdgeSubdivisions() const;
   void printOpenEdges() const;

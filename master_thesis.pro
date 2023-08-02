@@ -9,6 +9,9 @@ INCLUDEPATH += $$PWD/dependencies
 
 SOURCES += \
   GLWidget.cpp \
+  MeshDebug.cpp \
+  MeshTest.cpp \
+  MeshUtils.cpp \
   Ray.cpp \
   Utility.cpp \
   BoundingBox.cpp \

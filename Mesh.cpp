@@ -45,27 +45,30 @@ int Mesh::addEdge(int faceIndex0, int faceIndex1, int side0, int side1)
   return edgeIndex;
 }
 
-void Mesh::displaceVertices(float k)
-{
-  for (Vertex &v : vertices) v.pos = v.pos + (k * v.norm);
-}
-
 void Mesh::displaceVertex(int index, float k)
 {
   vertices[index].pos = vertices[index].pos + (k * vertices[index].norm);
 }
 
+void Mesh::displaceVertices(float k)
+{
+  for (Vertex &v : vertices) v.pos = v.pos + (k * v.norm);
+}
+
+void Mesh::displaceFace(int index, float k)
+{
+  Vertex &v0 = vertices[faces.at(index).index[0]];
+  Vertex &v2 = vertices[faces.at(index).index[1]];
+  Vertex &v1 = vertices[faces.at(index).index[2]];
+
+  v0.pos = v0.pos + (k * faces.at(index).norm);
+  v1.pos = v1.pos + (k * faces.at(index).norm);
+  v2.pos = v2.pos + (k * faces.at(index).norm);
+}
+
 void Mesh::displaceFaces(float k)
 {
-  for (Face &f : faces) {
-    Vertex &v0 = vertices[f.index[0]];
-    Vertex &v2 = vertices[f.index[1]];
-    Vertex &v1 = vertices[f.index[2]];
-
-    v0.pos = v0.pos + (k * f.norm);
-    v1.pos = v1.pos + (k * f.norm);
-    v2.pos = v2.pos + (k * f.norm);
-  }
+  for (int i = 0; i < faces.size(); i++) displaceFace(i, k);
 }
 
 std::vector<float> Mesh::getPositionsVector() const
@@ -165,7 +168,7 @@ Mesh Mesh::subdivide()
   return subdivided;
 }
 
-Mesh Mesh::nSubdivide(int n)
+Mesh Mesh::subdivideNtimes(int n)
 {
   Mesh subdivided = Mesh();
   subdivided.vertices = this->vertices;
@@ -207,7 +210,7 @@ Mesh Mesh::nSubdivide(int n)
 Mesh Mesh::micromeshSubdivide()
 {
   Mesh subdivided = Mesh();
-  fixEdges();
+  fixEdgesSubdivisionLevels();
 
   auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };
   auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
@@ -227,7 +230,7 @@ Mesh Mesh::micromeshSubdivide()
         float c = vx / float(n);
         float a = vy / float(n);
         vec3 bary = vec3((1 - a), (a - c), c);
-        subdivided.vertices.push_back(surfacePoint(f, bary));
+        subdivided.vertices.push_back(getSurfaceVertex(f, bary));
       }
     }
 
@@ -283,7 +286,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 }
 
 // This function fixes the edges which are downscaled but should be higher scale
-void Mesh::fixEdges()
+void Mesh::fixEdgesSubdivisionLevels()
 {
   for (Edge &e: edges) {
     if (e.faces[0] == -1 || e.faces[1] == -1) continue;
@@ -293,32 +296,6 @@ void Mesh::fixEdges()
     if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0)
       e.subdivisions = eMax0;
   }
-}
-
-void Mesh::removeDuplicatedVertices()
-{
-  std::vector<Vertex> newVertices;
-  std::vector<Face> newFaces;
-
-  for (const Vertex &v : vertices)
-    if (std::find(newVertices.begin(), newVertices.end(), v) == newVertices.end())
-      newVertices.push_back(v);
-
-  for (Face &f : faces) {
-    auto it0 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[0]));
-    auto it1 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[1]));
-    auto it2 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[2]));
-
-    uint newIndex0 = uint(std::distance(newVertices.begin(), it0));
-    uint newIndex1 = uint(std::distance(newVertices.begin(), it1));
-    uint newIndex2 = uint(std::distance(newVertices.begin(), it2));
-
-    f.index[0] = newIndex0;
-    f.index[1] = newIndex1;
-    f.index[2] = newIndex2;
-  }
-
-  vertices = newVertices;
 }
 
 void Mesh::updateFaceNormals()
@@ -396,12 +373,6 @@ void Mesh::setInitialEdgeSubdivisionLevels()
     }
 }
 
-void Mesh::setInitialEdgeSubdivisionLevelsTest()
-{
-  for (Edge &e : edges) e.subdivisions = 0;
-  edges.at(0).subdivisions = 6;
-}
-
 void Mesh::updateEdgesSubdivisionLevels()
 {
   setInitialEdgeSubdivisionLevels();
@@ -419,29 +390,6 @@ void Mesh::updateEdgesSubdivisionLevels()
     if (!changeAnything) break;
   }
   qDebug() << "Micromesh scheme enforced: " << count << " times.";
-}
-
-void Mesh::sanityCheckEdge()
-{
-  for (int edgeIndex = 0; edgeIndex < edges.size(); edgeIndex++) {
-    Edge e = edges[edgeIndex];
-
-    for (int edgeSide = 0; edgeSide < 2; edgeSide++) {
-      int faceIndex = e.faces[edgeSide];
-      int faceSide = e.side[edgeSide];
-      assert(faces[faceIndex].edgesIndices[faceSide] == edgeIndex);
-    }
-  }
-
-  for (int faceIndex = 0; faceIndex < faces.size(); faceIndex++) {
-    Face f = faces[faceIndex];
-
-    for (int faceEdge = 0; faceEdge < 3; faceEdge++) {
-      int edgeIndex = f.edgesIndices[faceEdge];
-      Edge e = edges[edgeIndex];
-      assert(e.faces[0] == faceIndex || e.faces[1] == faceIndex);
-    }
-  }
 }
 
 void Mesh::updateBoundingBox()
@@ -515,144 +463,22 @@ bool Mesh::enforceAnisotropicMicromesh(const Face &f)
   return changeAnything;
 }
 
-bool Mesh::isMicromeshScheme() const
-{
-  int correctFaces = 0;
-
-  for (const Face &f : faces) {
-    int i = edges.at(f.edgesIndices[0]).subdivisions;
-    int j = edges.at(f.edgesIndices[0]).subdivisions;
-    int k = edges.at(f.edgesIndices[0]).subdivisions;
-
-    int totalDelta = std::abs(i - j) + std::abs(j - k) + std::abs(i - k);
-
-    if (totalDelta <= 2) correctFaces++;
-  }
-
-  return correctFaces == faces.size();
-}
-
-Vertex Mesh::surfacePoint(const Face &f, vec3 bary) const
+Vertex Mesh::getSurfaceVertex(const Face &f, vec3 bary) const
 {
   int v0 = f.index[0];
   int v1 = f.index[1];
   int v2 = f.index[2];
 
   Vertex v;
-  v.pos = vertices[v0].pos * bary[0] +
-          vertices[v1].pos * bary[1] +
-          vertices[v2].pos * bary[2];
+  v.pos = vertices.at(v0).pos * bary[0] +
+          vertices.at(v1).pos * bary[1] +
+          vertices.at(v2).pos * bary[2];
 
-  v.norm = vertices[v0].norm * bary[0] +
-           vertices[v1].norm * bary[1] +
-           vertices[v2].norm * bary[2];
+  v.norm = vertices.at(v0).norm * bary[0] +
+           vertices.at(v1).norm * bary[1] +
+           vertices.at(v2).norm * bary[2];
 
   return v;
-}
-
-float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, const Mesh &target)
-{
-  float minDisp = INF;
-
-  for (const Face &f : target.faces) {
-    vec3 v0 = target.vertices[f.index[0]].pos;
-    vec3 v1 = target.vertices[f.index[1]].pos;
-    vec3 v2 = target.vertices[f.index[2]].pos;
-
-    Ray forwardRay = Ray(origin, direction);
-    Ray backwardRay = Ray(origin, -direction);
-
-    float forwardDisp, backDisp;
-
-    bool forwardIntersect = forwardRay.intersectTriangle(v0, v1, v2, forwardDisp);
-    bool backwardIntersect = backwardRay.intersectTriangle(v0, v1, v2, backDisp);
-
-    if (forwardIntersect && backwardIntersect) {
-      float smallerDisp = (abs(backDisp) < abs(forwardDisp)) ? backDisp : forwardDisp;
-      minDisp = (abs(minDisp) < abs(smallerDisp)) ? minDisp : smallerDisp;
-    } else if (forwardIntersect) {
-      minDisp = min(minDisp, forwardDisp);
-    } else if (backwardIntersect) {
-      minDisp = (abs(minDisp) < abs(backDisp)) ? minDisp : backDisp;
-    }
-  }
-
-  return minDisp;
-}
-
-std::vector<float> Mesh::getDisplacements(const Mesh &target)
-{
-  std::vector<float> displacements;
-
-  for (const Vertex &v : vertices)
-    displacements.push_back(minimumDisplacement(v.pos, v.norm, target));
-
-  return displacements;
-}
-
-void Mesh::exportOFF(const std::string &fileName) const
-{
-  std::ostringstream oss;
-  std::string fileNameExt = fileName + ".off";
-  std::ofstream fileStream(".\\mesh\\" + fileNameExt, std::ios::out);
-
-  if (!fileStream.is_open()) {
-    printf("Failed to open \'%s\'. File doesn't exist.", fileNameExt.c_str());
-    return;
-  }
-
-  fileStream
-      << "OFF"
-      << "\n"
-      << vertices.size() << " "
-      << faces.size() << " "
-      << 0 << std::endl; // todo: atm the # of edges is 0
-
-  for (const Vertex &v : vertices)
-    fileStream
-        << v.pos.x << " "
-        << v.pos.y << " "
-        << v.pos.z << std::endl;
-
-  for (const Face &f : faces)
-    fileStream
-        << 3
-        << " " << f.index[0]
-        << " " << f.index[1]
-        << " " << f.index[2] << std::endl;
-
-  fileStream.close();
-}
-
-void Mesh::exportOBJ(const std::string &fName) const
-{
-  std::ostringstream oss;
-  std::string fileNameExt = fName + ".obj";
-  std::ofstream fileStream(".\\mesh\\" + fileNameExt, std::ios::out);
-
-  if (!fileStream.is_open()) {
-    printf("Failed to open \'%s\'. File doesn't exist.", fileNameExt.c_str());
-    return;
-  }
-
-  for (const Vertex &v : vertices) {
-    fileStream << std::setprecision(6) << std::fixed
-               << "vn " << v.norm.x
-               << " " << v.norm.y
-               << " " << v.norm.z << std::endl;
-    fileStream << std::setprecision(6) << std::fixed
-               << "v " << v.pos.x
-               << " " << v.pos.y
-               << " " << v.pos.z << std::endl;
-  }
-
-  for (const Face &f : faces)
-    fileStream << "f "
-               << f.index[0] + 1 << "//" << f.index[0] + 1 << " "
-               << f.index[1] + 1 << "//" << f.index[1] + 1 << " "
-               << f.index[2] + 1 << "//" << f.index[2] + 1 << std::endl;
-
-  fileStream.close();
 }
 
 void Mesh::draw(bool wireframe)
@@ -678,46 +504,4 @@ void Mesh::drawDirect()
   }
 
   glEnd();
-}
-
-void Mesh::print() const
-{
-  std::cout << vertices.size() << " " << faces.size() << "\n";
-  for (const Vertex &v : vertices) std::cout << to_string(v.pos) << "\n";
-
-  std::cout << std::endl;
-  for (const Face &f : faces) std::cout << f.index[0] << f.index[1] << f.index[2] << "\n";
-
-  std::cout << std::endl;
-  for (const Edge &e : edges) std::cout << e.faces[0] << e.faces[1] << "\n";
-}
-
-void Mesh::printEdgeSubdivisions() const
-{
-  for (const Face &f : faces) {
-    qDebug()
-      << "f(" << f.index[0] << " - " << f.index[1] << " - " << f.index[2] << "), s("
-      << edges.at(f.index[0]).subdivisions << "/"
-      << edges.at(f.index[1]).subdivisions << "/"
-      << edges.at(f.index[2]).subdivisions << ")";
-    }
-}
-
-void Mesh::printOpenEdges() const
-{
-  uint nOpenEdges = 0;
-  for (const Edge &e: edges) {
-    if (e.side[1] == -1) {
-      Vertex v0 = vertices.at(faces.at(e.faces[0]).index[0]);
-      Vertex v1 = vertices.at(faces.at(e.faces[0]).index[1]);
-      Vertex v2 = vertices.at(faces.at(e.faces[0]).index[2]);
-
-      PRINT_VECTOR(v0.pos);
-      PRINT_VECTOR(v1.pos);
-      PRINT_VECTOR(v2.pos);
-
-      nOpenEdges++;
-    }
-  }
-  qDebug() << "In total there are " << nOpenEdges << " open edges.";
 }

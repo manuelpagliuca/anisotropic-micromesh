@@ -258,7 +258,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
                       this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
   if (isValid) {
-    baseMesh = baseMesh.nSubdivide(subdivisions);
+    baseMesh = baseMesh.subdivideNtimes(subdivisions);
     ui.openGLWidget->updateMeshData(baseMesh);
     ui.morphingGroupBox->setEnabled(true);
   }
@@ -333,7 +333,7 @@ void Mainwindow::on_uniform_subdivision_clicked()
                       this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
   if (isValid) {
-    baseMesh = baseMesh.nSubdivide(subdivisions);
+    baseMesh = baseMesh.subdivideNtimes(subdivisions);
     updateBaseMeshAndDisableSubdivisionsBox();
   }
 }
