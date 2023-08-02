@@ -584,27 +584,32 @@ bool Mesh::rayTriangleIntersect(const vec3& rayOrigin, const vec3& rayDirection,
   return t > EPSILON;
 }
 
-float Mesh::intersectRay(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh)
+float Mesh::minimumDisplacement(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh)
 {
-  int minDisp = +INF;
+  float minDisp = INF;
 
   for (const Face &f : targetMesh.faces) {
     vec3 v0 = targetMesh.vertices[f.index[0]].pos;
     vec3 v1 = targetMesh.vertices[f.index[1]].pos;
     vec3 v2 = targetMesh.vertices[f.index[2]].pos;
 
-    float disp0, disp1;
+    float forwardDisp, backDisp;
 
-    bool intersect0 = rayTriangleIntersect(rayOrigin, rayDirection,
+    bool forwardIntersect  = rayTriangleIntersect(rayOrigin, rayDirection,
                                            v0, v1, v2,
-                                           disp0);
-    bool intersect1 = rayTriangleIntersect(rayOrigin, -rayDirection,
+                                           forwardDisp);
+    bool backwardIntersect = rayTriangleIntersect(rayOrigin, -rayDirection,
                                            v0, v1, v2,
-                                           disp1);
+                                           backDisp);
 
-    if (intersect0 && intersect1) minDisp = (std::abs(disp0) < std::abs(disp1)) ? disp0 : -std::abs(disp1);
-    else if (intersect0) minDisp = disp0;
-    else if (intersect1) minDisp = -std::abs(disp1);
+    if (forwardIntersect && backwardIntersect) {
+      float smallerDisp = std::abs(backDisp) < std::abs(forwardDisp) ? backDisp : forwardDisp;
+      minDisp = std::abs(minDisp) < std::abs(smallerDisp) ? minDisp : smallerDisp;
+    } else if (forwardIntersect) {
+      minDisp = std::min(minDisp, forwardDisp);
+    } else if (backwardIntersect) {
+      minDisp = std::abs(minDisp) < std::abs(backDisp) ? minDisp : backDisp;
+    }
   }
 
   return minDisp;
@@ -618,7 +623,7 @@ std::vector<float> Mesh::getDisplacements(const Mesh &target)
     Vertex &v = vertices[vertexIdx];
     vec3 rayOrig = v.pos;
     vec3 rayDir = v.norm;
-    displacements.push_back(intersectRay(rayOrig, rayDir, target));
+    displacements.push_back(minimumDisplacement(rayOrig, rayDir, target));
   }
 
   return displacements;

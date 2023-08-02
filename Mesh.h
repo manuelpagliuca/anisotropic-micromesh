@@ -121,7 +121,7 @@ public:
   void removeDuplicateVertices();
 
   bool rayTriangleIntersect(const vec3 &rayOrigin, const vec3 &rayDirection, const vec3 &v0, const vec3 &v1, const vec3 &v2, float &t);
-  float intersectRay(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh);
+  float minimumDisplacement(const vec3 &rayOrigin, const vec3 &rayDirection, const Mesh &targetMesh);
   std::vector<float> getDisplacements(const Mesh &targetMesh);
 
   static Mesh parseOFF(const std::string &rawOFF);
