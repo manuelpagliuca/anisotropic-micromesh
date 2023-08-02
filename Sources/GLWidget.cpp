@@ -1,4 +1,4 @@
-﻿#include "GLWidget.h"
+﻿#include "Headers/GLWidget.h"
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
@@ -56,8 +56,8 @@ void GLWidget::reloadShaders()
 
 void GLWidget::initializeShaders()
 {
-  std::string vertexShaderSrc = readFile("./shaders/shader.vert");
-  std::string fragShaderSrc = readFile("./shaders/shader.frag");
+  std::string vertexShaderSrc = readFile("../Shaders/shader.vert");
+  std::string fragShaderSrc = readFile("../Shaders/shader.frag");
 
   vShader = createShader(GL_VERTEX_SHADER, vertexShaderSrc.c_str());
   fShader = createShader(GL_FRAGMENT_SHADER, fragShaderSrc.c_str());
