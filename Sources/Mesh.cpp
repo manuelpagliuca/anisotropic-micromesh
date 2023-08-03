@@ -71,7 +71,7 @@ void Mesh::displaceFaces(float k)
   for (int i = 0; i < faces.size(); i++) displaceFace(i, k);
 }
 
-std::vector<float> Mesh::getPositionsVector() const
+std::vector<float> Mesh::getPositionsData() const
 {
   std::vector<float> pos;
 
@@ -84,7 +84,20 @@ std::vector<float> Mesh::getPositionsVector() const
   return pos;
 }
 
-std::vector<uint> Mesh::getFacesVector() const
+std::vector<float> Mesh::getFaceNormalsData() const
+{
+  std::vector<float> normals;
+
+  for (const Face &f : faces) {
+    normals.push_back(f.norm[0]);
+    normals.push_back(f.norm[1]);
+    normals.push_back(f.norm[2]);
+  }
+
+  return normals;
+}
+
+std::vector<uint> Mesh::getFacesData() const
 {
   std::vector<uint> indices;
   for (const Face &f : faces) {
@@ -485,7 +498,7 @@ void Mesh::draw(bool wireframe)
 {
   initializeOpenGLFunctions();
   glPolygonMode(GL_FRONT_AND_BACK, wireframe ? GL_LINE : GL_FILL);
-  uint numFaces = static_cast<uint>(getFacesVector().size());
+  uint numFaces = static_cast<uint>(getFacesData().size());
   glDrawElements(GL_TRIANGLES, numFaces, GL_UNSIGNED_INT, 0);
 }
 

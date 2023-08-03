@@ -57,8 +57,9 @@ public:
   void setInitialEdgeSubdivisionLevels();
 
   // Get
-  std::vector<float> getPositionsVector() const;
-  std::vector<uint> getFacesVector() const;
+  std::vector<float> getPositionsData() const;
+  std::vector<float> getFaceNormalsData() const;
+  std::vector<uint> getFacesData() const;
 
 
   // Subdivision

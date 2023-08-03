@@ -39,7 +39,7 @@ protected:
   void initializeGL() override;
 
 private:
-  std::vector<float> vertices;
+  std::vector<float> vertices, normals;
   std::vector<unsigned int> faces;
 
   std::string readFile(const char *fileLocation) const;
@@ -48,9 +48,15 @@ private:
 
   GLuint shaderProgram;
   GLuint vShader, fShader;
-  GLint modelLocation, wireLocation;
-  mat4 model;
 
+  // Uniform locations
+  GLint modelLocation, viewLocation, projLocation;
+  GLint wireLocation, lightPositionLocation, lightColorLocation, shininessLocation;
+
+  // Uniform values
+  mat4 model, view, proj;
+  vec3 lightPosition, lightColor;
+  float shininess;
   bool wireframeMode = false;
 };
 

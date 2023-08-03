@@ -2,8 +2,17 @@
 
 GLWidget::GLWidget(QWidget *parent) : QOpenGLWidget(parent)
 {
-  shaderProgram = modelLocation = 0;
+  shaderProgram = 0;
+  modelLocation = viewLocation = projLocation = 0;
+  lightPositionLocation = lightColorLocation = 0;
+  shininessLocation = 0;
+
   model = mat4(1.f);
+  view = mat4(1.f);
+  proj = mat4(1.f);
+  lightPosition = vec3(-20.0f, 10.0f, 1.0f);
+  lightColor = vec3(1.0f);
+  shininess = 10.0f;
 }
 
 void GLWidget::paintGL()
@@ -15,9 +24,20 @@ void GLWidget::paintGL()
   model = trackBall.getRotationMatrix() * trackBall.getScalingMatrix() * model;
 
   glUniformMatrix4fv(modelLocation, 1, GL_FALSE, value_ptr(model));
-  glUniform1i(wireLocation, 0); // wireframe starts disabled
+  glUniformMatrix4fv(viewLocation, 1, GL_FALSE, value_ptr(view));
+  glUniformMatrix4fv(projLocation, 1, GL_FALSE, value_ptr(proj));
+  glUniform3fv(lightPositionLocation, 1, value_ptr(lightPosition));
+  glUniform3fv(lightColorLocation, 1, value_ptr(lightColor));
+  glUniform1f(shininessLocation, shininess);
+
+  // Wireframe starts disabled
+  glUniform1i(wireLocation, 0);
+
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, vertices.data());
   glEnableVertexAttribArray(0);
+
+  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, normals.data());
+  glEnableVertexAttribArray(1);
 
   // Drawing
   glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
@@ -34,6 +54,7 @@ void GLWidget::paintGL()
   }
 
   glDisableVertexAttribArray(0);
+  glDisableVertexAttribArray(1);
 
   update();
 }
@@ -80,6 +101,8 @@ void GLWidget::initializeShaders()
   glDeleteShader(fShader);
 
   modelLocation = glGetUniformLocation(shaderProgram, "model");
+  viewLocation = glGetUniformLocation(shaderProgram, "view");
+  projLocation = glGetUniformLocation(shaderProgram, "projection");
   wireLocation = glGetUniformLocation(shaderProgram, "wireframe");
 
   glUseProgram(shaderProgram);
@@ -89,8 +112,9 @@ void GLWidget::loadMeshData(const Mesh &mesh)
 {
   vertices.clear();
   faces.clear();
-  vertices = mesh.getPositionsVector();
-  faces = mesh.getFacesVector();
+  vertices = mesh.getPositionsData();
+  normals = mesh.getFaceNormalsData();
+  faces = mesh.getFacesData();
   model = mat4(1.f);
   model = mesh.bbox.centering();
   update();
@@ -105,8 +129,8 @@ void GLWidget::unloadMeshData()
 
 void GLWidget::updateMeshData(const Mesh &mesh)
 {
-  vertices = mesh.getPositionsVector();
-  faces = mesh.getFacesVector();
+  vertices = mesh.getPositionsData();
+  faces = mesh.getFacesData();
   update();
 }
 
