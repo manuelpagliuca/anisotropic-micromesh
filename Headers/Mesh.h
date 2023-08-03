@@ -54,7 +54,7 @@ public:
   int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
   float getAvgEdgeLength() const;
   void fixEdgesSubdivisionLevels();
-  void setInitialEdgeSubdivisionLevels();
+  void setInitialEdgeSubdivisionLevels(float targetEdgeLength);
 
   // Get
   std::vector<float> getPositionsVector() const;
@@ -76,7 +76,8 @@ public:
   void updateVertexNormals();
   void updateBoundingBox();
   void updateEdges();
-  void updateEdgesSubdivisionLevels();
+  void updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength);
+  void updateEdgesSubdivisionLevelsAniso(float targetEdgeLength);
 
   // Utils
   void removeDuplicatedVertices();
