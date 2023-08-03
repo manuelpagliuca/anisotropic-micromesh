@@ -2,12 +2,12 @@
 
 int nearestRoundPow2(float edgeLength)
 {
-  return int(round(abs(log2(edgeLength))));
+  return max(int(round(log2(edgeLength))), 0);
 }
 
 int nearestCeilPow2(float edgeLength)
 {
-  return int(ceil(abs(log2(edgeLength))));
+  return int(ceil(log2(edgeLength)));
 }
 
 int maxInt2(int a, int b)

@@ -210,6 +210,7 @@ Mesh Mesh::subdivideNtimes(int n)
 Mesh Mesh::micromeshSubdivide()
 {
   Mesh subdivided = Mesh();
+
   fixEdgesSubdivisionLevels();
 
   auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };
@@ -281,8 +282,82 @@ Mesh Mesh::micromeshSubdivide()
 Mesh Mesh::anisotropicMicromeshSubdivide()
 {
   Mesh subdivided = Mesh();
-  // to implement
-  return *this;
+
+  int counter = 0;
+  for (const Face& f: faces) {
+    int w0, w1, w2; // w2 is the shortest edge
+
+    if (edges[f.edgesIndices[2]].subdivisions > edges[f.edgesIndices[1]].subdivisions) {
+      // 1 is the smallest edge
+      w0 = 2; w1 = 0; w2 = 1;
+    } else if (edges[f.edgesIndices[2]].subdivisions > edges[f.edgesIndices[0]].subdivisions) {
+      // 0 is the smallest edge
+      w0 = 1; w1 = 2; w2 = 0;
+    } else {
+      w0 = 0, w1 = 1, w2 = 2;
+    }
+
+    int subLvlEdge0 = edges[f.edgesIndices[w0]].subdivisions;
+    int subLvlEdge1 = edges[f.edgesIndices[w1]].subdivisions;
+    int subLvlEdge2 = edges[f.edgesIndices[w2]].subdivisions;
+
+    assert(subLvlEdge0 == subLvlEdge1);
+    assert(subLvlEdge2 <= subLvlEdge0);
+
+    int n = pow(2, subLvlEdge0);
+    int m = pow(2, subLvlEdge2);
+    int aniso = pow(2, subLvlEdge0 - subLvlEdge2);
+    int k = int(subdivided.vertices.size());
+//    n = aniso = m = 4;
+//    n = 2; m = 1; aniso = 2; // caso a => 2
+//    n = 4; m = 4; aniso = 1; // caso b => 0
+//    n = m = 2; aniso = 1;
+//    n = m = 8; aniso = 1;
+//    n = 8; m = 4; aniso = 2;
+
+    // add microvertices
+    for (int vy = 0; vy <= m; vy++) {
+      int lastVx = vy * aniso + aniso - 1;
+
+      if (vy == m)
+        lastVx -= aniso - 1;
+      for (int vx = 0; vx <= lastVx; vx++) {
+        float c = vx / float(n);
+        float b = (vy - (vx + aniso - 1) / aniso) * 1 / float(m);
+        if (b < 0) b = 0;
+        float a = 1 - b - c;
+
+        vec3 bary = vec3();
+        bary[w0] = a;
+        bary[w1] = b;
+        bary[w2] = c;
+        subdivided.vertices.push_back(getSurfaceVertex(f, bary));
+      }
+    }
+
+    // add microfaces
+    auto toIndexV = [&](ivec2 v) { return v.y * aniso * (v.y + 1) / 2 + v.x; };
+
+    for (int fy = 0; fy < m; fy++) {
+      for (int fx = 0; fx < (n + aniso - 1); fx++) {
+        ivec2 v0(fx, fy), v1(fx, fy + 1), v2(fx + 1, fy + 1);
+
+        if (fx > (fy + 1) * aniso - 1) { // flip "red" triangle
+          v0 = ivec2(n + aniso - 1, m) - v0;
+          v1 = ivec2(n + aniso - 1, m) - v1;
+          v2 = ivec2(n + aniso - 1, m) - v2;
+        }
+
+        subdivided.addFace(k + toIndexV(v0), k + toIndexV(v1), k + toIndexV(v2));
+      }
+    }
+  }
+
+  subdivided.updateBoundingBox();
+  subdivided.updateEdges();
+  subdivided.removeDuplicatedVertices();
+
+  return subdivided;
 }
 
 // This function fixes the edges which are downscaled but should be higher scale
@@ -356,26 +431,26 @@ void Mesh::updateEdges()
   }
 }
 
-void Mesh::setInitialEdgeSubdivisionLevels()
+void Mesh::setInitialEdgeSubdivisionLevels(float targetEdgeLength)
 {
   for (const Face &f : faces) {
     int v0 = f.index[0];
     int v1 = f.index[1];
     int v2 = f.index[2];
 
-    float l0 = length(vertices.at(v1).pos - vertices.at(v0).pos);
-    float l1 = length(vertices.at(v2).pos - vertices.at(v1).pos);
-    float l2 = length(vertices.at(v0).pos - vertices.at(v2).pos);
+    float l0 = length(vertices.at(v1).pos - vertices.at(v0).pos) / targetEdgeLength;
+    float l1 = length(vertices.at(v2).pos - vertices.at(v1).pos) / targetEdgeLength;
+    float l2 = length(vertices.at(v0).pos - vertices.at(v2).pos) / targetEdgeLength;
 
     edges.at(f.edgesIndices[0]).subdivisions = nearestRoundPow2(l0);
     edges.at(f.edgesIndices[1]).subdivisions = nearestRoundPow2(l1);
     edges.at(f.edgesIndices[2]).subdivisions = nearestRoundPow2(l2);
-    }
+  }
 }
 
-void Mesh::updateEdgesSubdivisionLevels()
+void Mesh::updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength)
 {
-  setInitialEdgeSubdivisionLevels();
+  setInitialEdgeSubdivisionLevels(targetEdgeLength);
 
   int count = 0;
 
@@ -384,6 +459,25 @@ void Mesh::updateEdgesSubdivisionLevels()
 
     for (Face &f : faces) {
       changeAnything |= enforceMicromesh(f);
+    }
+
+    count++;
+    if (!changeAnything) break;
+  }
+  qDebug() << "Micromesh scheme enforced: " << count << " times.";
+}
+
+void Mesh::updateEdgesSubdivisionLevelsAniso(float targetEdgeLength)
+{
+  setInitialEdgeSubdivisionLevels(targetEdgeLength);
+
+  int count = 0;
+
+  while (true) {
+    bool changeAnything = false;
+
+    for (Face &f : faces) {
+      changeAnything |= enforceAnisotropicMicromesh(f);
     }
 
     count++;

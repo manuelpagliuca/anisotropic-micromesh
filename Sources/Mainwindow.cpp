@@ -280,6 +280,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
     if (ext == ".off") targetMesh = Mesh::parseOFF(file);
     else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
+    baseMesh.updateEdgesSubdivisionLevelsMicromesh(1.0f);
     baseMesh = baseMesh.micromeshSubdivide();
     ui.openGLWidget->updateMeshData(baseMesh);
 
@@ -290,6 +291,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
 
 void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()
 {
+  baseMesh.updateEdgesSubdivisionLevelsMicromesh(1.0f);
   baseMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(baseMesh);
 }
@@ -340,12 +342,14 @@ void Mainwindow::on_uniform_subdivision_clicked()
 
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
+  baseMesh.updateEdgesSubdivisionLevelsMicromesh(1.0f);
   baseMesh = baseMesh.micromeshSubdivide();
   updateBaseMeshAndDisableSubdivisionsBox();
 }
 
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
+  baseMesh.updateEdgesSubdivisionLevelsAniso(1.0f);
   baseMesh = baseMesh.anisotropicMicromeshSubdivide();
   updateBaseMeshAndDisableSubdivisionsBox();
 }

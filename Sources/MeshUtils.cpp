@@ -18,18 +18,19 @@ float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, const
     bool forwardIntersect = forwardRay.intersectTriangle(v0, v1, v2, forwardDisp);
     bool backwardIntersect = backwardRay.intersectTriangle(v0, v1, v2, backDisp);
 
-    if (forwardIntersect && backwardIntersect)
+//    if (forwardIntersect && backwardIntersect)
+//    {
+//      float smallerDisp = (abs(backDisp) < abs(forwardDisp)) ? backDisp : forwardDisp;
+//      minDisp = (abs(minDisp) < abs(smallerDisp)) ? minDisp : smallerDisp;
+//    }
+    if (forwardIntersect)
     {
-      float smallerDisp = (abs(backDisp) < abs(forwardDisp)) ? backDisp : forwardDisp;
-      minDisp = (abs(minDisp) < abs(smallerDisp)) ? minDisp : smallerDisp;
+      minDisp = (abs(minDisp) < abs(forwardDisp)) ? minDisp : forwardDisp;
     }
-    else if (forwardIntersect)
+
+    if (backwardIntersect)
     {
-      minDisp = min(minDisp, forwardDisp);
-    }
-    else if (backwardIntersect)
-    {
-      minDisp = (abs(minDisp) < abs(backDisp)) ? minDisp : backDisp;
+      minDisp = (abs(minDisp) < abs(backDisp)) ? minDisp : -backDisp;
     }
   }
 
@@ -49,14 +50,12 @@ std::vector<float> Mesh::getDisplacements(const Mesh &target)
 void Mesh::removeDuplicatedVertices()
 {
   std::vector<Vertex> newVertices;
-  std::vector<Face> newFaces;
 
   for (const Vertex &v : vertices)
     if (std::find(newVertices.begin(), newVertices.end(), v) == newVertices.end())
       newVertices.push_back(v);
 
-  for (Face &f : faces)
-  {
+  for (Face &f : faces) {
     auto it0 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[0]));
     auto it1 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[1]));
     auto it2 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[2]));
@@ -128,7 +127,6 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
-  mesh.updateEdgesSubdivisionLevels();
 
   return mesh;
 }
@@ -230,7 +228,6 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
-  mesh.updateEdgesSubdivisionLevels();
 
   return mesh;
 }
