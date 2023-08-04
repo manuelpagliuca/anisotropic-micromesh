@@ -9,7 +9,6 @@ Mainwindow::Mainwindow(QWidget *parent) : QMainWindow(parent)
   initUI();
 }
 
-// Utility function
 void Mainwindow::initUI()
 {
   ui.actionSave->setEnabled(false);
@@ -18,23 +17,27 @@ void Mainwindow::initUI()
   ui.actionWireframe->setEnabled(false);
   ui.actionVertex_displacement->setEnabled(false);
   ui.horizontalSlider->setEnabled(false);
-  ui.horizontalSlider->setMaximum(99);
+  ui.horizontalSlider->setMaximum(100);
   ui.horizontalSlider->setMinimum(0);
   ui.horizontalSlider->setValue(0);
+  ui.exportCurrentOBJ->setEnabled(false);
+  ui.exportCurrentOFF->setEnabled(false);
   ui.checkBox->toggle();
 }
 
-void Mainwindow::setTargetMeshAndResetSlider(const Mesh &targetMesh)
+void Mainwindow::setTargetMeshAndResetSlider(const Mesh &target)
 {
   bool baseMeshIsDisplaced = !displacementsDeltas.empty();
 
   if (baseMeshIsDisplaced)
     ui.openGLWidget->updateMeshData(baseMesh);
 
-  setDisplacementsDelta(baseMesh.getDisplacements(targetMesh));
+  setDisplacementsDelta(baseMesh.getDisplacements(target));
 
   ui.horizontalSlider->setEnabled(true);
   ui.horizontalSlider->setValue(0);
+  ui.exportCurrentOBJ->setEnabled(true);
+  ui.exportCurrentOFF->setEnabled(true);
 }
 
 void Mainwindow::setBaseMeshAndUI(const Mesh &mesh)
@@ -57,6 +60,8 @@ void Mainwindow::updateBaseMeshAndDisableSubdivisionsBox()
   ui.morphingGroupBox->setEnabled(true);
   ui.horizontalSlider->setEnabled(false);
   ui.horizontalSlider->setValue(0);
+  ui.exportCurrentOBJ->setEnabled(false);
+  ui.exportCurrentOFF->setEnabled(false);
 }
 
 void Mainwindow::setDisplacementsDelta(std::vector<float> displacements)
@@ -65,6 +70,18 @@ void Mainwindow::setDisplacementsDelta(std::vector<float> displacements)
 
   for (auto &disp : displacementsDeltas)
     disp = disp / 100.f;
+}
+
+int Mainwindow::extractPolyDetails(const std::string &str)
+{
+  size_t lastUnderscorePos = str.rfind("_");
+
+  if (lastUnderscorePos != std::string::npos) {
+    std::string numberString = str.substr(lastUnderscorePos + 1);
+    return std::stoll(numberString);
+  }
+
+  return 0;
 }
 
 std::string Mainwindow::readFile(const char *file_loc)
@@ -200,8 +217,6 @@ void Mainwindow::on_actionExtract_displacements_triggered()
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
-    Mesh targetMesh;
-
     if (ext == ".off") targetMesh = Mesh::parseOFF(file);
     else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
@@ -275,8 +290,6 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
-    Mesh targetMesh;
-
     if (ext == ".off") targetMesh = Mesh::parseOFF(file);
     else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
 
@@ -300,24 +313,28 @@ void Mainwindow::on_demo125faces_clicked()
 {
   std::string pallasOBJ125 = readFile("./Samples/pallas_125.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
+  polyBaseMesh = 125;
 }
 
 void Mainwindow::on_demo250faces_clicked()
 {
   std::string pallasOBJ250 = readFile("./Samples/pallas_250.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
+  polyBaseMesh = 250;
 }
 
 void Mainwindow::on_demo500faces_clicked()
 {
   std::string pallasOBJ500 = readFile("./Samples/pallas_500.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
+  polyBaseMesh = 500;
 }
 
 void Mainwindow::on_demo1000faces_clicked()
 {
   std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
+  polyBaseMesh = 1000;
 }
 
 void Mainwindow::on_midpoint_subdivision_clicked()
@@ -358,36 +375,43 @@ void Mainwindow::on_morph250faces_clicked()
 {
   std::string pallasOBJ250 = readFile("./Samples/pallas_250.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ250));
+  polyTargetMesh = 250;
 }
 
 void Mainwindow::on_morph500faces_clicked()
 {
   std::string pallasOBJ500 = readFile("./Samples/pallas_500.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ500));
+  polyTargetMesh = 500;
 }
 
 void Mainwindow::on_morph1000faces_clicked()
 {
   std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ1000));
+  polyTargetMesh = 1000;
+
 }
 
 void Mainwindow::on_morph2500faces_clicked()
 {
   std::string pallasOBJ2500 = readFile("./Samples/pallas_2500.obj");
   setTargetMeshAndResetSlider(Mesh ::parseOBJ(pallasOBJ2500));
+  polyTargetMesh = 2500;
 }
 
 void Mainwindow::on_morph5000faces_clicked()
 {
   std::string pallasOBJ5000 = readFile("./Samples/pallas_5000.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ5000));
+  polyTargetMesh = 5000;
 }
 
 void Mainwindow::on_horizontalSlider_valueChanged(int value) {
+  morphingCurrentValue = value;
   if (value == 0) return;
 
-  Mesh projectedMesh = baseMesh;
+  projectedMesh = baseMesh;
 
   int vertexIdx = 0;
 
@@ -411,7 +435,7 @@ void Mainwindow::on_loadBaseMesh_clicked()
 {
   QString filePath = QFileDialog::getOpenFileName(
     this,
-    tr("Load Mesh"), "..\\Samples",
+    tr("Load Mesh"), ".\\Samples",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);; OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty()) {
@@ -424,6 +448,8 @@ void Mainwindow::on_loadBaseMesh_clicked()
     } else if (ext == ".obj") {
       baseMesh = Mesh::parseOBJ(file);
     }
+
+    polyBaseMesh = extractPolyDetails(file);
   }
 }
 
@@ -431,17 +457,19 @@ void Mainwindow::on_loadTargetMesh_clicked()
 {
   QString filePath = QFileDialog::getOpenFileName(
     this,
-    tr("Load Mesh"), "..\\Samples",
+    tr("Load Mesh"), ".\\Samples",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty()) {
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
-    Mesh targetMesh;
+    if (ext == ".off")
+      targetMesh = Mesh::parseOFF(file);
+    else if (ext == ".obj")
+      targetMesh = Mesh::parseOBJ(file);
 
-    if (ext == ".off") targetMesh = Mesh::parseOFF(file);
-    else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
+    polyTargetMesh = extractPolyDetails(file);
     setDisplacementsDelta(baseMesh.getDisplacements(targetMesh));
     ui.horizontalSlider->setEnabled(true);
     ui.horizontalSlider->setValue(0);
@@ -449,4 +477,20 @@ void Mainwindow::on_loadTargetMesh_clicked()
   }
 }
 
-void Mainwindow::on_anisotropic_micromesh_subdivision_2_clicked() { /* to implement */}
+void Mainwindow::on_exportCurrentOBJ_clicked()
+{
+  std::ostringstream fileNameStream;
+  fileNameStream << polyBaseMesh << "to" << polyTargetMesh << "at" << morphingCurrentValue;
+  std::string fileName = fileNameStream.str();
+
+  projectedMesh.exportOBJ(fileName);
+}
+
+void Mainwindow::on_exportCurrentOFF_clicked()
+{
+  std::ostringstream fileNameStream;
+  fileNameStream << polyBaseMesh << "to" << polyTargetMesh << "at" << morphingCurrentValue;
+  std::string fileName = fileNameStream.str();
+
+  projectedMesh.exportOFF(fileName);
+}

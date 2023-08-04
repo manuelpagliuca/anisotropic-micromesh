@@ -8,6 +8,8 @@
 #include <QtOpenGL>
 #include <QtOpenGLWidgets>
 #include <QFileDialog>
+#include <iostream>
+#include <string>
 
 #include "Mesh.h"
 
@@ -31,10 +33,13 @@ protected:
   void setBaseMeshAndUI(const Mesh &mesh);
   void updateBaseMeshAndDisableSubdivisionsBox();
   void setDisplacementsDelta(std::vector<float> displacements);
+  int extractPolyDetails(const std::string &str);
 
 private:
   Ui::mainWindowClass ui;
   std::string readFile(const char *file_loc);
+
+  int polyBaseMesh, polyTargetMesh;
 
   // Mesh loading
   Mesh baseMesh;
@@ -44,8 +49,9 @@ private:
   QPoint newPos;
 
   // Morphing
+  Mesh targetMesh, projectedMesh;
   std::vector<float> displacementsDeltas;
-  int currentValue;
+  int morphingCurrentValue;
 
 public slots:
   void on_actionLoad_triggered();
@@ -78,11 +84,12 @@ public slots:
   void on_morph2500faces_clicked();
   void on_morph5000faces_clicked();
   void on_reloadShadersButton_clicked();
+  void on_exportCurrentOBJ_clicked();
+  void on_exportCurrentOFF_clicked();
 
 private slots:
   void on_loadBaseMesh_clicked();
   void on_loadTargetMesh_clicked();
-  void on_anisotropic_micromesh_subdivision_2_clicked();
 };
 
 #endif // MAIN_WINDOW_H
