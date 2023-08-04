@@ -34,22 +34,25 @@ protected:
   void updateBaseMeshAndDisableSubdivisionsBox();
   void setDisplacementsDelta(std::vector<float> displacements);
   int extractPolyDetails(const std::string &str);
+  std::string extractFileNameWithoutExtension(const std::string& fullPath);
 
 private:
   Ui::mainWindowClass ui;
   std::string readFile(const char *file_loc);
 
-  int polyBaseMesh, polyTargetMesh;
 
   // Mesh loading
   Mesh baseMesh;
+  std::string baseMeshNameAndDetail;
 
   // Mouse Trackball
   QPoint startPos;
   QPoint newPos;
 
   // Morphing
+  int polyTargetMesh;
   Mesh targetMesh, projectedMesh;
+  bool isAniso = false;
   std::vector<float> displacementsDeltas;
   int morphingCurrentValue;
 
@@ -72,17 +75,20 @@ public slots:
   void on_demo250faces_clicked();
   void on_demo500faces_clicked();
   void on_demo1000faces_clicked();
+
   void on_checkBox_stateChanged();
   void on_midpoint_subdivision_clicked();
   void on_uniform_subdivision_clicked();
   void on_micromesh_subdivision_clicked();
   void on_anisotropic_micromesh_subdivision_clicked();
   void on_horizontalSlider_valueChanged(int value);
+
   void on_morph250faces_clicked();
   void on_morph500faces_clicked();
   void on_morph1000faces_clicked();
   void on_morph2500faces_clicked();
   void on_morph5000faces_clicked();
+
   void on_reloadShadersButton_clicked();
   void on_exportCurrentOBJ_clicked();
   void on_exportCurrentOFF_clicked();

@@ -84,6 +84,19 @@ int Mainwindow::extractPolyDetails(const std::string &str)
   return 0;
 }
 
+std::string Mainwindow::extractFileNameWithoutExtension(const std::string &fullPath)
+{
+  size_t lastSlashPos = fullPath.find_last_of("/\\");
+  std::string fileName = fullPath.substr(lastSlashPos + 1);
+
+  size_t lastDotPos = fileName.find_last_of(".");
+  if (lastDotPos != std::string::npos) {
+    fileName = fileName.substr(0, lastDotPos);
+  }
+  std::cout << fileName;
+  return fileName;
+}
+
 std::string Mainwindow::readFile(const char *file_loc)
 {
   std::string content;
@@ -313,28 +326,28 @@ void Mainwindow::on_demo125faces_clicked()
 {
   std::string pallasOBJ125 = readFile("./Samples/pallas_125.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
-  polyBaseMesh = 125;
+  baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_125.obj");
 }
 
 void Mainwindow::on_demo250faces_clicked()
 {
   std::string pallasOBJ250 = readFile("./Samples/pallas_250.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
-  polyBaseMesh = 250;
+  baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_250.obj");
 }
 
 void Mainwindow::on_demo500faces_clicked()
 {
   std::string pallasOBJ500 = readFile("./Samples/pallas_500.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
-  polyBaseMesh = 500;
+  baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_500.obj");
 }
 
 void Mainwindow::on_demo1000faces_clicked()
 {
   std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
-  polyBaseMesh = 1000;
+  baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_1000.obj");
 }
 
 void Mainwindow::on_midpoint_subdivision_clicked()
@@ -359,6 +372,7 @@ void Mainwindow::on_uniform_subdivision_clicked()
 
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
+  isAniso = false;
   baseMesh.updateEdgesSubdivisionLevelsMicromesh(1.0f);
   baseMesh = baseMesh.micromeshSubdivide();
   updateBaseMeshAndDisableSubdivisionsBox();
@@ -366,6 +380,7 @@ void Mainwindow::on_micromesh_subdivision_clicked()
 
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
+  isAniso = true;
   baseMesh.updateEdgesSubdivisionLevelsAniso(1.0f);
   baseMesh = baseMesh.anisotropicMicromeshSubdivide();
   updateBaseMeshAndDisableSubdivisionsBox();
@@ -390,7 +405,6 @@ void Mainwindow::on_morph1000faces_clicked()
   std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ1000));
   polyTargetMesh = 1000;
-
 }
 
 void Mainwindow::on_morph2500faces_clicked()
@@ -441,6 +455,8 @@ void Mainwindow::on_loadBaseMesh_clicked()
   if (!filePath.isEmpty()) {
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
+    baseMeshNameAndDetail = extractFileNameWithoutExtension(filePath.toStdString());
+
     baseMesh = Mesh();
 
     if (ext == ".off") {
@@ -449,7 +465,6 @@ void Mainwindow::on_loadBaseMesh_clicked()
       baseMesh = Mesh::parseOBJ(file);
     }
 
-    polyBaseMesh = extractPolyDetails(file);
   }
 }
 
@@ -480,8 +495,13 @@ void Mainwindow::on_loadTargetMesh_clicked()
 void Mainwindow::on_exportCurrentOBJ_clicked()
 {
   std::ostringstream fileNameStream;
-  fileNameStream << polyBaseMesh << "to" << polyTargetMesh << "at" << morphingCurrentValue;
+  fileNameStream << baseMeshNameAndDetail << "to" << polyTargetMesh << "at" << morphingCurrentValue;
   std::string fileName = fileNameStream.str();
+
+
+  if (isAniso) {
+    fileNameStream << "_aniso";
+  }
 
   projectedMesh.exportOBJ(fileName);
 }
@@ -489,7 +509,12 @@ void Mainwindow::on_exportCurrentOBJ_clicked()
 void Mainwindow::on_exportCurrentOFF_clicked()
 {
   std::ostringstream fileNameStream;
-  fileNameStream << polyBaseMesh << "to" << polyTargetMesh << "at" << morphingCurrentValue;
+  fileNameStream << baseMeshNameAndDetail << "to" << polyTargetMesh << "at" << morphingCurrentValue;
+
+  if (isAniso) {
+    fileNameStream << "_aniso";
+  }
+
   std::string fileName = fileNameStream.str();
 
   projectedMesh.exportOFF(fileName);

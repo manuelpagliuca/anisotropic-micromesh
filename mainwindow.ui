@@ -119,19 +119,6 @@
          <string>Anisotropic Micro-mesh</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="anisotropic_micromesh_subdivision_2">
-        <property name="geometry">
-         <rect>
-          <x>190</x>
-          <y>50</y>
-          <width>51</width>
-          <height>24</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>None</string>
-        </property>
-       </widget>
       </widget>
       <widget class="QGroupBox" name="morphingGroupBox">
        <property name="enabled">
