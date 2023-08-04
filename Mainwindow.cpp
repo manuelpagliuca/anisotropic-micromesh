@@ -18,7 +18,7 @@ void Mainwindow::initUI()
   ui.actionVertex_displacement->setEnabled(false);
 
   ui.edgeLengthSlider->setEnabled(true);
-  int minIntValue = 0;    // 0.1
+  int minIntValue = 90;    // 1
   int maxIntValue = 1000; // 10.0
   ui.edgeLengthSlider->setRange(minIntValue, maxIntValue);
   double decimalPrecision = 0.01;
@@ -475,8 +475,13 @@ void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
 {
   edgeLengthCurrentValue = 0.01f * value;
   ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
-  if (subdividedMesh.isValid())
-    on_anisotropic_micromesh_subdivision_clicked(); // micromesh
+  if (subdividedMesh.isValid()) {
+    if (isAniso)
+      on_anisotropic_micromesh_subdivision_clicked(); // micromesh
+    else
+      on_micromesh_subdivision_clicked();
+
+  }
 }
 
 void Mainwindow::on_checkBox_stateChanged()

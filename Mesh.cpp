@@ -284,6 +284,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
   Mesh subdivided = Mesh();
 
   int counter = 0;
+
   for (const Face& f: faces) {
     int w0, w1, w2; // w2 is the shortest edge
 
@@ -308,12 +309,6 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     int m = pow(2, subLvlEdge2);
     int aniso = pow(2, subLvlEdge0 - subLvlEdge2);
     int k = int(subdivided.vertices.size());
-//    n = aniso = m = 4;
-//    n = 2; m = 1; aniso = 2; // caso a => 2
-//    n = 4; m = 4; aniso = 1; // caso b => 0
-//    n = m = 2; aniso = 1;
-//    n = m = 8; aniso = 1;
-//    n = 8; m = 4; aniso = 2;
 
     // add microvertices
     for (int vy = 0; vy <= m; vy++) {
