@@ -216,7 +216,7 @@ Mesh Mesh::micromeshSubdivide()
   auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };
   auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
 
-  for (const Face& f: faces) {
+  for (const Face &f: faces) {
     int subLvlEdge0 = edges[f.edgesIndices[0]].subdivisions;
     int subLvlEdge1 = edges[f.edgesIndices[1]].subdivisions;
     int subLvlEdge2 = edges[f.edgesIndices[2]].subdivisions;
@@ -322,10 +322,14 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
       if (vy == m)
         lastVx -= aniso - 1;
       for (int vx = 0; vx <= lastVx; vx++) {
+        int nVerticalSegments = m - vx / aniso;
+        int belowVverticalSegments = m - vy;
+
         float c = vx / float(n);
-        float b = (vy - (vx + aniso - 1) / aniso) * 1 / float(m);
-        if (b < 0) b = 0;
-        float a = 1 - b - c;
+        float a;
+        if (vx == n) a = 0.f;
+        else a = (1 - c) * float(belowVverticalSegments) / float(nVerticalSegments);
+        float b = 1 - a - c;
 
         vec3 bary = vec3();
         bary[w0] = a;

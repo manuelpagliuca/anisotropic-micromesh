@@ -412,7 +412,7 @@ void Mainwindow::on_micromesh_subdivision_clicked()
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
   isAniso = true;
-  baseMesh.updateEdgesSubdivisionLevelsAniso(1.0f);
+  baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.morphingGroupBox->setEnabled(true);
@@ -475,6 +475,8 @@ void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
 {
   edgeLengthCurrentValue = 0.01f * value;
   ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
+  if (subdividedMesh.isValid())
+    on_micromesh_subdivision_clicked(); // micromesh
 }
 
 void Mainwindow::on_checkBox_stateChanged()

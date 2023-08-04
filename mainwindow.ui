@@ -137,12 +137,12 @@
          <rect>
           <x>10</x>
           <y>90</y>
-          <width>71</width>
+          <width>101</width>
           <height>16</height>
          </rect>
         </property>
         <property name="text">
-         <string>Edge length</string>
+         <string>Target edge length</string>
         </property>
        </widget>
        <widget class="QLabel" name="lengthCurrentValue">
@@ -307,7 +307,7 @@
        <widget class="QLabel" name="displacementCurrentValue">
         <property name="geometry">
          <rect>
-          <x>300</x>
+          <x>290</x>
           <y>110</y>
           <width>16</width>
           <height>16</height>
