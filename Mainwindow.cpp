@@ -19,7 +19,7 @@ void Mainwindow::initUI()
 
   ui.edgeLengthSlider->setEnabled(true);
   int minIntValue = 90;    // 1
-  int maxIntValue = 1000; // 10.0
+  int maxIntValue = 700; // 10.0
   ui.edgeLengthSlider->setRange(minIntValue, maxIntValue);
   double decimalPrecision = 0.01;
   int numDecimalValues = (maxIntValue - minIntValue) / (decimalPrecision * 100);
@@ -156,7 +156,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
     ui.currentMeshLabel->setText("Base mesh");
   } else if (ev->key() == Qt::Key_T && targetMesh.isValid()) {
     ui.openGLWidget->updateMeshData(targetMesh);
-    ui.currentMeshLabel->setText("Target mesh");\
+    ui.currentMeshLabel->setText("Target mesh");
   } else if (ev->key() == Qt::Key_S && subdividedMesh.isValid()) {
     ui.openGLWidget->updateMeshData(subdividedMesh);
     ui.currentMeshLabel->setText("Subdivided mesh");
@@ -166,14 +166,12 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
   }
   else if (ev->key() == Qt::Key_W) ui.checkBox->toggle();
   else if (ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
-  else if (ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
-  else if (ev->key() == Qt::Key_O) on_actionSubdivision_surfaces_Uniform_triggered();
-  else if (ev->key() == Qt::Key_L) on_actionLoad_triggered();
   else if (ev->key() == Qt::Key_U) on_actionUnload_triggered();
   else if (ev->key() == Qt::Key_1) on_demo125faces_clicked();
   else if (ev->key() == Qt::Key_2) on_demo250faces_clicked();
   else if (ev->key() == Qt::Key_3) on_demo500faces_clicked();
   else if (ev->key() == Qt::Key_4) on_demo1000faces_clicked();
+  else if (ev->key() == Qt::Key_5) on_actionLoad_triggered();
 }
 
 void Mainwindow::on_actionSave_triggered()
@@ -243,11 +241,12 @@ void Mainwindow::on_actionFace_displacement_triggered()
   }
 }
 
+// TODO: to get fixed, extract the displacements somewhere as .txt
 void Mainwindow::on_actionExtract_displacements_triggered()
 {
   QString filePath = QFileDialog::getOpenFileName(
     this,
-    tr("Load Mesh"), "..\\Samples",
+    tr("Load Mesh"), ".\\Samples",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty()) {
@@ -260,8 +259,8 @@ void Mainwindow::on_actionExtract_displacements_triggered()
     bool isValid;
     int k = QInputDialog::getInt(
       this,
-      tr("Insert the number of subdivision to perform"),
-      tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
+      tr("Insert the number of mipoint subdivision to execute"),
+      tr("Midpoint subdivisions iterations:"), 1, 1, 9, 1, &isValid,
       this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
 
     if (isValid) {
@@ -271,6 +270,44 @@ void Mainwindow::on_actionExtract_displacements_triggered()
 
     Mesh tmpMesh = baseMesh;
     auto displacements = tmpMesh.getDisplacements(targetMesh);
+
+    QString outputFilePath = QFileDialog::getSaveFileName(this, tr("Save Displacements"), ".\\", tr("Text Files (*.txt)"));
+
+    if (!outputFilePath.isEmpty()) {
+        QFile outputFile(outputFilePath);
+        if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream stream(&outputFile);
+            for (float displacement : displacements) {
+                stream << displacement << "\n";
+            }
+            outputFile.close();
+            qDebug() << "Displacements saved to file:" << outputFilePath;
+        } else {
+            qDebug() << "Error: Unable to open file for writing.";
+        }
+    }
+  }
+}
+
+void Mainwindow::on_actionMidpoint_subdivision_triggered()
+{
+  subdividedMesh = baseMesh.subdivide();
+  ui.openGLWidget->updateMeshData(subdividedMesh);
+  ui.currentMeshLabel->setText("Subdivided mesh");
+}
+
+void Mainwindow::on_actionUniform_subdivision_triggered()
+{
+  bool isValid;
+  int subdivisions = QInputDialog::getInt(
+                      this, tr("Insert the number of subdivision to perform"),
+                      tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
+                      this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
+
+  if (isValid) {
+    baseMesh = baseMesh.subdivideNtimes(subdivisions);
+    ui.openGLWidget->updateMeshData(baseMesh);
+    ui.morphingGroupBox->setEnabled(true);
   }
 }
 
@@ -289,61 +326,9 @@ void Mainwindow::on_actionWireframe_triggered()
   ui.checkBox->toggle();
 }
 
-void Mainwindow::on_actionSubdivide_triggered()
-{
-  baseMesh = baseMesh.subdivide();
-  ui.openGLWidget->updateMeshData(baseMesh);
-  ui.morphingGroupBox->setEnabled(true);
-}
-
 void Mainwindow::on_actionExit_triggered()
 {
   exit(1);
-}
-
-void Mainwindow::on_actionSubdivision_surfaces_Uniform_triggered()
-{
-  bool isValid;
-  int subdivisions = QInputDialog::getInt(
-                      this, tr("Insert the number of subdivision to perform"),
-                      tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
-                      this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
-
-  if (isValid) {
-    baseMesh = baseMesh.subdivideNtimes(subdivisions);
-    ui.openGLWidget->updateMeshData(baseMesh);
-    ui.morphingGroupBox->setEnabled(true);
-  }
-}
-
-void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
-{
-  QString filePath = QFileDialog::getOpenFileName(
-    this,
-    tr("Load Mesh"), "..\\Samples",
-    tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
-
-  if (!filePath.isEmpty()) {
-    std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
-    std::string file = readFile(filePath.toStdString().c_str());
-
-    if (ext == ".off") targetMesh = Mesh::parseOFF(file);
-    else if (ext == ".obj") targetMesh = Mesh::parseOBJ(file);
-
-    baseMesh.updateEdgesSubdivisionLevelsMicromesh(1.0f);
-    baseMesh = baseMesh.micromeshSubdivide();
-    ui.openGLWidget->updateMeshData(baseMesh);
-
-    Mesh tmpMesh = baseMesh;
-    auto displacements = tmpMesh.getDisplacements(targetMesh);
-  }
-}
-
-void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()
-{
-  baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
-  baseMesh = baseMesh.micromeshSubdivide();
-  ui.openGLWidget->updateMeshData(baseMesh);
 }
 
 void Mainwindow::on_demo125faces_clicked()
@@ -378,26 +363,6 @@ void Mainwindow::on_demo1000faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
 }
 
-void Mainwindow::on_midpoint_subdivision_clicked()
-{
-  baseMesh = baseMesh.subdivide();
-  disableSubdivisionsBox();
-}
-
-void Mainwindow::on_uniform_subdivision_clicked()
-{
-  bool isValid;
-  int subdivisions = QInputDialog::getInt(
-                      this, tr("Insert the number of subdivision to perform"),
-                      tr("Number of subdivisions:"), 1, 1, 9, 1, &isValid,
-                      this->windowFlags() | Qt::MSWindowsFixedSizeDialogHint);
-
-  if (isValid) {
-    baseMesh = baseMesh.subdivideNtimes(subdivisions);
-    disableSubdivisionsBox();
-  }
-}
-
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
   isAniso = false;
@@ -405,7 +370,6 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   subdividedMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.currentMeshLabel->setText("Subdivided mesh");
-//  disableSubdivisionsBox();
   ui.morphingGroupBox->setEnabled(true);
 }
 
@@ -417,7 +381,6 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.morphingGroupBox->setEnabled(true);
   ui.currentMeshLabel->setText("Subdivided mesh");
-  //  disableSubdivisionsBox(); TODO: cosa fare con questo?
 }
 
 void Mainwindow::on_morph250faces_clicked()

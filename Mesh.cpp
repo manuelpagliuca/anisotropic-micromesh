@@ -283,8 +283,6 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 {
   Mesh subdivided = Mesh();
 
-  int counter = 0;
-
   for (const Face& f: faces) {
     int w0, w1, w2; // w2 is the shortest edge
 

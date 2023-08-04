@@ -62,13 +62,11 @@ public slots:
   void on_actionExit_triggered();
 
   void on_actionWireframe_triggered();
-  void on_actionSubdivide_triggered();
   void on_actionVertex_displacement_triggered();
   void on_actionFace_displacement_triggered();
   void on_actionExtract_displacements_triggered();
-  void on_actionSubdivision_surfaces_Uniform_triggered();
-  void on_actionSubdivision_surfaces_Adaptive_triggered();
-  void on_actionSubdivision_surfaces_Micromesh_triggered();
+  void on_actionMidpoint_subdivision_triggered();
+  void on_actionUniform_subdivision_triggered();
 
   void on_demo125faces_clicked();
   void on_demo250faces_clicked();
@@ -76,8 +74,6 @@ public slots:
   void on_demo1000faces_clicked();
 
   void on_checkBox_stateChanged();
-  void on_midpoint_subdivision_clicked();
-  void on_uniform_subdivision_clicked();
   void on_micromesh_subdivision_clicked();
   void on_anisotropic_micromesh_subdivision_clicked();
   void on_horizontalSlider_valueChanged(int value);
