@@ -93,13 +93,16 @@ protected:
   void draw(bool wireframe);
   void drawDirect();
 
+// Test
 private:
-  // Test
   void setInitialEdgeSubdivisionLevelsTest();
   void sanityCheckEdge();
   bool isMicromeshScheme() const;
+public:
+  bool isValid() const;
 
-  // Debug
+// Debug
+private:
   void print() const;
   void printEdgeSubdivisions() const;
   void printOpenEdges() const;

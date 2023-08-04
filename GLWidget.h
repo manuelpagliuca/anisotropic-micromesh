@@ -32,8 +32,6 @@ public:
   void saveLastModel();
   TrackBall trackBall;
 
-  void reloadShaders();
-
 protected:
   void paintGL() override;
   void initializeGL() override;

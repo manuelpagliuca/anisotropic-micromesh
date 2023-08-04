@@ -45,3 +45,8 @@ bool Mesh::isMicromeshScheme() const
 
   return correctFaces == faces.size();
 }
+
+bool Mesh::isValid() const
+{
+  return !vertices.empty() && !faces.empty();
+}

@@ -40,21 +40,17 @@ private:
   Ui::mainWindowClass ui;
   std::string readFile(const char *file_loc);
 
-
   // Mesh loading
-  Mesh baseMesh, subdividedMesh;
+  Mesh baseMesh, subdividedMesh, targetMesh, projectedMesh, swapMesh;
   std::string baseMeshNameAndDetail;
+  float edgeLengthCurrentValue;
 
   // Mouse Trackball
   QPoint startPos;
   QPoint newPos;
 
-  // Edge length slider
-  float edgeLengthCurrentValue;
-
   // Morphing
   int polyTargetMesh;
-  Mesh targetMesh, projectedMesh;
   bool isAniso = false;
   std::vector<float> displacementsDeltas;
   int morphingCurrentValue;
@@ -93,7 +89,6 @@ public slots:
   void on_morph2500faces_clicked();
   void on_morph5000faces_clicked();
 
-  void on_reloadShadersButton_clicked();
   void on_exportCurrentOBJ_clicked();
   void on_exportCurrentOFF_clicked();
 

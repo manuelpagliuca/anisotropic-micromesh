@@ -47,13 +47,6 @@ void GLWidget::initializeGL()
   initializeShaders();
 }
 
-void GLWidget::reloadShaders()
-{
-  glUseProgram(0);
-  glDeleteProgram(shaderProgram);
-  initializeGL();
-}
-
 void GLWidget::initializeShaders()
 {
   std::string vertexShaderSrc = readFile("./Shaders/shader.vert");

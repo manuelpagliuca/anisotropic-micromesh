@@ -45,9 +45,9 @@
       <widget class="QCheckBox" name="checkBox">
        <property name="geometry">
         <rect>
-         <x>150</x>
-         <y>470</y>
-         <width>101</width>
+         <x>250</x>
+         <y>10</y>
+         <width>81</width>
          <height>21</height>
         </rect>
        </property>
@@ -59,13 +59,13 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>110</y>
+         <y>130</y>
          <width>321</width>
          <height>141</height>
         </rect>
        </property>
        <property name="title">
-        <string>Subdivision scheme</string>
+        <string>Subdivision schemes</string>
        </property>
        <widget class="QPushButton" name="midpoint_subdivision">
         <property name="geometry">
@@ -166,13 +166,13 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>280</y>
          <width>321</width>
          <height>201</height>
         </rect>
        </property>
        <property name="title">
-        <string>Target mesh</string>
+        <string>Target mesh samples</string>
        </property>
        <widget class="QPushButton" name="morph250faces">
         <property name="geometry">
@@ -318,30 +318,17 @@
         </property>
        </widget>
       </widget>
-      <widget class="QPushButton" name="reloadShadersButton">
-       <property name="geometry">
-        <rect>
-         <x>20</x>
-         <y>470</y>
-         <width>121</width>
-         <height>24</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Reload Shaders</string>
-       </property>
-      </widget>
       <widget class="QGroupBox" name="meshGroupBox">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>10</y>
+         <y>30</y>
          <width>321</width>
          <height>91</height>
         </rect>
        </property>
        <property name="title">
-        <string>Base mesh</string>
+        <string>Base mesh samples</string>
        </property>
        <widget class="QPushButton" name="demo1000faces">
         <property name="geometry">
@@ -408,6 +395,24 @@
          <string>...</string>
         </property>
        </widget>
+      </widget>
+      <widget class="QLabel" name="currentMeshLabel">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>141</width>
+         <height>16</height>
+        </rect>
+       </property>
+       <property name="font">
+        <font>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
       </widget>
      </widget>
     </item>

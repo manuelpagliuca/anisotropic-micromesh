@@ -39,12 +39,12 @@ void Mainwindow::initUI()
 
 void Mainwindow::setTargetMeshAndResetSlider(const Mesh &target)
 {
+  targetMesh = target;
   bool baseMeshIsDisplaced = !displacementsDeltas.empty();
 
-  if (baseMeshIsDisplaced)
-    ui.openGLWidget->updateMeshData(subdividedMesh);
+  if (baseMeshIsDisplaced) ui.openGLWidget->updateMeshData(subdividedMesh); // reset to subdivided mesh
 
-  setDisplacementsDelta(subdividedMesh.getDisplacements(target));
+  setDisplacementsDelta(subdividedMesh.getDisplacements(targetMesh));
 
   ui.horizontalSlider->setEnabled(true);
   ui.horizontalSlider->setValue(0);
@@ -151,13 +151,25 @@ void Mainwindow::wheelEvent(QWheelEvent *ev)
 void Mainwindow::keyPressEvent(QKeyEvent *ev)
 {
   if (ev->key() == Qt::Key_Escape) exit(1);
+  else if (ev->key() == Qt::Key_B  && baseMesh.isValid()) {
+    ui.openGLWidget->updateMeshData(baseMesh);
+    ui.currentMeshLabel->setText("Base mesh");
+  } else if (ev->key() == Qt::Key_T && targetMesh.isValid()) {
+    ui.openGLWidget->updateMeshData(targetMesh);
+    ui.currentMeshLabel->setText("Target mesh");\
+  } else if (ev->key() == Qt::Key_S && subdividedMesh.isValid()) {
+    ui.openGLWidget->updateMeshData(subdividedMesh);
+    ui.currentMeshLabel->setText("Subdivided mesh");
+  } else if (ev->key() == Qt::Key_P && projectedMesh.isValid()) {
+    ui.openGLWidget->updateMeshData(projectedMesh);
+    ui.currentMeshLabel->setText("Projected mesh");
+  }
   else if (ev->key() == Qt::Key_W) ui.checkBox->toggle();
   else if (ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
   else if (ev->key() == Qt::Key_S) on_actionSubdivide_triggered();
   else if (ev->key() == Qt::Key_O) on_actionSubdivision_surfaces_Uniform_triggered();
   else if (ev->key() == Qt::Key_L) on_actionLoad_triggered();
   else if (ev->key() == Qt::Key_U) on_actionUnload_triggered();
-  else if (ev->key() == Qt::Key_R) ui.openGLWidget->reloadShaders();
   else if (ev->key() == Qt::Key_1) on_demo125faces_clicked();
   else if (ev->key() == Qt::Key_2) on_demo250faces_clicked();
   else if (ev->key() == Qt::Key_3) on_demo500faces_clicked();
@@ -339,6 +351,7 @@ void Mainwindow::on_demo125faces_clicked()
   std::string pallasOBJ125 = readFile("./Samples/pallas_125.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_125.obj");
+  ui.currentMeshLabel->setText("Base mesh");
 }
 
 void Mainwindow::on_demo250faces_clicked()
@@ -346,6 +359,7 @@ void Mainwindow::on_demo250faces_clicked()
   std::string pallasOBJ250 = readFile("./Samples/pallas_250.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_250.obj");
+  ui.currentMeshLabel->setText("Base mesh");
 }
 
 void Mainwindow::on_demo500faces_clicked()
@@ -353,6 +367,7 @@ void Mainwindow::on_demo500faces_clicked()
   std::string pallasOBJ500 = readFile("./Samples/pallas_500.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_500.obj");
+  ui.currentMeshLabel->setText("Base mesh");
 }
 
 void Mainwindow::on_demo1000faces_clicked()
@@ -360,6 +375,7 @@ void Mainwindow::on_demo1000faces_clicked()
   std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_1000.obj");
+  ui.currentMeshLabel->setText("Base mesh");
 }
 
 void Mainwindow::on_midpoint_subdivision_clicked()
@@ -388,9 +404,9 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
+  ui.currentMeshLabel->setText("Subdivided mesh");
 //  disableSubdivisionsBox();
   ui.morphingGroupBox->setEnabled(true);
-
 }
 
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
@@ -400,8 +416,8 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.morphingGroupBox->setEnabled(true);
-
-//  disableSubdivisionsBox();
+  ui.currentMeshLabel->setText("Subdivided mesh");
+  //  disableSubdivisionsBox(); TODO: cosa fare con questo?
 }
 
 void Mainwindow::on_morph250faces_clicked()
@@ -444,7 +460,7 @@ void Mainwindow::on_horizontalSlider_valueChanged(int value) {
   ui.displacementCurrentValue->setText(std::to_string(value).c_str());
 
   if (value == 0) return;
-
+  ui.currentMeshLabel->setText("Projected mesh");
   projectedMesh = subdividedMesh;
 
   int vertexIdx = 0;
@@ -459,11 +475,6 @@ void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
 {
   edgeLengthCurrentValue = 0.01f * value;
   ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
-}
-
-void Mainwindow::on_reloadShadersButton_clicked()
-{
-  ui.openGLWidget->reloadShaders();
 }
 
 void Mainwindow::on_checkBox_stateChanged()
