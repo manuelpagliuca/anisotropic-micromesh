@@ -31,7 +31,7 @@ protected:
   void initUI();
   void setTargetMeshAndResetSlider(const Mesh &targetMesh);
   void setBaseMeshAndUI(const Mesh &mesh);
-  void updateBaseMeshAndDisableSubdivisionsBox();
+  void disableSubdivisionsBox();
   void setDisplacementsDelta(std::vector<float> displacements);
   int extractPolyDetails(const std::string &str);
   std::string extractFileNameWithoutExtension(const std::string& fullPath);
@@ -42,12 +42,15 @@ private:
 
 
   // Mesh loading
-  Mesh baseMesh;
+  Mesh baseMesh, subdividedMesh;
   std::string baseMeshNameAndDetail;
 
   // Mouse Trackball
   QPoint startPos;
   QPoint newPos;
+
+  // Edge length slider
+  float edgeLengthCurrentValue;
 
   // Morphing
   int polyTargetMesh;
@@ -82,6 +85,7 @@ public slots:
   void on_micromesh_subdivision_clicked();
   void on_anisotropic_micromesh_subdivision_clicked();
   void on_horizontalSlider_valueChanged(int value);
+  void on_edgeLengthSlider_valueChanged(int value);
 
   void on_morph250faces_clicked();
   void on_morph500faces_clicked();

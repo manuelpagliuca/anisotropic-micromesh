@@ -16,12 +16,24 @@ void Mainwindow::initUI()
   ui.actionUnload->setEnabled(false);
   ui.actionWireframe->setEnabled(false);
   ui.actionVertex_displacement->setEnabled(false);
+
+  ui.edgeLengthSlider->setEnabled(true);
+  int minIntValue = 0;    // 0.1
+  int maxIntValue = 1000; // 10.0
+  ui.edgeLengthSlider->setRange(minIntValue, maxIntValue);
+  double decimalPrecision = 0.01;
+  int numDecimalValues = (maxIntValue - minIntValue) / (decimalPrecision * 100);
+  ui.edgeLengthSlider->setSingleStep(numDecimalValues);
+  ui.edgeLengthSlider->setValue(100); // 1.0
+
   ui.horizontalSlider->setEnabled(false);
   ui.horizontalSlider->setMaximum(100);
   ui.horizontalSlider->setMinimum(0);
   ui.horizontalSlider->setValue(0);
+
   ui.exportCurrentOBJ->setEnabled(false);
   ui.exportCurrentOFF->setEnabled(false);
+
   ui.checkBox->toggle();
 }
 
@@ -30,9 +42,9 @@ void Mainwindow::setTargetMeshAndResetSlider(const Mesh &target)
   bool baseMeshIsDisplaced = !displacementsDeltas.empty();
 
   if (baseMeshIsDisplaced)
-    ui.openGLWidget->updateMeshData(baseMesh);
+    ui.openGLWidget->updateMeshData(subdividedMesh);
 
-  setDisplacementsDelta(baseMesh.getDisplacements(target));
+  setDisplacementsDelta(subdividedMesh.getDisplacements(target));
 
   ui.horizontalSlider->setEnabled(true);
   ui.horizontalSlider->setValue(0);
@@ -53,9 +65,8 @@ void Mainwindow::setBaseMeshAndUI(const Mesh &mesh)
   ui.subdivisionsGroupBox->setEnabled(true);
 }
 
-void Mainwindow::updateBaseMeshAndDisableSubdivisionsBox()
+void Mainwindow::disableSubdivisionsBox()
 {
-  ui.openGLWidget->updateMeshData(baseMesh);
   ui.subdivisionsGroupBox->setEnabled(false);
   ui.morphingGroupBox->setEnabled(true);
   ui.horizontalSlider->setEnabled(false);
@@ -88,12 +99,10 @@ std::string Mainwindow::extractFileNameWithoutExtension(const std::string &fullP
 {
   size_t lastSlashPos = fullPath.find_last_of("/\\");
   std::string fileName = fullPath.substr(lastSlashPos + 1);
-
   size_t lastDotPos = fileName.find_last_of(".");
-  if (lastDotPos != std::string::npos) {
-    fileName = fileName.substr(0, lastDotPos);
-  }
-  std::cout << fileName;
+
+  if (lastDotPos != std::string::npos) fileName = fileName.substr(0, lastDotPos);
+
   return fileName;
 }
 
@@ -120,15 +129,18 @@ std::string Mainwindow::readFile(const char *file_loc)
 
 void Mainwindow::mousePressEvent(QMouseEvent *ev)
 {
-  ui.openGLWidget->trackBall.setFistClick(ev->pos());
+  if (ui.openGLWidget->underMouse())
+    ui.openGLWidget->trackBall.setFistClick(ev->pos());
 }
 
 void Mainwindow::mouseMoveEvent(QMouseEvent *ev)
 {
-  ui.openGLWidget->trackBall.trackMousePositions(
-    ev->pos(),
-    ui.openGLWidget->width(),
-    ui.openGLWidget->height());
+  if (ui.openGLWidget->underMouse()) {
+    ui.openGLWidget->trackBall.trackMousePositions(
+      ev->pos(),
+      ui.openGLWidget->width(),
+      ui.openGLWidget->height());
+  }
 }
 
 void Mainwindow::wheelEvent(QWheelEvent *ev)
@@ -317,7 +329,7 @@ void Mainwindow::on_actionSubdivision_surfaces_Adaptive_triggered()
 
 void Mainwindow::on_actionSubdivision_surfaces_Micromesh_triggered()
 {
-  baseMesh.updateEdgesSubdivisionLevelsMicromesh(1.0f);
+  baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
   baseMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(baseMesh);
 }
@@ -353,7 +365,7 @@ void Mainwindow::on_demo1000faces_clicked()
 void Mainwindow::on_midpoint_subdivision_clicked()
 {
   baseMesh = baseMesh.subdivide();
-  updateBaseMeshAndDisableSubdivisionsBox();
+  disableSubdivisionsBox();
 }
 
 void Mainwindow::on_uniform_subdivision_clicked()
@@ -366,24 +378,30 @@ void Mainwindow::on_uniform_subdivision_clicked()
 
   if (isValid) {
     baseMesh = baseMesh.subdivideNtimes(subdivisions);
-    updateBaseMeshAndDisableSubdivisionsBox();
+    disableSubdivisionsBox();
   }
 }
 
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
   isAniso = false;
-  baseMesh.updateEdgesSubdivisionLevelsMicromesh(1.0f);
-  baseMesh = baseMesh.micromeshSubdivide();
-  updateBaseMeshAndDisableSubdivisionsBox();
+  baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
+  subdividedMesh = baseMesh.micromeshSubdivide();
+  ui.openGLWidget->updateMeshData(subdividedMesh);
+//  disableSubdivisionsBox();
+  ui.morphingGroupBox->setEnabled(true);
+
 }
 
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
   isAniso = true;
   baseMesh.updateEdgesSubdivisionLevelsAniso(1.0f);
-  baseMesh = baseMesh.anisotropicMicromeshSubdivide();
-  updateBaseMeshAndDisableSubdivisionsBox();
+  subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
+  ui.openGLWidget->updateMeshData(subdividedMesh);
+  ui.morphingGroupBox->setEnabled(true);
+
+//  disableSubdivisionsBox();
 }
 
 void Mainwindow::on_morph250faces_clicked()
@@ -423,9 +441,11 @@ void Mainwindow::on_morph5000faces_clicked()
 
 void Mainwindow::on_horizontalSlider_valueChanged(int value) {
   morphingCurrentValue = value;
+  ui.displacementCurrentValue->setText(std::to_string(value).c_str());
+
   if (value == 0) return;
 
-  projectedMesh = baseMesh;
+  projectedMesh = subdividedMesh;
 
   int vertexIdx = 0;
 
@@ -433,6 +453,12 @@ void Mainwindow::on_horizontalSlider_valueChanged(int value) {
     projectedMesh.displaceVertex(vertexIdx++, disp * float(value));
 
   ui.openGLWidget->updateMeshData(projectedMesh);
+}
+
+void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
+{
+  edgeLengthCurrentValue = 0.01f * value;
+  ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
 }
 
 void Mainwindow::on_reloadShadersButton_clicked()
@@ -459,12 +485,10 @@ void Mainwindow::on_loadBaseMesh_clicked()
 
     baseMesh = Mesh();
 
-    if (ext == ".off") {
+    if (ext == ".off")
       baseMesh = Mesh::parseOFF(file);
-    } else if (ext == ".obj") {
+    else if (ext == ".obj")
       baseMesh = Mesh::parseOBJ(file);
-    }
-
   }
 }
 
@@ -495,13 +519,10 @@ void Mainwindow::on_loadTargetMesh_clicked()
 void Mainwindow::on_exportCurrentOBJ_clicked()
 {
   std::ostringstream fileNameStream;
-  fileNameStream << baseMeshNameAndDetail << "to" << polyTargetMesh << "at" << morphingCurrentValue;
+  fileNameStream << "displaced\\" << baseMeshNameAndDetail << "to" << polyTargetMesh << "at" << morphingCurrentValue;
   std::string fileName = fileNameStream.str();
 
-
-  if (isAniso) {
-    fileNameStream << "_aniso";
-  }
+  if (isAniso) fileNameStream << "_aniso";
 
   projectedMesh.exportOBJ(fileName);
 }
@@ -509,11 +530,9 @@ void Mainwindow::on_exportCurrentOBJ_clicked()
 void Mainwindow::on_exportCurrentOFF_clicked()
 {
   std::ostringstream fileNameStream;
-  fileNameStream << baseMeshNameAndDetail << "to" << polyTargetMesh << "at" << morphingCurrentValue;
+  fileNameStream << "displaced\\" << baseMeshNameAndDetail << "to" << polyTargetMesh << "at" << morphingCurrentValue;
 
-  if (isAniso) {
-    fileNameStream << "_aniso";
-  }
+  if (isAniso) fileNameStream << "_aniso";
 
   std::string fileName = fileNameStream.str();
 
