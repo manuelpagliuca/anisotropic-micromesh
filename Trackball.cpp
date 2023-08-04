@@ -1,4 +1,4 @@
-#include "Headers/Trackball.h"
+#include "Trackball.h"
 #include <iostream>
 
 TrackBall::TrackBall() {}

@@ -1,5 +1,5 @@
-#include "Headers/Mesh.h"
-#include "Headers/Utility.h"
+#include "Mesh.h"
+#include "Utility.h"
 
 void Mesh::print() const
 {

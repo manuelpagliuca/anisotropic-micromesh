@@ -1,4 +1,4 @@
-#include "Headers/Mainwindow.h"
+#include "Mainwindow.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
