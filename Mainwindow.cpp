@@ -476,7 +476,7 @@ void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
   edgeLengthCurrentValue = 0.01f * value;
   ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
   if (subdividedMesh.isValid())
-    on_micromesh_subdivision_clicked(); // micromesh
+    on_anisotropic_micromesh_subdivision_clicked(); // micromesh
 }
 
 void Mainwindow::on_checkBox_stateChanged()

@@ -332,9 +332,9 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
         float b = 1 - a - c;
 
         vec3 bary = vec3();
-        bary[w0] = a;
-        bary[w1] = b;
-        bary[w2] = c;
+        bary[w0] = b;
+        bary[w1] = c;
+        bary[w2] = a;
         subdivided.vertices.push_back(getSurfaceVertex(f, bary));
       }
     }
