@@ -34,6 +34,8 @@ protected:
   void disableSubdivisionsBox();
   void disableEdgeLengthSlider();
   void disableDisplacementSlider();
+  void resetSubdividedMeshLabels();
+  void resetTargetMeshLabels();
   void setDisplacementsDelta(std::vector<float> displacements);
   int extractPolyDetails(const std::string &str);
   std::string extractFileName(const std::string& fullPath);

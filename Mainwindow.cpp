@@ -92,6 +92,19 @@ void Mainwindow::disableDisplacementSlider()
   targetMesh = projectedMesh = Mesh();
 }
 
+void Mainwindow::resetSubdividedMeshLabels()
+{
+  ui.subdividedMeshFaces->setText("");
+  ui.subdividedMeshTriangles->setText("");
+  ui.subdivisionSchemeLabel->setText("");
+}
+
+void Mainwindow::resetTargetMeshLabels()
+{
+  ui.targetMeshTriangles->setText("");
+  ui.targetMeshFaces->setText("");
+}
+
 void Mainwindow::setDisplacementsDelta(std::vector<float> displacements)
 {
   displacementsDeltas = displacements;
@@ -361,6 +374,8 @@ void Mainwindow::on_demo125faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  resetSubdividedMeshLabels();
+  resetTargetMeshLabels();
   disableEdgeLengthSlider();
 }
 
@@ -372,6 +387,8 @@ void Mainwindow::on_demo250faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  resetSubdividedMeshLabels();
+  resetTargetMeshLabels();
   disableEdgeLengthSlider();
 }
 
@@ -383,6 +400,8 @@ void Mainwindow::on_demo500faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  resetSubdividedMeshLabels();
+  resetTargetMeshLabels();
   disableEdgeLengthSlider();
 }
 
@@ -394,12 +413,15 @@ void Mainwindow::on_demo1000faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  resetSubdividedMeshLabels();
+  resetTargetMeshLabels();
   disableEdgeLengthSlider();
 }
 
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
   isAniso = false;
+  ui.subdivisionSchemeLabel->setText("Micromesh");
   baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
@@ -411,12 +433,14 @@ void Mainwindow::on_micromesh_subdivision_clicked()
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
+    resetTargetMeshLabels();
   }
 }
 
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
   isAniso = true;
+  ui.subdivisionSchemeLabel->setText("Anisotropic M.");
   baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
@@ -428,6 +452,7 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
+    resetTargetMeshLabels();
   }
 }
 
