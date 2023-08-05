@@ -26,10 +26,10 @@ void Mainwindow::initUI()
   ui.edgeLengthSlider->setSingleStep(numDecimalValues);
   ui.edgeLengthSlider->setValue(100); // 1.0
 
-  ui.horizontalSlider->setEnabled(false);
-  ui.horizontalSlider->setMaximum(100);
-  ui.horizontalSlider->setMinimum(0);
-  ui.horizontalSlider->setValue(0);
+  ui.displacementSlider->setEnabled(false);
+  ui.displacementSlider->setMaximum(100);
+  ui.displacementSlider->setMinimum(0);
+  ui.displacementSlider->setValue(0);
 
   ui.exportCurrentOBJ->setEnabled(false);
   ui.exportCurrentOFF->setEnabled(false);
@@ -42,12 +42,15 @@ void Mainwindow::setTargetMeshAndResetSlider(const Mesh &target)
   targetMesh = target;
   bool baseMeshIsDisplaced = !displacementsDeltas.empty();
 
-  if (baseMeshIsDisplaced) ui.openGLWidget->updateMeshData(subdividedMesh); // reset to subdivided mesh
+  if (baseMeshIsDisplaced) {
+    ui.openGLWidget->updateMeshData(subdividedMesh);
+    ui.currentMeshLabel->setText("Subdivided mesh");
+  }
 
   setDisplacementsDelta(subdividedMesh.getDisplacements(targetMesh));
 
-  ui.horizontalSlider->setEnabled(true);
-  ui.horizontalSlider->setValue(0);
+  ui.displacementSlider->setEnabled(true);
+  ui.displacementSlider->setValue(0);
   ui.exportCurrentOBJ->setEnabled(true);
   ui.exportCurrentOFF->setEnabled(true);
 }
@@ -69,8 +72,8 @@ void Mainwindow::disableSubdivisionsBox()
 {
   ui.subdivisionsGroupBox->setEnabled(false);
   ui.morphingGroupBox->setEnabled(true);
-  ui.horizontalSlider->setEnabled(false);
-  ui.horizontalSlider->setValue(0);
+  ui.displacementSlider->setEnabled(false);
+  ui.displacementSlider->setValue(0);
   ui.exportCurrentOBJ->setEnabled(false);
   ui.exportCurrentOFF->setEnabled(false);
 }
@@ -223,6 +226,7 @@ void Mainwindow::on_actionVertex_displacement_triggered()
   if (isValid) {
     baseMesh.displaceVertices(k);
     ui.openGLWidget->updateMeshData(baseMesh);
+    ui.currentMeshLabel->setText("Base mesh");
   }
 }
 
@@ -238,6 +242,7 @@ void Mainwindow::on_actionFace_displacement_triggered()
   if (isValid) {
     baseMesh.displaceFaces(k);
     ui.openGLWidget->updateMeshData(baseMesh);
+    ui.currentMeshLabel->setText("Base mesh");
   }
 }
 
@@ -266,6 +271,7 @@ void Mainwindow::on_actionExtract_displacements_triggered()
     if (isValid) {
       for (int i = 0; i < k; i++) baseMesh = baseMesh.subdivide();
       ui.openGLWidget->updateMeshData(baseMesh);
+      ui.currentMeshLabel->setText("Base mesh");
     }
 
     Mesh tmpMesh = baseMesh;
@@ -307,6 +313,7 @@ void Mainwindow::on_actionUniform_subdivision_triggered()
   if (isValid) {
     baseMesh = baseMesh.subdivideNtimes(subdivisions);
     ui.openGLWidget->updateMeshData(baseMesh);
+    ui.currentMeshLabel->setText("Base mesh");
     ui.morphingGroupBox->setEnabled(true);
   }
 }
@@ -337,6 +344,11 @@ void Mainwindow::on_demo125faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_125.obj");
   ui.currentMeshLabel->setText("Base mesh");
+
+  ui.edgeLengthSlider->setEnabled(false);
+  ui.edgeLengthSlider->setValue(100);
+
+  subdividedMesh = projectedMesh = Mesh();
 }
 
 void Mainwindow::on_demo250faces_clicked()
@@ -345,6 +357,11 @@ void Mainwindow::on_demo250faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_250.obj");
   ui.currentMeshLabel->setText("Base mesh");
+
+  ui.edgeLengthSlider->setEnabled(false);
+  ui.edgeLengthSlider->setValue(100);
+
+  subdividedMesh = projectedMesh = Mesh();
 }
 
 void Mainwindow::on_demo500faces_clicked()
@@ -353,6 +370,11 @@ void Mainwindow::on_demo500faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_500.obj");
   ui.currentMeshLabel->setText("Base mesh");
+
+  ui.edgeLengthSlider->setEnabled(false);
+  ui.edgeLengthSlider->setValue(100);
+
+  subdividedMesh = projectedMesh = Mesh();
 }
 
 void Mainwindow::on_demo1000faces_clicked()
@@ -361,6 +383,11 @@ void Mainwindow::on_demo1000faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
   baseMeshNameAndDetail = extractFileNameWithoutExtension("./Samples/pallas_1000.obj");
   ui.currentMeshLabel->setText("Base mesh");
+
+  ui.edgeLengthSlider->setEnabled(false);
+  ui.edgeLengthSlider->setValue(100);
+
+  subdividedMesh = projectedMesh = Mesh();
 }
 
 void Mainwindow::on_micromesh_subdivision_clicked()
@@ -371,6 +398,13 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.currentMeshLabel->setText("Subdivided mesh");
   ui.morphingGroupBox->setEnabled(true);
+  ui.edgeLengthSlider->setEnabled(true);
+
+  if (ui.displacementSlider->isEnabled()) {
+    ui.displacementSlider->setEnabled(false);
+    ui.displacementSlider->setValue(0);
+    targetMesh = projectedMesh = Mesh();
+  }
 }
 
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
@@ -379,8 +413,15 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
-  ui.morphingGroupBox->setEnabled(true);
   ui.currentMeshLabel->setText("Subdivided mesh");
+  ui.morphingGroupBox->setEnabled(true);
+  ui.edgeLengthSlider->setEnabled(true);
+
+  if (ui.displacementSlider->isEnabled()) {
+    ui.displacementSlider->setEnabled(false);
+    ui.displacementSlider->setValue(0);
+    targetMesh = projectedMesh = Mesh();
+  }
 }
 
 void Mainwindow::on_morph250faces_clicked()
@@ -418,12 +459,30 @@ void Mainwindow::on_morph5000faces_clicked()
   polyTargetMesh = 5000;
 }
 
-void Mainwindow::on_horizontalSlider_valueChanged(int value) {
+void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
+{
+  if (ui.displacementSlider->isEnabled()) {
+    ui.displacementSlider->setEnabled(false);
+    ui.displacementSlider->setValue(0);
+    targetMesh = Mesh();
+  }
+
+  edgeLengthCurrentValue = 0.01f * value;
+  ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
+
+  if (subdividedMesh.isValid()) {
+    if (isAniso)
+      on_anisotropic_micromesh_subdivision_clicked();
+    else
+      on_micromesh_subdivision_clicked();
+  }
+}
+
+void Mainwindow::on_displacementSlider_valueChanged(int value) {
   morphingCurrentValue = value;
   ui.displacementCurrentValue->setText(std::to_string(value).c_str());
 
   if (value == 0) return;
-  ui.currentMeshLabel->setText("Projected mesh");
   projectedMesh = subdividedMesh;
 
   int vertexIdx = 0;
@@ -432,19 +491,7 @@ void Mainwindow::on_horizontalSlider_valueChanged(int value) {
     projectedMesh.displaceVertex(vertexIdx++, disp * float(value));
 
   ui.openGLWidget->updateMeshData(projectedMesh);
-}
-
-void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
-{
-  edgeLengthCurrentValue = 0.01f * value;
-  ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
-  if (subdividedMesh.isValid()) {
-    if (isAniso)
-      on_anisotropic_micromesh_subdivision_clicked(); // micromesh
-    else
-      on_micromesh_subdivision_clicked();
-
-  }
+  ui.currentMeshLabel->setText("Projected mesh");
 }
 
 void Mainwindow::on_checkBox_stateChanged()
@@ -491,8 +538,8 @@ void Mainwindow::on_loadTargetMesh_clicked()
 
     polyTargetMesh = extractPolyDetails(file);
     setDisplacementsDelta(baseMesh.getDisplacements(targetMesh));
-    ui.horizontalSlider->setEnabled(true);
-    ui.horizontalSlider->setValue(0);
+    ui.displacementSlider->setEnabled(true);
+    ui.displacementSlider->setValue(0);
     ui.subdivisionsGroupBox->setEnabled(false);
   }
 }

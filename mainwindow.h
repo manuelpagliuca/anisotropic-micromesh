@@ -76,8 +76,9 @@ public slots:
   void on_checkBox_stateChanged();
   void on_micromesh_subdivision_clicked();
   void on_anisotropic_micromesh_subdivision_clicked();
-  void on_horizontalSlider_valueChanged(int value);
+
   void on_edgeLengthSlider_valueChanged(int value);
+  void on_displacementSlider_valueChanged(int value);
 
   void on_morph250faces_clicked();
   void on_morph500faces_clicked();
