@@ -32,9 +32,11 @@ protected:
   void setTargetMeshAndResetSlider(const Mesh &targetMesh);
   void setBaseMeshAndUI(const Mesh &mesh);
   void disableSubdivisionsBox();
+  void disableEdgeLengthSlider();
+  void disableDisplacementSlider();
   void setDisplacementsDelta(std::vector<float> displacements);
   int extractPolyDetails(const std::string &str);
-  std::string extractFileNameWithoutExtension(const std::string& fullPath);
+  std::string extractFileName(const std::string& fullPath);
 
 private:
   Ui::mainWindowClass ui;
@@ -73,7 +75,7 @@ public slots:
   void on_demo500faces_clicked();
   void on_demo1000faces_clicked();
 
-  void on_checkBox_stateChanged();
+  void on_wireframeToggle_stateChanged();
   void on_micromesh_subdivision_clicked();
   void on_anisotropic_micromesh_subdivision_clicked();
 

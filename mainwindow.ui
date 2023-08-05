@@ -54,7 +54,7 @@
     </item>
     <item>
      <widget class="QWidget" name="widget" native="true">
-      <widget class="QCheckBox" name="checkBox">
+      <widget class="QCheckBox" name="wireframeToggle">
        <property name="geometry">
         <rect>
          <x>250</x>
