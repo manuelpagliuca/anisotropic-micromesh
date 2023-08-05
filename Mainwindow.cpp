@@ -95,13 +95,13 @@ void Mainwindow::disableDisplacementSlider()
 void Mainwindow::resetSubdividedMeshLabels()
 {
   ui.subdividedMeshFaces->setText("");
-  ui.subdividedMeshTriangles->setText("");
+  ui.subdividedMeshVertices->setText("");
   ui.subdivisionSchemeLabel->setText("");
 }
 
 void Mainwindow::resetTargetMeshLabels()
 {
-  ui.targetMeshTriangles->setText("");
+  ui.targetMeshVertices->setText("");
   ui.targetMeshFaces->setText("");
 }
 
@@ -372,7 +372,7 @@ void Mainwindow::on_demo125faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
   baseMeshNameAndDetail = extractFileName("./Samples/pallas_125.obj");
   ui.currentMeshLabel->setText("Base mesh");
-  ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
+  ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
@@ -385,7 +385,7 @@ void Mainwindow::on_demo250faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
   baseMeshNameAndDetail = extractFileName("./Samples/pallas_250.obj");
   ui.currentMeshLabel->setText("Base mesh");
-  ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
+  ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
@@ -398,7 +398,7 @@ void Mainwindow::on_demo500faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
   baseMeshNameAndDetail = extractFileName("./Samples/pallas_500.obj");
   ui.currentMeshLabel->setText("Base mesh");
-  ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
+  ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
@@ -411,7 +411,7 @@ void Mainwindow::on_demo1000faces_clicked()
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
   baseMeshNameAndDetail = extractFileName("./Samples/pallas_1000.obj");
   ui.currentMeshLabel->setText("Base mesh");
-  ui.baseMeshTriangles->setText(std::to_string(baseMesh.vertices.size()).c_str());
+  ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
@@ -426,7 +426,7 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   subdividedMesh = baseMesh.micromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.currentMeshLabel->setText("Subdivided mesh");
-  ui.subdividedMeshTriangles->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
+  ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
   ui.morphingGroupBox->setEnabled(true);
   ui.edgeLengthSlider->setEnabled(true);
@@ -445,7 +445,7 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.currentMeshLabel->setText("Subdivided mesh");
-  ui.subdividedMeshTriangles->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
+  ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
   ui.morphingGroupBox->setEnabled(true);
   ui.edgeLengthSlider->setEnabled(true);
@@ -461,7 +461,7 @@ void Mainwindow::on_morph250faces_clicked()
   std::string pallasOBJ250 = readFile("./Samples/pallas_250.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ250));
   polyTargetMesh = 250;
-  ui.targetMeshTriangles->setText(std::to_string(targetMesh.vertices.size()).c_str());
+  ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
@@ -470,7 +470,7 @@ void Mainwindow::on_morph500faces_clicked()
   std::string pallasOBJ500 = readFile("./Samples/pallas_500.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ500));
   polyTargetMesh = 500;
-  ui.targetMeshTriangles->setText(std::to_string(targetMesh.vertices.size()).c_str());
+  ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
@@ -479,7 +479,7 @@ void Mainwindow::on_morph1000faces_clicked()
   std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ1000));
   polyTargetMesh = 1000;
-  ui.targetMeshTriangles->setText(std::to_string(targetMesh.vertices.size()).c_str());
+  ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
@@ -488,7 +488,7 @@ void Mainwindow::on_morph2500faces_clicked()
   std::string pallasOBJ2500 = readFile("./Samples/pallas_2500.obj");
   setTargetMeshAndResetSlider(Mesh ::parseOBJ(pallasOBJ2500));
   polyTargetMesh = 2500;
-  ui.targetMeshTriangles->setText(std::to_string(targetMesh.vertices.size()).c_str());
+  ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
@@ -497,7 +497,7 @@ void Mainwindow::on_morph5000faces_clicked()
   std::string pallasOBJ5000 = readFile("./Samples/pallas_5000.obj");
   setTargetMeshAndResetSlider(Mesh::parseOBJ(pallasOBJ5000));
   polyTargetMesh = 5000;
-  ui.targetMeshTriangles->setText(std::to_string(targetMesh.vertices.size()).c_str());
+  ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 

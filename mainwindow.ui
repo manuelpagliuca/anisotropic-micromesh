@@ -575,7 +575,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Base mesh triangles</string>
+         <string>Base mesh vertices</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_4">
@@ -601,7 +601,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Subdivided mesh triangles</string>
+         <string>Subdivided mesh vertices</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_6">
@@ -617,7 +617,7 @@
          <string>Subdivided mesh faces</string>
         </property>
        </widget>
-       <widget class="QLabel" name="baseMeshTriangles">
+       <widget class="QLabel" name="baseMeshVertices">
         <property name="geometry">
          <rect>
           <x>230</x>
@@ -643,7 +643,7 @@
          <string/>
         </property>
        </widget>
-       <widget class="QLabel" name="subdividedMeshTriangles">
+       <widget class="QLabel" name="subdividedMeshVertices">
         <property name="geometry">
          <rect>
           <x>230</x>
@@ -692,10 +692,10 @@
          </rect>
         </property>
         <property name="text">
-         <string>Target mesh triangles</string>
+         <string>Target mesh vertices</string>
         </property>
        </widget>
-       <widget class="QLabel" name="targetMeshTriangles">
+       <widget class="QLabel" name="targetMeshVertices">
         <property name="geometry">
          <rect>
           <x>230</x>
