@@ -24,15 +24,13 @@ using namespace glm;
 
 class Mesh : protected QOpenGLExtraFunctions
 {
-private:
+public:
   std::vector<Vertex> vertices;
   std::vector<Face> faces;
   std::vector<Edge> edges;
 
-public:
   BoundingBox bbox;
 
-public:
   Mesh();
   ~Mesh();
 
