@@ -6,6 +6,7 @@
 #include <QtWidgets/QMainWindow>
 #include <QWidget>
 #include <QtOpenGL>
+#include <QDebug>
 #include <QtOpenGLWidgets>
 #include <QFileDialog>
 #include <iostream>
@@ -24,7 +25,8 @@ public:
 
 public:
   // Command Line functions
-  void exportDisplacedSamples(int nSamples = 5, double minVal = 1.0, double maxVal = 10.0, int targetFaces = 5000);
+  void exportDisplacedSamples(int nSamples = 5, double minVal = 1.0, double maxVal = 10.0);
+  void loadTargetMesh(const QString &fileName);
 
 protected:
   void mousePressEvent(QMouseEvent *ev);
@@ -33,7 +35,7 @@ protected:
   void keyPressEvent(QKeyEvent *ev);
 
   void initUI();
-  void setTargetMeshAndResetDisplacementSlider(const Mesh &targetMesh);
+  void setTargetAndResetDisplacementSlider(const Mesh &targetMesh);
   void setBaseMeshAndUI(const Mesh &mesh);
   void disableSubdivisionsBox();
   void disableEdgeLengthSlider();
@@ -43,6 +45,7 @@ protected:
   void findTargetEdgeLengthCombinations();
   void setDisplacementsDelta(std::vector<float> displacements);
   int extractPolyDetails(const std::string &str);
+
   std::string extractFileName(const std::string& fullPath);
 
 private:

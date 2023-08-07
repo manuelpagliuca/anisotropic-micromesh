@@ -1,25 +1,10 @@
 #include "Mainwindow.h"
 
-void Mainwindow::exportDisplacedSamples(int nSamples, double minVal, double maxVal, int targetFaces)
+void Mainwindow::exportDisplacedSamples(int nSamples, double minVal, double maxVal)
 {
   if (nSamples <= 0) {
     perror("Invalid number of samples.\n");
     return;
-  }
-
-  switch(targetFaces) {
-    case 250:
-      on_target250faces_clicked();
-      break;
-    case 500:
-      on_target500faces_clicked();
-      break;
-    case 1000:
-      on_target1000faces_clicked();
-      break;
-    case 5000:
-      on_target5000faces_clicked();
-      break;
   }
 
   double step = (maxVal - minVal) / nSamples;

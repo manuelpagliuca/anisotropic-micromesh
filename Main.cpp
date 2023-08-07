@@ -10,6 +10,7 @@ int main(int argc, char *argv[])
 
   if (argc > 1) {
     QCommandLineParser parser;
+
     parser.setApplicationDescription("Description of your application.");
     parser.addHelpOption();
     parser.addVersionOption();
@@ -36,11 +37,14 @@ int main(int argc, char *argv[])
     QString nSamples = valuesMap.value("n");
     QString minValValue = valuesMap.value("min_val");
     QString maxValValue = valuesMap.value("max_val");
-    QString targetFacesValue = valuesMap.value("target_faces");
+    QString targetMeshName = valuesMap.value("target");
 
-    w.exportDisplacedSamples(nSamples.toInt(), minValValue.toDouble(), maxValValue.toDouble(), targetFacesValue.toInt());
+    if (!targetMeshName.isEmpty())
+      w.loadTargetMesh(targetMeshName);
 
-    exit(1);
+    w.exportDisplacedSamples(nSamples.toInt(), minValValue.toDouble(), maxValValue.toDouble());
+
+    exit(0);
   }
 
   w.show();
