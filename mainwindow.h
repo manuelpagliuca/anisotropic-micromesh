@@ -22,6 +22,10 @@ public:
   ~Mainwindow() {}
   void loadDemoMesh();
 
+public:
+  // Command Line functions
+  void exportDisplacedSamples(int nSamples = 5, double minVal = 1.0, double maxVal = 10.0, int targetFaces = 5000);
+
 protected:
   void mousePressEvent(QMouseEvent *ev);
   void mouseMoveEvent(QMouseEvent *ev);
@@ -29,13 +33,14 @@ protected:
   void keyPressEvent(QKeyEvent *ev);
 
   void initUI();
-  void setTargetMeshAndResetSlider(const Mesh &targetMesh);
+  void setTargetMeshAndResetDisplacementSlider(const Mesh &targetMesh);
   void setBaseMeshAndUI(const Mesh &mesh);
   void disableSubdivisionsBox();
   void disableEdgeLengthSlider();
   void disableDisplacementSlider();
   void resetSubdividedMeshLabels();
   void resetTargetMeshLabels();
+  void findTargetEdgeLengthCombinations();
   void setDisplacementsDelta(std::vector<float> displacements);
   int extractPolyDetails(const std::string &str);
   std::string extractFileName(const std::string& fullPath);
@@ -84,11 +89,11 @@ public slots:
   void on_edgeLengthSlider_valueChanged(int value);
   void on_displacementSlider_valueChanged(int value);
 
-  void on_morph250faces_clicked();
-  void on_morph500faces_clicked();
-  void on_morph1000faces_clicked();
-  void on_morph2500faces_clicked();
-  void on_morph5000faces_clicked();
+  void on_target250faces_clicked();
+  void on_target500faces_clicked();
+  void on_target1000faces_clicked();
+  void on_target2500faces_clicked();
+  void on_target5000faces_clicked();
 
   void on_exportCurrentOBJ_clicked();
   void on_exportCurrentOFF_clicked();

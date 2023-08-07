@@ -165,7 +165,7 @@
        <property name="title">
         <string>Target mesh samples</string>
        </property>
-       <widget class="QPushButton" name="morph250faces">
+       <widget class="QPushButton" name="target250faces">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -178,7 +178,7 @@
          <string>250 Faces</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="morph1000faces">
+       <widget class="QPushButton" name="target1000faces">
         <property name="geometry">
          <rect>
           <x>170</x>
@@ -191,7 +191,7 @@
          <string>1000 Faces</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="morph500faces">
+       <widget class="QPushButton" name="target500faces">
         <property name="geometry">
          <rect>
           <x>90</x>
@@ -204,7 +204,7 @@
          <string>500 Faces</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="morph2500faces">
+       <widget class="QPushButton" name="target2500faces">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -217,7 +217,7 @@
          <string>2500 Faces</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="morph5000faces">
+       <widget class="QPushButton" name="target5000faces">
         <property name="geometry">
          <rect>
           <x>100</x>

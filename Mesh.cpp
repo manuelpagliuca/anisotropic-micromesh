@@ -211,6 +211,8 @@ Mesh Mesh::micromeshSubdivide()
 {
   Mesh subdivided = Mesh();
 
+  assert(isValid() == true);
+
   fixEdgesSubdivisionLevels();
 
   auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };

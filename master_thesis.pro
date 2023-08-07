@@ -8,6 +8,7 @@ CONFIG += c++17 console
 INCLUDEPATH += $$PWD/dependencies
 
 SOURCES += \
+  CLI.cpp \
   GLWidget.cpp \
   MeshDebug.cpp \
   MeshTest.cpp \

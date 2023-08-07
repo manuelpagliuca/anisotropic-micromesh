@@ -100,7 +100,7 @@ public:
   bool isValid() const;
 
 // Debug
-private:
+public:
   void print() const;
   void printEdgeSubdivisions() const;
   void printOpenEdges() const;
