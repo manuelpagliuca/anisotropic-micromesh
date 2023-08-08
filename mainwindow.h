@@ -25,7 +25,8 @@ public:
 
 public:
   // Command Line functions
-  void exportDisplacedSamples(int nSamples = 5, double minVal = 1.0, double maxVal = 10.0);
+  void exportDisplacedSamplesSameTargetEdgeMetric(int nSamples = 5, double minVal = 1.0, double maxVal = 10.0);
+  void loadBaseMesh(const QString &fileName);
   void loadTargetMesh(const QString &fileName);
 
 protected:

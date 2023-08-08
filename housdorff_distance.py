@@ -1,4 +1,5 @@
 import os
+import argparse
 import subprocess
 import glob
 import re
@@ -48,19 +49,34 @@ def extract_last_decimal_number_from_string(input_string):
 	else:
 		return None
 
-# 
+# Parse the args
+parser = argparse.ArgumentParser(description="Description of your application.")
+parser.add_argument("-n", type=int, default=7, help="Parameter 2 (n)")
+parser.add_argument("--min_val", type=float, default=0.3, help="Parameter 3 (min_val)")
+parser.add_argument("--max_val", type=float, default=7.0, help="Parameter 4 (max_val)")
+parser.add_argument("--target", default="pallas_5000.obj", help="Parameter 5 (target)")
+
+args = parser.parse_args()
+
+# Setup path variables
 directory_path_micro = "./Samples/displaced/micro"
 directory_path_aniso = "./Samples/displaced/aniso"
-target_file = "pallas_5000.obj"
-target_mesh_path = "./Samples/" + target_file
+target_mesh_path = "./Samples/" + args.target
 
 exe_path = os.path.join(os.getcwd(), "Debug", "master_thesis.exe")
 
+# Clean the samples dirs
 delete_files_in_directory(directory_path_micro)
 delete_files_in_directory(directory_path_aniso)
 
-command_to_execute = " comparison_samples n=7 min_val=1.0 max_val=7.0 target_faces=5000"
-params = ["comparison_samples", "n=7", "min_val=0.3", "max_val=7.0", "target=" + target_file]
+# Execute the command
+params = [
+	"build-samples",
+	f"n={args.n}",
+	f"min_val={args.min_val}",
+	f"max_val={args.max_val}",
+	f"target={args.target}",
+]
 
 try:
 	subprocess.check_call([exe_path, params[0], params[1], params[2], params[3], params[4]])
@@ -68,9 +84,6 @@ except subprocess.CalledProcessError as e:
 	print(f"Error while executing the command: {e}")
 except FileNotFoundError as e:
 	print(f"File not found: {e}")
-
-# come prima cosa dovrei eseguire la mia applicazione da linea di comando in
-# maniera che generi i sample in cui sono interessato
 
 file_list = glob.glob(os.path.join(directory_path_micro, "*"))
 

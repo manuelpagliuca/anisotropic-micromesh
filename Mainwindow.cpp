@@ -172,6 +172,21 @@ int Mainwindow::extractPolyDetails(const std::string &str)
   return 0;
 }
 
+void Mainwindow::loadBaseMesh(const QString &fileName){
+  if (!fileName.isEmpty()) {
+    QString filePath = "./Samples/" + fileName;
+    std::string ext = fileName.mid(fileName.lastIndexOf(".")).toStdString();
+    std::string file = readFile(filePath.toStdString().c_str());
+
+    if (ext == ".off") setBaseMeshAndUI(Mesh::parseOFF(file));
+    else if (ext == ".obj") setBaseMeshAndUI(Mesh::parseOBJ(file));
+
+    ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
+    ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  }
+}
+
+
 void Mainwindow::loadTargetMesh(const QString &fileName)
 {
   if (!fileName.isEmpty()) {

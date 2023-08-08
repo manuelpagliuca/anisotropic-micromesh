@@ -4,49 +4,67 @@
 int main(int argc, char *argv[])
 {
   QApplication a(argc, argv);
+  QCommandLineParser parser;
+
   Mainwindow w;
 
-  w.on_demo125faces_clicked();
 
   if (argc > 1) {
-    QCommandLineParser parser;
+    QString cmd = argv[1];
 
-    parser.setApplicationDescription("Description of your application.");
-    parser.addHelpOption();
-    parser.addVersionOption();
+    QCommandLineOption samplesOption("n", "Number of samples option (default: 5)", "n");
+    parser.addOption(samplesOption);
 
-    QCommandLineOption comparisonSamplesOption("comparison_samples", "Comparison samples");
-    parser.addOption(comparisonSamplesOption);
+    QCommandLineOption minEdgeOption("min-edge", "Minimum edge value (default: 1.0)", "min-edge");
+    parser.addOption(minEdgeOption);
+
+    QCommandLineOption maxEdgeOption("max-edge", "Maximum edge value (default: 7.0)", "max-edge");
+    parser.addOption(maxEdgeOption);
+
+    QCommandLineOption targetOption("target", "Target mesh (default: pallas_5000.obj)", "target");
+    parser.addOption(targetOption);
+
+    QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_5000.obj)", "base-mesh");
+    parser.addOption(baseMeshOption);
+
+    QCommandLineOption metricOption("metric", "Metric option (default: same-edges-length)", "same-edges-length");
+    parser.addOption(metricOption);
 
     parser.process(a);
 
-    QString comparisonSamplesValue = parser.value(comparisonSamplesOption);
+    QString metric = parser.value(metricOption);
+    QString nSamples = parser.value(samplesOption);
+    QString minEdge = parser.value(minEdgeOption);
+    QString maxEdge = parser.value(maxEdgeOption);
+    QString targetMesh = parser.value(targetOption);
+    QString baseMesh = parser.value(baseMeshOption);
 
-    QStringList args = parser.positionalArguments();
-    QMap<QString, QString> valuesMap;
+    if (metric.isEmpty()) metric = "same-edges-length";
+    if (nSamples.isEmpty()) nSamples = "5";
+    if (minEdge.isEmpty()) minEdge = "1.0";
+    if (maxEdge.isEmpty()) maxEdge = "7.0";
+    if (targetMesh.isEmpty()) targetMesh = "pallas_5000.obj";
+    if (baseMesh.isEmpty()) baseMesh = "pallas_125.obj";
 
-    for (const QString& arg : args) {
-      int index = arg.indexOf('=');
-      if (index != -1) {
-        QString key = arg.mid(0, index);
-        QString value = arg.mid(index + 1);
-        valuesMap[key] = value;
+    QLocale locale(QLocale::C);
+    minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
+    maxEdge = locale.toString(maxEdge.toDouble(), 'f', 1);
+
+    if (cmd == "build-samples") {
+      w.loadBaseMesh(baseMesh);
+      w.loadTargetMesh(targetMesh);
+
+      if (metric == "same-edges-length") {
+        w.exportDisplacedSamplesSameTargetEdgeMetric(nSamples.toInt(), minEdge.toDouble(), maxEdge.toDouble());
+      } else if(metric == "same-faces-amount") {
+        qDebug() << "To implement..";
       }
     }
-
-    QString nSamples = valuesMap.value("n");
-    QString minValValue = valuesMap.value("min_val");
-    QString maxValValue = valuesMap.value("max_val");
-    QString targetMeshName = valuesMap.value("target");
-
-    if (!targetMeshName.isEmpty())
-      w.loadTargetMesh(targetMeshName);
-
-    w.exportDisplacedSamples(nSamples.toInt(), minValValue.toDouble(), maxValValue.toDouble());
 
     exit(0);
   }
 
+  w.on_demo125faces_clicked();
   w.show();
 
   return a.exec();

@@ -1,6 +1,6 @@
 #include "Mainwindow.h"
 
-void Mainwindow::exportDisplacedSamples(int nSamples, double minVal, double maxVal)
+void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double minVal, double maxVal)
 {
   if (nSamples <= 0) {
     perror("Invalid number of samples.\n");
