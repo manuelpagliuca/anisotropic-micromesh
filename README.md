@@ -20,7 +20,11 @@ Generic Python script
 ### Qt App
 
 ```cmd
-{o.exe} comparison_samples n=7 min_val=0.3 max_val=7.0 target_faces=5000
+{o.exe} build-samples n=7 min_val=0.3 max_val=7.0 target_faces=5000
+```
+
+```cmd
+master_thesis.exe build-samples --base-mesh=pallas_125.obj --target=pallas_5000.obj --n=4 --min-edge=0.8 --max-edge=1.2
 ```
 
 ### Meshlab

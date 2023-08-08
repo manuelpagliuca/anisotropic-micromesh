@@ -51,17 +51,19 @@ def extract_last_decimal_number_from_string(input_string):
 
 # Parse the args
 parser = argparse.ArgumentParser(description="Description of your application.")
-parser.add_argument("-n", type=int, default=7, help="Parameter 2 (n)")
-parser.add_argument("--min_val", type=float, default=0.3, help="Parameter 3 (min_val)")
-parser.add_argument("--max_val", type=float, default=7.0, help="Parameter 4 (max_val)")
-parser.add_argument("--target", default="pallas_5000.obj", help="Parameter 5 (target)")
+parser.add_argument("-n", type=int, help="Parameter 2 (n)")
+parser.add_argument("--min-edge", type=float, help="Parameter 3 (min-edge)")
+parser.add_argument("--max-edge", type=float, help="Parameter 4 (max-edge)")
+parser.add_argument("--base-mesh", help="Parameter 5 (base-mesh)")
+parser.add_argument("--target-mesh", help="Parameter 6 (target)")
+parser.add_argument("--metric", default="same-edges-length", help="Parameter 7 (metric)")
 
 args = parser.parse_args()
 
 # Setup path variables
 directory_path_micro = "./Samples/displaced/micro"
 directory_path_aniso = "./Samples/displaced/aniso"
-target_mesh_path = "./Samples/" + args.target
+target_mesh_path = "./Samples/" + (args.target_mesh if args.target_mesh else "pallas_5000.obj")
 
 exe_path = os.path.join(os.getcwd(), "Debug", "master_thesis.exe")
 
@@ -69,17 +71,32 @@ exe_path = os.path.join(os.getcwd(), "Debug", "master_thesis.exe")
 delete_files_in_directory(directory_path_micro)
 delete_files_in_directory(directory_path_aniso)
 
-# Execute the command
-params = [
-	"build-samples",
-	f"n={args.n}",
-	f"min_val={args.min_val}",
-	f"max_val={args.max_val}",
-	f"target={args.target}",
-]
+params = []
+
+if args.n is not None:
+    params.append(f"-n={args.n}")
+
+if args.min_edge is not None:
+    params.append(f"--min-edge={args.min_edge}")
+
+if args.max_edge is not None:
+    params.append(f"--max-edge={args.max_edge}")
+
+if args.base_mesh is not None:
+    params.append(f"--base-mesh={args.base_mesh}")
+
+if args.target_mesh is not None:
+    params.append(f"--target-mesh={args.target_mesh}")
+
+if args.metric is not None:
+    params.append(f"--metric={args.metric}")
+
+command = exe_path + " build-samples " # + " ".join(params)
+
+print(command)
 
 try:
-	subprocess.check_call([exe_path, params[0], params[1], params[2], params[3], params[4]])
+	subprocess.check_call([exe_path, "build-samples"] + params)
 except subprocess.CalledProcessError as e:
 	print(f"Error while executing the command: {e}")
 except FileNotFoundError as e:
@@ -121,5 +138,3 @@ with open("./hausdorff_edge_length_aniso.txt", "w") as output_file:
 print("Hausdorff's distances for anisotropic micro-mesh scheme > ./hausdorff_edge_length_micro.txt")
 
 output_file.close()
-
-print("Hausdorff's distances are being computed and exported successfully.")

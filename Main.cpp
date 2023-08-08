@@ -8,7 +8,6 @@ int main(int argc, char *argv[])
 
   Mainwindow w;
 
-
   if (argc > 1) {
     QString cmd = argv[1];
 
@@ -39,12 +38,12 @@ int main(int argc, char *argv[])
     QString targetMesh = parser.value(targetOption);
     QString baseMesh = parser.value(baseMeshOption);
 
-    if (metric.isEmpty()) metric = "same-edges-length";
-    if (nSamples.isEmpty()) nSamples = "5";
-    if (minEdge.isEmpty()) minEdge = "1.0";
-    if (maxEdge.isEmpty()) maxEdge = "7.0";
+    if (metric.isEmpty())     metric = "same-edges-length";
+    if (nSamples.isEmpty())   nSamples = "5";
+    if (minEdge.isEmpty())    minEdge = "1.0";
+    if (maxEdge.isEmpty())    maxEdge = "7.0";
     if (targetMesh.isEmpty()) targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty()) baseMesh = "pallas_125.obj";
+    if (baseMesh.isEmpty())   baseMesh = "pallas_125.obj";
 
     QLocale locale(QLocale::C);
     minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
@@ -55,12 +54,12 @@ int main(int argc, char *argv[])
       w.loadTargetMesh(targetMesh);
 
       if (metric == "same-edges-length") {
+        qDebug() << "Building samples for anisotropic and isotropic schemes with same target edge lenght.";
         w.exportDisplacedSamplesSameTargetEdgeMetric(nSamples.toInt(), minEdge.toDouble(), maxEdge.toDouble());
       } else if(metric == "same-faces-amount") {
         qDebug() << "To implement..";
       }
     }
-
     exit(0);
   }
 

@@ -181,6 +181,8 @@ void Mainwindow::loadBaseMesh(const QString &fileName){
     if (ext == ".off") setBaseMeshAndUI(Mesh::parseOFF(file));
     else if (ext == ".obj") setBaseMeshAndUI(Mesh::parseOBJ(file));
 
+    qDebug() << fileName << " has been loaded as base mesh.";
+
     ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
     ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
   }
@@ -196,6 +198,8 @@ void Mainwindow::loadTargetMesh(const QString &fileName)
 
     if (ext == ".off") setTargetAndResetDisplacementSlider(Mesh::parseOFF(file));
     else if (ext == ".obj") setTargetAndResetDisplacementSlider(Mesh::parseOBJ(file));
+
+    qDebug() << fileName << " has been loaded as target mesh.";
 
     polyTargetMesh = extractPolyDetails(file);
     ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
