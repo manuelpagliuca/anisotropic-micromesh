@@ -20,7 +20,7 @@ int main(int argc, char *argv[])
     QCommandLineOption maxEdgeOption("max-edge", "Maximum edge value (default: 7.0)", "max-edge");
     parser.addOption(maxEdgeOption);
 
-    QCommandLineOption targetOption("target", "Target mesh (default: pallas_5000.obj)", "target");
+    QCommandLineOption targetOption("target-mesh", "Target mesh (default: pallas_5000.obj)", "target-mesh");
     parser.addOption(targetOption);
 
     QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_5000.obj)", "base-mesh");

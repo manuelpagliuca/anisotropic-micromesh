@@ -9,8 +9,12 @@
 #include <QDebug>
 #include <QtOpenGLWidgets>
 #include <QFileDialog>
+#include <QDir>
+
+#include <vector>
 #include <iostream>
 #include <string>
+#include <omp.h>
 
 #include "Mesh.h"
 

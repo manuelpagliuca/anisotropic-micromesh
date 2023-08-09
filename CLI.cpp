@@ -1,9 +1,5 @@
 #include "Mainwindow.h"
 
-#include <iostream>
-#include <vector>
-#include <omp.h>
-
 void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double minEdge, double maxEdge)
 {
   if (nSamples <= 0) {
@@ -174,14 +170,25 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
       for (const float &disp : displacements)
         micro.displaceVertex(vertexIdx++, disp);
 
-      std::string microPath =
-        "Evaluation/same_microfaces/micro/"
-        + baseMeshNameAndDetail
-        + "_to_" + std::to_string(targetMesh.faces.size())
-        + "_disp_100_faces_" + std::to_string(faces);
+      QString microDirPath =
+        "Evaluation/same_microfaces/micro/" +
+        QString::fromStdString(baseMeshNameAndDetail +
+        "/");
+      QDir microDir(QString::fromStdString("./Output/") + microDirPath);
 
-      qDebug() << micro.faces.size();
-      micro.exportOBJ(microPath.c_str());
+      if (!microDir.exists()) {
+        if (!microDir.mkpath(".")) {
+          qDebug() << "Error during the creation of the directory: " << microDirPath;
+          return;
+        }
+      }
+
+      std::string microFilePath =
+        microDirPath.toStdString()
+        + "to_" + std::to_string(targetMesh.faces.size())
+        + "_faces_" + std::to_string(faces);
+
+      micro.exportOBJ(microFilePath.c_str());
 
       Mesh aniso = baseMesh;
 
@@ -194,13 +201,25 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
       for (const float &disp : displacements)
         aniso.displaceVertex(vertexIdx++, disp);
 
-      std::string anisoPath =
-        "Evaluation/same_microfaces/aniso/"
-        + baseMeshNameAndDetail
-        + "_to_" + std::to_string(targetMesh.faces.size())
-        + "_disp_100_faces_" + std::to_string(faces);
+      QString anisoDirPath =
+        "Evaluation/same_microfaces/aniso/" +
+        QString::fromStdString(baseMeshNameAndDetail +
+        "/");
+      QDir anisoDir(QString::fromStdString("./Output/") + anisoDirPath);
 
-      aniso.exportOBJ(anisoPath.c_str());
+      if (!anisoDir.exists()) {
+        if (!anisoDir.mkpath(".")) {
+          qDebug() << "Error during the creation of the directory: " << anisoDirPath;
+          return;
+        }
+      }
+
+      std::string anisoFilePath =
+        anisoDirPath.toStdString()
+        + "to_" + std::to_string(targetMesh.faces.size())
+        + "_faces_" + std::to_string(faces);
+
+      aniso.exportOBJ(anisoFilePath.c_str());
     }
   }
 
