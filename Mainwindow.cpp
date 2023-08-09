@@ -67,6 +67,8 @@ void Mainwindow::setBaseMeshAndUI(const Mesh &mesh)
   ui.actionVertex_displacement->setEnabled(true);
   ui.morphingGroupBox->setEnabled(false);
   ui.subdivisionsGroupBox->setEnabled(true);
+  ui.baseMeshFaces->setText(QString::number(baseMesh.faces.size()));
+  ui.baseMeshVertices->setText(QString::number(baseMesh.vertices.size()));
 }
 
 void Mainwindow::disableSubdivisionsBox()
@@ -269,7 +271,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
   else if (ev->key() == Qt::Key_W) ui.wireframeToggle->toggle();
   else if (ev->key() == Qt::Key_E) on_actionExtract_displacements_triggered();
   else if (ev->key() == Qt::Key_U) on_actionUnload_triggered();
-  else if (ev->key() == Qt::Key_1) on_demo125faces_clicked();
+  else if (ev->key() == Qt::Key_1) on_demo124faces_clicked();
   else if (ev->key() == Qt::Key_2) on_demo250faces_clicked();
   else if (ev->key() == Qt::Key_3) on_demo500faces_clicked();
   else if (ev->key() == Qt::Key_4) on_demo1000faces_clicked();
@@ -437,11 +439,11 @@ void Mainwindow::on_actionExit_triggered()
   exit(1);
 }
 
-void Mainwindow::on_demo125faces_clicked()
+void Mainwindow::on_demo124faces_clicked()
 {
-  std::string pallasOBJ125 = readFile("./Models/pallas_125.obj");
+  std::string pallasOBJ125 = readFile("./Models/pallas_124.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
-  baseMeshNameAndDetail = extractFileName("./Models/pallas_125.obj");
+  baseMeshNameAndDetail = extractFileName("./Models/pallas_124.obj");
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());

@@ -70,8 +70,8 @@ void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double
 
 void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge)
 {
-  Mesh micro, aniso;
-  std::vector<float> microDisplacements, anisoDisplacements;
+//  Mesh micro, aniso;
+//  std::vector<float> microDisplacements, anisoDisplacements;
 
 //  std::string outputFileName = "./Output/Evaluation/same_microfaces/presets/" + baseMeshNameAndDetail + "_micro_aniso_target_lengths_matches.txt";
 //  QFile presetFile (outputFileName.c_str());
@@ -121,15 +121,15 @@ void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, doubl
 //  #pragma omp parallel for
 //  for (size_t i = 0; i < microMeshFaces.size(); ++i) {
 //    for (size_t j = 0; j < anisoMeshFaces.size(); ++j) {
-//      if (microMeshFaces[i] == anisoMeshFaces[j] && microMeshFaces[i] != lastFacesMatch) {
-//        lastFacesMatch = microMeshFaces[i];
+//      if (microMeshFaces[i] == anisoMeshFaces[j] /*&& microMeshFaces[i] != lastFacesMatch*/) {
+////        lastFacesMatch = microMeshFaces[i];
 
 //        double microLength = minEdge + i * 0.01;
 //        double anisoLength = minEdge + j * 0.01;
 
 //        #pragma omp critical
 //        {
-//          out << microLength << "\t| " << anisoLength << "\t| " << micro.faces.size() << "\n";
+//          out << microLength << "\t| " << anisoLength << "\t| " << microMeshFaces[i] << "\n";
 //        }
 //      }
 //    }
@@ -137,12 +137,7 @@ void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, doubl
 
 //  presetFile.close();
 
-  QFile presetFile("./Output/Evaluation/same_microfaces/presets/pallas_125_micro_aniso_target_lengths_matches - Copia.txt");
-
-//  if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-//    qDebug() << "Failed to open file for writing.";
-//    return;
-//  }
+  QFile presetFile("./Output/Evaluation/same_microfaces/presets/pallas_250_micro_aniso_target_lengths_matches - Copia.txt");
 
   exportDisplacedSamples(presetFile);
 }
@@ -155,6 +150,7 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
   }
 
   QTextStream in(&presetFile);
+  in.readLine();
 
   while (!in.atEnd()) {
     QString line = in.readLine();
@@ -171,9 +167,7 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
 
       Mesh micro = baseMesh;
       micro.updateEdgesSubdivisionLevelsMicromesh(microLength);
-      qDebug() << micro.faces.size();
       micro = micro.micromeshSubdivide();
-      qDebug() << micro.faces.size();
 
       std::vector<float> displacements = micro.getDisplacements(targetMesh);
 
@@ -188,6 +182,7 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
         + "_to_" + std::to_string(targetMesh.faces.size())
         + "_disp_100_faces_" + std::to_string(faces);
 
+      qDebug() << micro.faces.size();
       micro.exportOBJ(microPath.c_str());
 
       Mesh aniso = baseMesh;

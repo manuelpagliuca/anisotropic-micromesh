@@ -82,7 +82,7 @@ public slots:
   void on_actionMidpoint_subdivision_triggered();
   void on_actionUniform_subdivision_triggered();
 
-  void on_demo125faces_clicked();
+  void on_demo124faces_clicked();
   void on_demo250faces_clicked();
   void on_demo500faces_clicked();
   void on_demo1000faces_clicked();

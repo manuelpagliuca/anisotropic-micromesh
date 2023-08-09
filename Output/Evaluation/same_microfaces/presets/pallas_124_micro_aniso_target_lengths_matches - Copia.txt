@@ -1,4 +1,3 @@
-Matching target edge lengths for Micromesh and Anisotropic Micromesh schemes
 Micro | Aniso | Faces
 2.63  | 2.56  | 1684
 2.9   | 3.25  | 1540

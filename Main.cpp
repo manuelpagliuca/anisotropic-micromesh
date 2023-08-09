@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     if (minEdge.isEmpty())    minEdge = "1.0";
     if (maxEdge.isEmpty())    maxEdge = "7.0";
     if (targetMesh.isEmpty()) targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty())   baseMesh = "pallas_125.obj";
+    if (baseMesh.isEmpty())   baseMesh = "pallas_250.obj";
 
     QLocale locale(QLocale::C);
     minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     exit(0);
   }
 
-  w.on_demo125faces_clicked();
+  w.on_demo124faces_clicked();
   w.show();
 
   return a.exec();
