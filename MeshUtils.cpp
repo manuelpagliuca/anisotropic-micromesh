@@ -213,7 +213,7 @@ void Mesh::exportOFF(const std::string &fileName) const
 {
   std::ostringstream oss;
   std::string fileNameExt = fileName + ".off";
-  std::string filePath = ".\\Samples\\" + fileNameExt;
+  std::string filePath = "./Output/" + fileNameExt;
   std::ofstream fileStream(filePath.c_str(), std::ios::out);
 
   if (!fileStream.is_open()) {
@@ -249,7 +249,7 @@ void Mesh::exportOBJ(const std::string &fName) const
 {
   std::ostringstream oss;
   std::string fileNameExt = fName + ".obj";
-  std::string filePath = ".\\Samples\\" + fileNameExt;
+  std::string filePath = "./Output/" + fileNameExt;
   std::ofstream fileStream(filePath.c_str(), std::ios::out);
 
   if (!fileStream.is_open()) {

@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
     QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_5000.obj)", "base-mesh");
     parser.addOption(baseMeshOption);
 
-    QCommandLineOption metricOption("metric", "Metric option (default: same-edges-length)", "same-edges-length");
+    QCommandLineOption metricOption("metric", "Metric option (default: same-target-edges)", "same-target-edges");
     parser.addOption(metricOption);
 
     parser.process(a);
@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     QString targetMesh = parser.value(targetOption);
     QString baseMesh = parser.value(baseMeshOption);
 
-    if (metric.isEmpty())     metric = "same-edges-length";
+    if (metric.isEmpty())     metric = "same-target-edges";
     if (nSamples.isEmpty())   nSamples = "5";
     if (minEdge.isEmpty())    minEdge = "1.0";
     if (maxEdge.isEmpty())    maxEdge = "7.0";
@@ -53,10 +53,10 @@ int main(int argc, char *argv[])
       w.loadBaseMesh(baseMesh);
       w.loadTargetMesh(targetMesh);
 
-      if (metric == "same-edges-length") {
+      if (metric == "same-target-edges") {
         qDebug() << "Building samples for anisotropic and isotropic schemes with same target edge lenght.";
         w.exportDisplacedSamplesSameTargetEdgeMetric(nSamples.toInt(), minEdge.toDouble(), maxEdge.toDouble());
-      } else if(metric == "same-faces-amount") {
+      } else if(metric == "same-microfaces") {
         qDebug() << "To implement..";
       }
     }

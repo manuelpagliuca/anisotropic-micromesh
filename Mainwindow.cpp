@@ -160,21 +160,9 @@ void Mainwindow::setDisplacementsDelta(std::vector<float> displacements)
     disp = disp / 100.f;
 }
 
-int Mainwindow::extractPolyDetails(const std::string &str)
-{
-  size_t lastUnderscorePos = str.rfind("_");
-
-  if (lastUnderscorePos != std::string::npos) {
-    std::string numberString = str.substr(lastUnderscorePos + 1);
-    return std::stoll(numberString);
-  }
-
-  return 0;
-}
-
 void Mainwindow::loadBaseMesh(const QString &fileName){
   if (!fileName.isEmpty()) {
-    QString filePath = "./Samples/" + fileName;
+    QString filePath = "./Models/" + fileName;
     std::string ext = fileName.mid(fileName.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
@@ -188,11 +176,10 @@ void Mainwindow::loadBaseMesh(const QString &fileName){
   }
 }
 
-
 void Mainwindow::loadTargetMesh(const QString &fileName)
 {
   if (!fileName.isEmpty()) {
-    QString filePath = "./Samples/" + fileName;
+    QString filePath = "./Models/" + fileName;
     std::string ext = fileName.mid(fileName.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
 
@@ -201,7 +188,6 @@ void Mainwindow::loadTargetMesh(const QString &fileName)
 
     qDebug() << fileName << " has been loaded as target mesh.";
 
-    polyTargetMesh = extractPolyDetails(file);
     ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
     ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
   }
@@ -291,7 +277,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
 void Mainwindow::on_actionSave_triggered()
 {
   QString filePath = QFileDialog::getSaveFileName(this,
-                                                  tr("Save Mesh"), "..\\Samples",
+                                                  tr("Save Mesh"), "../Models",
                                                   tr("OFF File (*.off);;OBJ File (*.obj)"));
 
   if (!filePath.isEmpty())
@@ -309,7 +295,7 @@ void Mainwindow::on_actionLoad_triggered()
 {
   QString filePath = QFileDialog::getOpenFileName(
     this,
-    tr("Load Mesh"), ".\\Samples",
+    tr("Load Mesh"), "./Models",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);; OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty()) {
@@ -362,7 +348,7 @@ void Mainwindow::on_actionExtract_displacements_triggered()
 {
   QString filePath = QFileDialog::getOpenFileName(
     this,
-    tr("Load Mesh"), ".\\Samples",
+    tr("Load Mesh"), "./Models",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty()) {
@@ -451,9 +437,9 @@ void Mainwindow::on_actionExit_triggered()
 
 void Mainwindow::on_demo125faces_clicked()
 {
-  std::string pallasOBJ125 = readFile("./Samples/pallas_125.obj");
+  std::string pallasOBJ125 = readFile("./Models/pallas_125.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
-  baseMeshNameAndDetail = extractFileName("./Samples/pallas_125.obj");
+  baseMeshNameAndDetail = extractFileName("./Models/pallas_125.obj");
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
@@ -464,9 +450,9 @@ void Mainwindow::on_demo125faces_clicked()
 
 void Mainwindow::on_demo250faces_clicked()
 {
-  std::string pallasOBJ250 = readFile("./Samples/pallas_250.obj");
+  std::string pallasOBJ250 = readFile("./Models/pallas_250.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
-  baseMeshNameAndDetail = extractFileName("./Samples/pallas_250.obj");
+  baseMeshNameAndDetail = extractFileName("./Models/pallas_250.obj");
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
@@ -477,9 +463,9 @@ void Mainwindow::on_demo250faces_clicked()
 
 void Mainwindow::on_demo500faces_clicked()
 {
-  std::string pallasOBJ500 = readFile("./Samples/pallas_500.obj");
+  std::string pallasOBJ500 = readFile("./Models/pallas_500.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
-  baseMeshNameAndDetail = extractFileName("./Samples/pallas_500.obj");
+  baseMeshNameAndDetail = extractFileName("./Models/pallas_500.obj");
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
@@ -490,9 +476,9 @@ void Mainwindow::on_demo500faces_clicked()
 
 void Mainwindow::on_demo1000faces_clicked()
 {
-  std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
+  std::string pallasOBJ1000 = readFile("./Models/pallas_1000.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
-  baseMeshNameAndDetail = extractFileName("./Samples/pallas_1000.obj");
+  baseMeshNameAndDetail = extractFileName("./Models/pallas_1000.obj");
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
@@ -541,45 +527,40 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 
 void Mainwindow::on_target250faces_clicked()
 {
-  std::string pallasOBJ250 = readFile("./Samples/pallas_250.obj");
+  std::string pallasOBJ250 = readFile("./Models/pallas_250.obj");
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ250));
-  polyTargetMesh = 250;
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
 void Mainwindow::on_target500faces_clicked()
 {
-  std::string pallasOBJ500 = readFile("./Samples/pallas_500.obj");
+  std::string pallasOBJ500 = readFile("./Models/pallas_500.obj");
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ500));
-  polyTargetMesh = 500;
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
 void Mainwindow::on_target1000faces_clicked()
 {
-  std::string pallasOBJ1000 = readFile("./Samples/pallas_1000.obj");
+  std::string pallasOBJ1000 = readFile("./Models/models/pallas_1000.obj");
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ1000));
-  polyTargetMesh = 1000;
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
 void Mainwindow::on_target2500faces_clicked()
 {
-  std::string pallasOBJ2500 = readFile("./Samples/pallas_2500.obj");
+  std::string pallasOBJ2500 = readFile("./Models/pallas_2500.obj");
   setTargetAndResetDisplacementSlider(Mesh ::parseOBJ(pallasOBJ2500));
-  polyTargetMesh = 2500;
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
 
 void Mainwindow::on_target5000faces_clicked()
 {
-  std::string pallasOBJ5000 = readFile("./Samples/pallas_5000.obj");
+  std::string pallasOBJ5000 = readFile("./Models/pallas_5000.obj");
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ5000));
-  polyTargetMesh = 5000;
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
 }
@@ -631,7 +612,7 @@ void Mainwindow::on_loadTargetMesh_clicked()
 {
   QString filePath = QFileDialog::getOpenFileName(
     this,
-    tr("Load Mesh"), ".\\Samples",
+    tr("Load Mesh"), "./Models",
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);;OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty()) {
@@ -641,7 +622,6 @@ void Mainwindow::on_loadTargetMesh_clicked()
     if (ext == ".off") setTargetAndResetDisplacementSlider(Mesh::parseOFF(file));
     else if (ext == ".obj") setTargetAndResetDisplacementSlider(Mesh::parseOBJ(file));
 
-    polyTargetMesh = extractPolyDetails(file);
     ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
     ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
   }
@@ -652,12 +632,12 @@ void Mainwindow::on_exportCurrentOBJ_clicked()
   std::ostringstream fileNameStream;
 
   if (isAniso)  {
-    fileNameStream << "displaced\\aniso\\";
+    fileNameStream << "./Output/displaced/aniso";
   } else {
-    fileNameStream << "displaced\\micro\\";
+    fileNameStream << "./Output/displaced/micro";
   }
 
-  fileNameStream << baseMeshNameAndDetail << "_to_" << polyTargetMesh << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
+  fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
   std::string fileName = fileNameStream.str();
 
   projectedMesh.exportOBJ(fileName);
@@ -668,12 +648,12 @@ void Mainwindow::on_exportCurrentOFF_clicked()
   std::ostringstream fileNameStream;
 
   if (isAniso)  {
-    fileNameStream << "displaced\\aniso\\";
+    fileNameStream << "./Output/displaced/aniso";
   } else {
-    fileNameStream << "displaced\\micro\\";
+    fileNameStream << "./Output/displaced/micro";
   }
 
-  fileNameStream << baseMeshNameAndDetail << "_to_" << polyTargetMesh << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
+  fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
   std::string fileName = fileNameStream.str();
 
   projectedMesh.exportOFF(fileName);

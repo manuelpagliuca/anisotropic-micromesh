@@ -26,6 +26,8 @@ public:
 public:
   // Command Line functions
   void exportDisplacedSamplesSameTargetEdgeMetric(int nSamples = 5, double minVal = 1.0, double maxVal = 10.0);
+  void exportDisplacedSamplesWithSameFacesAmount(double minVal = 1.0, double maxVal = 10.0);
+
   void loadBaseMesh(const QString &fileName);
   void loadTargetMesh(const QString &fileName);
 
@@ -45,7 +47,6 @@ protected:
   void resetTargetMeshLabels();
   void findTargetEdgeLengthCombinations();
   void setDisplacementsDelta(std::vector<float> displacements);
-  int extractPolyDetails(const std::string &str);
 
   std::string extractFileName(const std::string& fullPath);
 
@@ -63,7 +64,6 @@ private:
   QPoint newPos;
 
   // Morphing
-  int polyTargetMesh;
   bool isAniso = false;
   std::vector<float> displacementsDeltas;
   int morphingCurrentValue;
