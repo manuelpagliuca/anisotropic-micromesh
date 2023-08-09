@@ -169,6 +169,8 @@ void Mainwindow::loadBaseMesh(const QString &fileName){
     if (ext == ".off") setBaseMeshAndUI(Mesh::parseOFF(file));
     else if (ext == ".obj") setBaseMeshAndUI(Mesh::parseOBJ(file));
 
+    baseMeshNameAndDetail = extractFileName(fileName.toStdString());
+
     qDebug() << fileName << " has been loaded as base mesh.";
 
     ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());

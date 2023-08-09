@@ -57,7 +57,8 @@ int main(int argc, char *argv[])
         qDebug() << "Building samples for anisotropic and isotropic schemes with same target edge lenght.";
         w.exportDisplacedSamplesSameTargetEdgeMetric(nSamples.toInt(), minEdge.toDouble(), maxEdge.toDouble());
       } else if(metric == "same-microfaces") {
-        qDebug() << "To implement..";
+        qDebug() << "Building samples for anisotropic and isotropic schemes with same amount of microfaces.";
+        w.exportDisplacedSamplesWithSameFacesAmount(minEdge.toDouble(), maxEdge.toDouble());
       }
     }
     exit(0);

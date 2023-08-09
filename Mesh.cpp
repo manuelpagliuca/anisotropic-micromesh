@@ -482,7 +482,7 @@ void Mesh::updateEdgesSubdivisionLevelsAniso(float targetEdgeLength)
     count++;
     if (!changeAnything) break;
   }
-  qDebug() << "Micromesh scheme enforced: " << count << " times.";
+  qDebug() << "Anisotropic scheme enforced: " << count << " times.";
 }
 
 void Mesh::updateBoundingBox()
