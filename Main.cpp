@@ -60,6 +60,8 @@ int main(int argc, char *argv[])
         qDebug() << "Building samples for anisotropic and isotropic schemes with same amount of microfaces.";
         w.exportDisplacedSamplesWithSameFacesAmount(minEdge.toDouble(), maxEdge.toDouble());
       }
+    } else if (cmd == "build-samples-presets") {
+      // to implement
     }
     exit(0);
   }

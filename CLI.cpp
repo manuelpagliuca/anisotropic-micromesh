@@ -70,74 +70,72 @@ void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double
 
 void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge)
 {
-//  Mesh micro, aniso;
-//  std::vector<float> microDisplacements, anisoDisplacements;
+  Mesh micro, aniso;
+  std::vector<float> microDisplacements, anisoDisplacements;
 
-//  std::string outputFileName = "./Output/Evaluation/same_microfaces/presets/" + baseMeshNameAndDetail + "_micro_aniso_target_lengths_matches.txt";
-//  QFile presetFile (outputFileName.c_str());
+  std::string outputFileName = "./Output/Evaluation/same_microfaces/presets/" + baseMeshNameAndDetail + "_micro_aniso_target_lengths_matches.txt";
+  QFile presetFile (outputFileName.c_str());
 
-//  if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-//    qDebug() << "Failed to open file for writing.";
-//    return;
-//  }
+  if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+    qDebug() << "Failed to open file for writing.";
+    return;
+  }
 
-//  QTextStream out(&presetFile);
-//  out << "Micro\t| Aniso\t| Faces\n";
+  QTextStream out(&presetFile);
+  out << "Micro\t| Aniso\t| Faces\n";
 
-//  std::vector<int> microMeshFaces;
+  std::vector<int> microMeshFaces;
 
-//  #pragma omp parallel for
-//  for (int microLengthIdx = 0; microLengthIdx < ((maxEdge - minEdge) / 0.01); ++microLengthIdx) {
-//    double microLength = minEdge + microLengthIdx * 0.01;
-//    micro = baseMesh;
-//    micro.updateEdgesSubdivisionLevelsMicromesh(microLength);
-//    micro = micro.micromeshSubdivide();
-//    microMeshFaces.push_back(micro.faces.size());
+  #pragma omp parallel for
+  for (int microLengthIdx = 0; microLengthIdx < ((maxEdge - minEdge) / 0.01); ++microLengthIdx) {
+    double microLength = minEdge + microLengthIdx * 0.01;
+    micro = baseMesh;
+    micro.updateEdgesSubdivisionLevelsMicromesh(microLength);
+    micro = micro.micromeshSubdivide();
+    microMeshFaces.push_back(micro.faces.size());
 
-//    #pragma omp critical
-//    {
-//      qDebug() << "Progress (microMeshFaces): " << microLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", microLength: " << microLength;
-//    }
-//  }
+    #pragma omp critical
+    {
+      qDebug() << "Progress (microMeshFaces): " << microLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", microLength: " << microLength;
+    }
+  }
 
-//  std::vector<int> anisoMeshFaces;
+  std::vector<int> anisoMeshFaces;
 
-//  #pragma omp parallel for
-//  for (int anisoLengthIdx = 0; anisoLengthIdx < ((maxEdge - minEdge) / 0.01); ++anisoLengthIdx) {
-//    double anisoLength = minEdge + anisoLengthIdx * 0.01;
-//    aniso = baseMesh;
-//    aniso.updateEdgesSubdivisionLevelsAniso(anisoLength);
-//    aniso = aniso.anisotropicMicromeshSubdivide();
-//    anisoMeshFaces.push_back(aniso.faces.size());
+  #pragma omp parallel for
+  for (int anisoLengthIdx = 0; anisoLengthIdx < ((maxEdge - minEdge) / 0.01); ++anisoLengthIdx) {
+    double anisoLength = minEdge + anisoLengthIdx * 0.01;
+    aniso = baseMesh;
+    aniso.updateEdgesSubdivisionLevelsAniso(anisoLength);
+    aniso = aniso.anisotropicMicromeshSubdivide();
+    anisoMeshFaces.push_back(aniso.faces.size());
 
-//    #pragma omp critical
-//    {
-//      qDebug() << "Progress (anisoMeshFaces): " << anisoLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", anisoLength: " << anisoLength;;
-//    }
-//  }
+    #pragma omp critical
+    {
+      qDebug() << "Progress (anisoMeshFaces): " << anisoLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", anisoLength: " << anisoLength;;
+    }
+  }
 
-//  int lastFacesMatch = -1;
+  int lastFacesMatch = -1;
 
-//  #pragma omp parallel for
-//  for (size_t i = 0; i < microMeshFaces.size(); ++i) {
-//    for (size_t j = 0; j < anisoMeshFaces.size(); ++j) {
-//      if (microMeshFaces[i] == anisoMeshFaces[j] /*&& microMeshFaces[i] != lastFacesMatch*/) {
-////        lastFacesMatch = microMeshFaces[i];
+  #pragma omp parallel for
+  for (size_t i = 0; i < microMeshFaces.size(); ++i) {
+    for (size_t j = 0; j < anisoMeshFaces.size(); ++j) {
+      if (microMeshFaces[i] == anisoMeshFaces[j] && microMeshFaces[i] != lastFacesMatch) {
+        lastFacesMatch = microMeshFaces[i];
 
-//        double microLength = minEdge + i * 0.01;
-//        double anisoLength = minEdge + j * 0.01;
+        double microLength = minEdge + i * 0.01;
+        double anisoLength = minEdge + j * 0.01;
 
-//        #pragma omp critical
-//        {
-//          out << microLength << "\t| " << anisoLength << "\t| " << microMeshFaces[i] << "\n";
-//        }
-//      }
-//    }
-//  }
+        #pragma omp critical
+        {
+          out << microLength << "\t| " << anisoLength << "\t| " << microMeshFaces[i] << "\n";
+        }
+      }
+    }
+  }
 
-//  presetFile.close();
-
-  QFile presetFile("./Output/Evaluation/same_microfaces/presets/pallas_250_micro_aniso_target_lengths_matches - Copia.txt");
+  presetFile.close();
 
   exportDisplacedSamples(presetFile);
 }
