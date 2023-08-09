@@ -1,4 +1,4 @@
-#include "Mainwindow.h"
+#include "Headers/Mainwindow.h"
 
 void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double minEdge, double maxEdge)
 {
@@ -172,8 +172,7 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
 
       QString microDirPath =
         "Evaluation/same_microfaces/micro/" +
-        QString::fromStdString(baseMeshNameAndDetail +
-        "/");
+        QString::fromStdString(baseMeshNameAndDetail + minEdge + "_" + maxEdge + "/");
       QDir microDir(QString::fromStdString("./Output/") + microDirPath);
 
       if (!microDir.exists()) {
@@ -203,8 +202,7 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
 
       QString anisoDirPath =
         "Evaluation/same_microfaces/aniso/" +
-        QString::fromStdString(baseMeshNameAndDetail +
-        "/");
+        QString::fromStdString(baseMeshNameAndDetail + "/");
       QDir anisoDir(QString::fromStdString("./Output/") + anisoDirPath);
 
       if (!anisoDir.exists()) {

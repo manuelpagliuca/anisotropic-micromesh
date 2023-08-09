@@ -1,4 +1,4 @@
-#include "Mainwindow.h"
+#include "Headers/Mainwindow.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
@@ -14,10 +14,10 @@ int main(int argc, char *argv[])
     QCommandLineOption samplesOption("n", "Number of samples option (default: 5)", "n");
     parser.addOption(samplesOption);
 
-    QCommandLineOption minEdgeOption("min-edge", "Minimum edge value (default: 1.0)", "min-edge");
+    QCommandLineOption minEdgeOption("min-edge", "Minimum edge value (default: 0.7)", "min-edge");
     parser.addOption(minEdgeOption);
 
-    QCommandLineOption maxEdgeOption("max-edge", "Maximum edge value (default: 7.0)", "max-edge");
+    QCommandLineOption maxEdgeOption("max-edge", "Maximum edge value (default: 10.0)", "max-edge");
     parser.addOption(maxEdgeOption);
 
     QCommandLineOption targetOption("target-mesh", "Target mesh (default: pallas_5000.obj)", "target-mesh");
@@ -40,8 +40,8 @@ int main(int argc, char *argv[])
 
     if (metric.isEmpty())     metric = "same-target-edges";
     if (nSamples.isEmpty())   nSamples = "5";
-    if (minEdge.isEmpty())    minEdge = "1.0";
-    if (maxEdge.isEmpty())    maxEdge = "7.0";
+    if (minEdge.isEmpty())    minEdge = "0.7";
+    if (maxEdge.isEmpty())    maxEdge = "10.0";
     if (targetMesh.isEmpty()) targetMesh = "pallas_5000.obj";
     if (baseMesh.isEmpty())   baseMesh = "pallas_250.obj";
 

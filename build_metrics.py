@@ -156,41 +156,39 @@ if args.metric == "same-target-edges":
 elif args.metric == "same-microfaces":
   file_list = glob.glob(os.path.join(directory_path_micro, "*"))
 
-  print(file_list)
+  with open(f"./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_micro.txt", "w") as output_file:
+    output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
-  # with open(f"./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_micro.txt", "w") as output_file:
-  #   output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
+    for displaced_mesh_path in file_list:
+      ms = pymeshlab.MeshSet()
+      ms.load_new_mesh(target_mesh_path)
+      ms.load_new_mesh(displaced_mesh_path)
+      output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
 
-  #   for displaced_mesh_path in file_list:
-  #     ms = pymeshlab.MeshSet()
-  #     ms.load_new_mesh(target_mesh_path)
-  #     ms.load_new_mesh(displaced_mesh_path)
-  #     output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
+      for key, value in ms.get_hausdorff_distance().items():
+        output_file.write(str(value) + " ")
 
-  #     for key, value in ms.get_hausdorff_distance().items():
-  #       output_file.write(str(value) + " ")
+      output_file.write("\n")
 
-  #     output_file.write("\n")
+  print(
+      f"Hausdorff's distances > ./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_micro.txt")
 
-  # print(
-  #     f"Hausdorff's distances > ./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_micro.txt")
+  file_list = glob.glob(os.path.join(directory_path_aniso, "*"))
 
-  # file_list = glob.glob(os.path.join(directory_path_aniso, "*"))
+  with open(f"./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_aniso.txt", "w") as output_file:
+    output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
-  # with open(f"./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_aniso.txt", "w") as output_file:
-  #   output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
+    for displaced_mesh_path in file_list:
+      ms = pymeshlab.MeshSet()
+      ms.load_new_mesh(target_mesh_path)
+      ms.load_new_mesh(displaced_mesh_path)
+      output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
 
-  #   for displaced_mesh_path in file_list:
-  #     ms = pymeshlab.MeshSet()
-  #     ms.load_new_mesh(target_mesh_path)
-  #     ms.load_new_mesh(displaced_mesh_path)
-  #     output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
+      for key, value in ms.get_hausdorff_distance().items():
+        output_file.write(str(value) + " ")
 
-  #     for key, value in ms.get_hausdorff_distance().items():
-  #       output_file.write(str(value) + " ")
+      output_file.write("\n")
+  print(
+      f"Hausdorff's distances > ./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_aniso.txt")
 
-  #     output_file.write("\n")
-  # print(
-  #     f"Hausdorff's distances > ./Output/Evaluation/{ev_metric_dir}/hausdorff_microfaces_aniso.txt")
-
-  # output_file.close()
+  output_file.close()
