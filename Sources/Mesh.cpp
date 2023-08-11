@@ -313,23 +313,21 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     // add microvertices
     for (int vy = 0; vy <= m; vy++) {
       int lastVx = vy * aniso + aniso - 1;
-
-      if (vy == m)
-        lastVx -= aniso - 1;
+      if (vy == m) lastVx -= aniso - 1;
       for (int vx = 0; vx <= lastVx; vx++) {
-        int nVerticalSegments = m - vx / aniso;
-        int belowVverticalSegments = m - vy;
-
+        // Number of vertical segments -> m - vx / aniso;
+        // Number of vertical segments below the microvertex -> m - vy;
         float c = vx / float(n);
         float a;
         if (vx == n) a = 0.f;
-        else a = (1 - c) * float(belowVverticalSegments) / float(nVerticalSegments);
+        else a = (1 - c) * float(m - vy) / float(m - vx / aniso);
         float b = 1 - a - c;
 
         vec3 bary = vec3();
         bary[w0] = b;
         bary[w1] = c;
         bary[w2] = a;
+
         subdivided.vertices.push_back(getSurfaceVertex(f, bary));
       }
     }

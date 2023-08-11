@@ -164,6 +164,8 @@ void Mainwindow::setDisplacementsDelta(std::vector<float> displacements)
 
 void Mainwindow::loadBaseMesh(const QString &fileName){
   if (!fileName.isEmpty()) {
+    projectedMesh = subdividedMesh = Mesh();
+
     QString filePath = "./Models/" + fileName;
     std::string ext = fileName.mid(fileName.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
@@ -303,6 +305,8 @@ void Mainwindow::on_actionLoad_triggered()
     tr("3D Mesh(*.off *.obj);;OFF Files (*.off);; OBJ Files (*.obj)"));
 
   if (!filePath.isEmpty()) {
+    projectedMesh = subdividedMesh = Mesh();
+
     std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
     std::string file = readFile(filePath.toStdString().c_str());
     baseMesh = Mesh();
@@ -312,6 +316,8 @@ void Mainwindow::on_actionLoad_triggered()
     } else if (ext == ".obj") {
       setBaseMeshAndUI(Mesh::parseOBJ(file));
     }
+
+    baseMeshNameAndDetail = extractFileName(filePath.toStdString());
   }
 }
 
@@ -447,6 +453,7 @@ void Mainwindow::on_demo124faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  projectedMesh = subdividedMesh = Mesh();
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
@@ -460,6 +467,7 @@ void Mainwindow::on_demo250faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  projectedMesh = subdividedMesh = Mesh();
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
@@ -473,6 +481,7 @@ void Mainwindow::on_demo500faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  projectedMesh = subdividedMesh = Mesh();
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
@@ -486,6 +495,7 @@ void Mainwindow::on_demo1000faces_clicked()
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+  projectedMesh = subdividedMesh = Mesh();
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
@@ -636,15 +646,18 @@ void Mainwindow::on_exportCurrentOBJ_clicked()
   std::ostringstream fileNameStream;
 
   if (isAniso)  {
-    fileNameStream << "./Output/displaced/aniso";
+    fileNameStream << "displaced/aniso";
   } else {
-    fileNameStream << "./Output/displaced/micro";
+    fileNameStream << "displaced/micro";
   }
 
   fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
   std::string fileName = fileNameStream.str();
 
-  projectedMesh.exportOBJ(fileName);
+  if (ui.displacementSlider->value() == 0)
+    subdividedMesh.exportOBJ(fileName);
+  else
+    projectedMesh.exportOBJ(fileName);
 }
 
 void Mainwindow::on_exportCurrentOFF_clicked()
@@ -652,13 +665,16 @@ void Mainwindow::on_exportCurrentOFF_clicked()
   std::ostringstream fileNameStream;
 
   if (isAniso)  {
-    fileNameStream << "./Output/displaced/aniso";
+    fileNameStream << "displaced/aniso";
   } else {
-    fileNameStream << "./Output/displaced/micro";
+    fileNameStream << "displaced/micro";
   }
 
   fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
   std::string fileName = fileNameStream.str();
-
-  projectedMesh.exportOFF(fileName);
+  if (ui.displacementSlider->value() == 0)
+    subdividedMesh.exportOFF(fileName);
+  else
+    projectedMesh.exportOFF(fileName);
 }
+

@@ -170,20 +170,20 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
       for (const float &disp : displacements)
         micro.displaceVertex(vertexIdx++, disp);
 
-      QString microDirPath =
+      QString microDir =
         "Evaluation/same_microfaces/micro/" +
-        QString::fromStdString(baseMeshNameAndDetail + minEdge + "_" + maxEdge + "/");
-      QDir microDir(QString::fromStdString("./Output/") + microDirPath);
+        QString::fromStdString(baseMeshNameAndDetail + "/");
+      QDir microDirPath(QString::fromStdString("./Output/") + microDir);
 
-      if (!microDir.exists()) {
-        if (!microDir.mkpath(".")) {
-          qDebug() << "Error during the creation of the directory: " << microDirPath;
+      if (!microDirPath.exists()) {
+        if (!microDirPath.mkpath(".")) {
+          qDebug() << "Error during the creation of the directory: " << microDir;
           return;
         }
       }
 
       std::string microFilePath =
-        microDirPath.toStdString()
+        microDir.toStdString()
         + "to_" + std::to_string(targetMesh.faces.size())
         + "_faces_" + std::to_string(faces);
 
@@ -200,20 +200,20 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
       for (const float &disp : displacements)
         aniso.displaceVertex(vertexIdx++, disp);
 
-      QString anisoDirPath =
+      QString anisoDir =
         "Evaluation/same_microfaces/aniso/" +
         QString::fromStdString(baseMeshNameAndDetail + "/");
-      QDir anisoDir(QString::fromStdString("./Output/") + anisoDirPath);
+      QDir anisoDirPath(QString::fromStdString("./Output/") + anisoDir);
 
-      if (!anisoDir.exists()) {
-        if (!anisoDir.mkpath(".")) {
-          qDebug() << "Error during the creation of the directory: " << anisoDirPath;
+      if (!anisoDirPath.exists()) {
+        if (!anisoDirPath.mkpath(".")) {
+          qDebug() << "Error during the creation of the directory: " << anisoDir;
           return;
         }
       }
 
       std::string anisoFilePath =
-        anisoDirPath.toStdString()
+        anisoDir.toStdString()
         + "to_" + std::to_string(targetMesh.faces.size())
         + "_faces_" + std::to_string(faces);
 

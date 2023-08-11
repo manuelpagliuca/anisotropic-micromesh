@@ -74,7 +74,7 @@ parser.add_argument("--clean", help="Parameter 8 (clean flag)", action="store_tr
 
 args = parser.parse_args()
 
-# Setup path variables
+# Setup paths
 ev_metric_dir = args.metric.replace("-", "_")
 directory_path_micro = f"./Output/Evaluation/{ev_metric_dir}/micro"
 directory_path_aniso = f"./Output/Evaluation/{ev_metric_dir}/aniso"
@@ -107,14 +107,20 @@ if args.target_mesh is not None:
 if args.metric is not None:
   params.append(f"--metric={args.metric}")
 
-# try:
-#   subprocess.check_call([exe_path, "build-samples"] + params)
-# except subprocess.CalledProcessError as e:
-#   print(f"Error while executing the command: {e}")
-# except FileNotFoundError as e:
-#   print(f"File not found: {e}")
+# Setup generic variables
+if args.target_mesh:
+  target_n_faces = extract_last_integer_number_from_string(args.target_mesh[:-4])
+
+# Execute command
+try:
+  subprocess.check_call([exe_path, "build-samples"] + params)
+except subprocess.CalledProcessError as e:
+  print(f"Error while executing the command: {e}")
+except FileNotFoundError as e:
+  print(f"File not found: {e}")
 
 
+# Switch data analysis in base of selected metric
 if args.metric == "same-target-edges":
   file_list = glob.glob(os.path.join(directory_path_micro, "*"))
 
@@ -161,9 +167,10 @@ elif args.metric == "same-microfaces":
     if args.base_mesh[:-4] in file:
       outputDir = file
 
+  print(outputDir)
   file_list = glob.glob(os.path.join(outputDir, "*"))
 
-  with open(f"{outputDir}/hausdorff_microfaces_micro.txt", "w") as output_file:
+  with open(f"{outputDir}/hausdorff_{args.base_mesh[:-4]}_to_{target_n_faces}.txt", "w") as output_file:
     output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
     for displaced_mesh_path in file_list:
@@ -188,7 +195,7 @@ elif args.metric == "same-microfaces":
 
   file_list = glob.glob(os.path.join(outputDir, "*"))
 
-  with open(f"{outputDir}/hausdorff_microfaces_aniso.txt", "w") as output_file:
+  with open(f"{outputDir}/hausdorff_{args.base_mesh[:-4]}_to_{target_n_faces}.txt", "w") as output_file:
     output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
     for displaced_mesh_path in file_list:
