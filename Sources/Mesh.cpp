@@ -492,6 +492,7 @@ void Mesh::updateBoundingBox()
 bool Mesh::enforceMicromesh(const Face &f)
 {
   bool changeAnything = false;
+
   uint edgeSubdivision[3] = {
     edges.at(f.edgesIndices[0]).subdivisions,
     edges.at(f.edgesIndices[1]).subdivisions,

@@ -4,6 +4,7 @@
 Mainwindow::Mainwindow(QWidget *parent) : QMainWindow(parent)
 {
   ui.setupUi(this);
+  this->setWindowTitle(QString("Master's Degree Final Project, Manuel Pagliuca (975169), A.Y. 2022/2023"));
   const int x = (screen()->size().width() / 2) - (width() / 2);
   const int y = (screen()->size().height() / 2) - (height() / 2);
   move(x, y);
