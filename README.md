@@ -14,8 +14,9 @@
 
 Generic Python script
 ```py
-
+python aasdfaksjl.py --base-mesh=aldsfj --target-mesh=adfalk --metric=same-microfaces
 ```
+There are some default values to know
 
 ### Qt App
 

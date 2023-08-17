@@ -4,7 +4,8 @@
     },
     "python.formatting.provider": "none",
     "cSpell.words": [
-        "aniso"
+        "aniso",
+        "microfaces"
     ],
     "editor.tabSize": 2,
     "editor.insertSpaces": true,
