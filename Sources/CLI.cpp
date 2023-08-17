@@ -1,4 +1,4 @@
-#include "Headers/Mainwindow.h"
+#include "Mainwindow.h"
 
 void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double minEdge, double maxEdge)
 {
@@ -61,24 +61,23 @@ void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double
       + "_disp_100_edge_" + std::to_string(length);
 
     projectedMesh.exportOBJ(pathAndName.c_str());
-  }
+    }
 }
 
-void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge)
+void Mainwindow::exportSameMicrofacesPresets(double minEdge, double maxEdge)
 {
   Mesh micro, aniso;
   std::vector<float> microDisplacements, anisoDisplacements;
 
-  std::string outputFileName = "./Output/Evaluation/same_microfaces/presets/" + baseMeshNameAndDetail + "_micro_aniso_target_lengths_matches.txt";
+  std::string outputFileName = "./Output/Evaluation/same_microfaces/presets/" +
+                                baseMeshNameAndDetail +
+                                "_micro_aniso_target_lengths_matches.txt";
   QFile presetFile (outputFileName.c_str());
 
   if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qDebug() << "Failed to open file for writing.";
     return;
   }
-
-  QTextStream out(&presetFile);
-  out << "Micro\t| Aniso\t| Faces\n";
 
   std::vector<int> microMeshFaces;
 
@@ -112,6 +111,8 @@ void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, doubl
     }
   }
 
+  QTextStream out(&presetFile);
+  out << "Micro\t| Aniso\t| Faces\n";
   int lastFacesMatch = -1;
 
   #pragma omp parallel for
@@ -132,8 +133,23 @@ void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, doubl
   }
 
   presetFile.close();
+}
 
-  exportDisplacedSamples(presetFile);
+void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge, QString presetFileName)
+{
+  if (!presetFileName.isEmpty()) {
+    QString microDirPath(QString::fromStdString("./Output/Evaluation/same_microfaces/") + presetFileName);
+    QFile presetFile = QFile(microDirPath.toStdString().c_str());
+
+    if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+      qDebug() << "Failed to open preset file for writing.";
+      return;
+    }
+
+    exportDisplacedSamples(presetFile);
+  } else {
+    exportSameMicrofacesPresets(minEdge, maxEdge);
+  }
 }
 
 void Mainwindow::exportDisplacedSamples(QFile &presetFile)

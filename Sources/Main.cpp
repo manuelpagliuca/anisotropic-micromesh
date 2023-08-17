@@ -1,4 +1,4 @@
-#include "Headers/Mainwindow.h"
+#include "Mainwindow.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
@@ -29,7 +29,11 @@ int main(int argc, char *argv[])
     QCommandLineOption metricOption("metric", "Metric option (default: same-target-edges)", "same-target-edges");
     parser.addOption(metricOption);
 
+    QCommandLineOption presetFileNameOption("preset-path", "Preset path (default: )", "preset-path");
+    parser.addOption(presetFileNameOption);
+
     parser.process(a);
+    qDebug() << "jersdfg";
 
     QString metric = parser.value(metricOption);
     QString nSamples = parser.value(samplesOption);
@@ -37,31 +41,35 @@ int main(int argc, char *argv[])
     QString maxEdge = parser.value(maxEdgeOption);
     QString targetMesh = parser.value(targetOption);
     QString baseMesh = parser.value(baseMeshOption);
+    QString presetFileName = parser.value(presetFileNameOption);
 
-    if (metric.isEmpty())     metric = "same-target-edges";
-    if (nSamples.isEmpty())   nSamples = "5";
-    if (minEdge.isEmpty())    minEdge = "0.7";
-    if (maxEdge.isEmpty())    maxEdge = "10.0";
-    if (targetMesh.isEmpty()) targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty())   baseMesh = "pallas_250.obj";
+    if (metric.isEmpty())           metric = "same-target-edges";
+    if (nSamples.isEmpty())         nSamples = "5";
+    if (minEdge.isEmpty())          minEdge = "0.7";
+    if (maxEdge.isEmpty())          maxEdge = "10.0";
+    if (targetMesh.isEmpty())       targetMesh = "pallas_5000.obj";
+    if (baseMesh.isEmpty())         baseMesh = "pallas_250.obj";
+    if (presetFileName.isEmpty())   baseMesh = "";
 
     QLocale locale(QLocale::C);
     minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
     maxEdge = locale.toString(maxEdge.toDouble(), 'f', 1);
+    qDebug() << cmd;
 
-    if (cmd == "build-samples") {
+    if (cmd == "gen-samples") {
       w.loadBaseMesh(baseMesh);
       w.loadTargetMesh(targetMesh);
 
       if (metric == "same-target-edges") {
-        qDebug() << "Building samples for anisotropic and isotropic schemes with same target edge lenght.";
+        qDebug() << "Generating samples for anisotropic and isotropic schemes with same target edge lenght.";
         w.exportDisplacedSamplesSameTargetEdgeMetric(nSamples.toInt(), minEdge.toDouble(), maxEdge.toDouble());
       } else if(metric == "same-microfaces") {
-        qDebug() << "Building samples for anisotropic and isotropic schemes with same amount of microfaces.";
-        w.exportDisplacedSamplesWithSameFacesAmount(minEdge.toDouble(), maxEdge.toDouble());
+        qDebug() << "Generating samples for anisotropic and isotropic schemes with same amount of microfaces.";
+        w.exportDisplacedSamplesWithSameFacesAmount(minEdge.toDouble(), maxEdge.toDouble(), presetFileName);
       }
-    } else if (cmd == "build-samples-presets") {
-      // to implement
+    } else if (cmd == "gen-samples-presets") {
+      qDebug() << "Generating same-microfaces samples presets for anisotropic and isotropic schemes.";
+      w.exportSameMicrofacesPresets(minEdge.toDouble(), maxEdge.toDouble());
     }
     exit(0);
   }

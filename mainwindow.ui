@@ -360,7 +360,7 @@
          <string>(3) 500 Faces</string>
         </property>
        </widget>
-       <widget class="QPushButton" name="demo125faces">
+       <widget class="QPushButton" name="demo124faces">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -370,7 +370,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>(1) 125 Faces</string>
+         <string>(1) 124 Faces</string>
         </property>
        </widget>
        <widget class="QPushButton" name="loadBaseMesh">
