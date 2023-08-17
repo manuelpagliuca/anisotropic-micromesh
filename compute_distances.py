@@ -81,6 +81,8 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
 
+      output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
+
       for key, value in ms.get_hausdorff_distance().items():
         output_file.write(str(value) + " ")
 
@@ -105,6 +107,7 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
+
       output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
 
       for key, value in ms.get_hausdorff_distance().items():
@@ -126,6 +129,7 @@ def hausdorff_same_target_edges(base_mesh_name, metric_name, target_mesh_path, d
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
+
       output_file.write(str(extract_last_decimal_number_from_string(displaced_mesh_path)) + " ")
 
       for key, value in ms.get_hausdorff_distance().items():
@@ -146,6 +150,7 @@ def hausdorff_same_target_edges(base_mesh_name, metric_name, target_mesh_path, d
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
+
       output_file.write(str(extract_last_decimal_number_from_string(displaced_mesh_path)) + " ")
 
       for key, value in ms.get_hausdorff_distance().items():
