@@ -118,11 +118,11 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
   print(f"Hausdorff's distances > {outputDir}/hausdorff_microfaces_aniso.txt")
 
 
-def hausdorff_same_target_edges(base_mesh_name, metric_name, target_mesh_path, dir_path_micro, dir_path_aniso):
+def hausdorff_same_target_edges(base_mesh_name, criteria_name, target_mesh_path, dir_path_micro, dir_path_aniso):
   file_list = glob.glob(os.path.join(dir_path_micro, "*"))
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
-  with open(f"./Output/Evaluation/{metric_name}/micro/hausdorff_{base_mesh_name}.txt", "w") as output_file:
+  with open(f"./Output/Evaluation/{criteria_name}/micro/hausdorff_{base_mesh_name}.txt", "w") as output_file:
     output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
     for displaced_mesh_path in displaced_meshes:
@@ -138,12 +138,12 @@ def hausdorff_same_target_edges(base_mesh_name, metric_name, target_mesh_path, d
       output_file.write("\n")
 
   print(
-      f"Hausdorff's distances > ./Output/Evaluation/{metric_name}/micro/hausdorff_{base_mesh_name}.txt")
+      f"Hausdorff's distances > ./Output/Evaluation/{criteria_name}/micro/hausdorff_{base_mesh_name}.txt")
 
   file_list = glob.glob(os.path.join(dir_path_aniso, "*"))
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
-  with open(f"./Output/Evaluation/{metric_name}/aniso/hausdorff_{base_mesh_name}.txt", "w") as output_file:
+  with open(f"./Output/Evaluation/{criteria_name}/aniso/hausdorff_{base_mesh_name}.txt", "w") as output_file:
     output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
     for displaced_mesh_path in displaced_meshes:
@@ -158,7 +158,7 @@ def hausdorff_same_target_edges(base_mesh_name, metric_name, target_mesh_path, d
 
       output_file.write("\n")
   print(
-      f"Hausdorff's distances > ./Output/Evaluation/{metric_name}/aniso/hausdorff_{base_mesh_name}.txt")
+      f"Hausdorff's distances > ./Output/Evaluation/{criteria_name}/aniso/hausdorff_{base_mesh_name}.txt")
 
   output_file.close()
 
@@ -167,14 +167,14 @@ def hausdorff_same_target_edges(base_mesh_name, metric_name, target_mesh_path, d
 parser = argparse.ArgumentParser(description="Description of your application.")
 parser.add_argument("--base-mesh", default="pallas_5000.obj", help="Parameter 5 (base-mesh)")
 parser.add_argument("--target-mesh", default="pallas_124.obj", help="Parameter 6 (target)")
-parser.add_argument("--metric", default="same-target-edges", help="Parameter 7 (metric)")
+parser.add_argument("--criteria", default="same-target-edges", help="Parameter 7 (criteria)")
 parser.add_argument("--clean", help="Parameter 8 (clean flag)", action="store_true")
 args = parser.parse_args()
 
 # Setup paths
-metric_name = args.metric.replace("-", "_")
-dir_path_micro = f"./Output/Evaluation/{metric_name}/micro"
-dir_path_aniso = f"./Output/Evaluation/{metric_name}/aniso"
+criteria_name = args.criteria.replace("-", "_")
+dir_path_micro = f"./Output/Evaluation/{criteria_name}/micro"
+dir_path_aniso = f"./Output/Evaluation/{criteria_name}/aniso"
 target_mesh_path = "./Models/" + args.target_mesh
 target_mesh_faces = extract_last_integer_number_from_string(args.target_mesh[:-4])
 exe_path = os.path.join(os.getcwd(), "Debug", "master_thesis.exe")  # Should be changed to Release
@@ -183,9 +183,9 @@ if args.clean:
   delete_files_in_directory(dir_path_micro)
   delete_files_in_directory(dir_path_aniso)
 
-if args.metric == "same-microfaces":
+if args.criteria == "same-microfaces":
   hausdorff_same_microfaces(args.base_mesh[:-4], target_mesh_faces,
                             target_mesh_path, dir_path_micro, dir_path_aniso)
-elif args.metric == "same-target-edges":
-  hausdorff_same_target_edges(args.base_mesh[:-4], metric_name,
+elif args.criteria == "same-target-edges":
+  hausdorff_same_target_edges(args.base_mesh[:-4], criteria_name,
                               target_mesh_path, dir_path_micro, dir_path_aniso)
