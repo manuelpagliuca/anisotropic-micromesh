@@ -14,12 +14,12 @@
 
 Generic Python script
 ```py
-python compute-distances.py --base-mesh=model.obj --target-mesh=target.obj --criteria=same-microfaces
+python compute-distances.py --base-mesh=model.obj --target-mesh=target.obj --criterion=same-microfaces
 ```
 There are some default values if you omit some of the options:
 * `--base-mesh=pallas_124.obj`
 * `--target-mesh=pallas_5000.obj`
-* `--criteria=same-microfaces`
+* `--criterion=same-microfaces`
 
 There is also an optional criteria which uses same target edge length for the comparison between the displaced models.
 
