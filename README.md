@@ -30,7 +30,7 @@ There is also an optional criteria which uses same target edge length for the co
 ```
 
 ```cmd
-master_thesis.exe build-samples --base-mesh=pallas_125.obj --target=pallas_5000.obj --n=4 --min-edge=0.8 --max-edge=1.2
+anisotropic_micromesh.exe build-samples --base-mesh=pallas_125.obj --target=pallas_5000.obj --n=4 --min-edge=0.8 --max-edge=1.2
 ```
 
 ### Meshlab
