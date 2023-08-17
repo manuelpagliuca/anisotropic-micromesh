@@ -77,7 +77,6 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
     output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
     for displaced_mesh_path in displaced_meshes:
-      print(displaced_mesh_path, target_mesh_path)
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
@@ -96,7 +95,8 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
     if base_mesh_name in file:
       outputDir = file
 
-  displaced_meshes = glob.glob(os.path.join(outputDir, "*"))
+  file_list = glob.glob(os.path.join(outputDir, "*"))
+  displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
   with open(f"{outputDir}/hausdorff_{base_mesh_name}_to_{target_mesh_faces}.txt", "w") as output_file:
     output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
@@ -117,11 +117,12 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
 
 def hausdorff_same_target_edges(metric_name, target_mesh_path, dir_path_micro, dir_path_aniso):
   file_list = glob.glob(os.path.join(dir_path_micro, "*"))
+  displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
   with open(f"./Output/Evaluation/{metric_name}/hausdorff_micro.txt", "w") as output_file:
     output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
-    for displaced_mesh_path in file_list:
+    for displaced_mesh_path in displaced_meshes:
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
@@ -135,11 +136,12 @@ def hausdorff_same_target_edges(metric_name, target_mesh_path, dir_path_micro, d
   print(f"Hausdorff's distances > ./Output/Evaluation/{metric_name}/hausdorff_micro.txt")
 
   file_list = glob.glob(os.path.join(dir_path_aniso, "*"))
+  displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
   with open(f"./Output/Evaluation/{metric_name}/hausdorff_aniso.txt", "w") as output_file:
     output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
-    for displaced_mesh_path in file_list:
+    for displaced_mesh_path in displaced_meshes:
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
