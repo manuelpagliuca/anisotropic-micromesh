@@ -1,4 +1,4 @@
-#include "Mainwindow.h"
+#include "Headers/Mainwindow.h"
 #include <QtWidgets/QApplication>
 
 int main(int argc, char *argv[])
@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     QCommandLineOption targetOption("target-mesh", "Target mesh (default: pallas_5000.obj)", "target-mesh");
     parser.addOption(targetOption);
 
-    QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_5000.obj)", "base-mesh");
+    QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_124.obj)", "base-mesh");
     parser.addOption(baseMeshOption);
 
     QCommandLineOption metricOption("metric", "Metric option (default: same-target-edges)", "same-target-edges");
@@ -33,7 +33,6 @@ int main(int argc, char *argv[])
     parser.addOption(presetFileNameOption);
 
     parser.process(a);
-    qDebug() << "jersdfg";
 
     QString metric = parser.value(metricOption);
     QString nSamples = parser.value(samplesOption);
@@ -48,13 +47,12 @@ int main(int argc, char *argv[])
     if (minEdge.isEmpty())          minEdge = "0.7";
     if (maxEdge.isEmpty())          maxEdge = "10.0";
     if (targetMesh.isEmpty())       targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty())         baseMesh = "pallas_250.obj";
-    if (presetFileName.isEmpty())   baseMesh = "";
+    if (baseMesh.isEmpty())         baseMesh = "pallas_124.obj";
+    if (presetFileName.isEmpty())   presetFileName = "";
 
     QLocale locale(QLocale::C);
     minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
     maxEdge = locale.toString(maxEdge.toDouble(), 'f', 1);
-    qDebug() << cmd;
 
     if (cmd == "gen-samples") {
       w.loadBaseMesh(baseMesh);
@@ -69,6 +67,7 @@ int main(int argc, char *argv[])
       }
     } else if (cmd == "gen-samples-presets") {
       qDebug() << "Generating same-microfaces samples presets for anisotropic and isotropic schemes.";
+      w.loadBaseMesh(baseMesh);
       w.exportSameMicrofacesPresets(minEdge.toDouble(), maxEdge.toDouble());
     }
     exit(0);

@@ -1,4 +1,4 @@
-#include "Mainwindow.h"
+#include "Headers/Mainwindow.h"
 
 void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double minEdge, double maxEdge)
 {
@@ -68,7 +68,6 @@ void Mainwindow::exportSameMicrofacesPresets(double minEdge, double maxEdge)
 {
   Mesh micro, aniso;
   std::vector<float> microDisplacements, anisoDisplacements;
-
   std::string outputFileName = "./Output/Evaluation/same_microfaces/presets/" +
                                 baseMeshNameAndDetail +
                                 "_micro_aniso_target_lengths_matches.txt";
