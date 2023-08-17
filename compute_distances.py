@@ -115,11 +115,11 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
   print(f"Hausdorff's distances > {outputDir}/hausdorff_microfaces_aniso.txt")
 
 
-def hausdorff_same_target_edges(metric_name, target_mesh_path, dir_path_micro, dir_path_aniso):
+def hausdorff_same_target_edges(base_mesh_name, metric_name, target_mesh_path, dir_path_micro, dir_path_aniso):
   file_list = glob.glob(os.path.join(dir_path_micro, "*"))
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
-  with open(f"./Output/Evaluation/{metric_name}/hausdorff_micro.txt", "w") as output_file:
+  with open(f"./Output/Evaluation/{metric_name}/micro/hausdorff_{base_mesh_name}.txt", "w") as output_file:
     output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
     for displaced_mesh_path in displaced_meshes:
@@ -133,12 +133,13 @@ def hausdorff_same_target_edges(metric_name, target_mesh_path, dir_path_micro, d
 
       output_file.write("\n")
 
-  print(f"Hausdorff's distances > ./Output/Evaluation/{metric_name}/hausdorff_micro.txt")
+  print(
+      f"Hausdorff's distances > ./Output/Evaluation/{metric_name}/micro/hausdorff_{base_mesh_name}.txt")
 
   file_list = glob.glob(os.path.join(dir_path_aniso, "*"))
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
-  with open(f"./Output/Evaluation/{metric_name}/hausdorff_aniso.txt", "w") as output_file:
+  with open(f"./Output/Evaluation/{metric_name}/aniso/hausdorff_{base_mesh_name}.txt", "w") as output_file:
     output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
 
     for displaced_mesh_path in displaced_meshes:
@@ -151,7 +152,8 @@ def hausdorff_same_target_edges(metric_name, target_mesh_path, dir_path_micro, d
         output_file.write(str(value) + " ")
 
       output_file.write("\n")
-  print(f"Hausdorff's distances > ./Output/Evaluation/{metric_name}/hausdorff_aniso.txt")
+  print(
+      f"Hausdorff's distances > ./Output/Evaluation/{metric_name}/aniso/hausdorff_{base_mesh_name}.txt")
 
   output_file.close()
 
@@ -180,5 +182,5 @@ if args.metric == "same-microfaces":
   hausdorff_same_microfaces(args.base_mesh[:-4], target_mesh_faces,
                             target_mesh_path, dir_path_micro, dir_path_aniso)
 elif args.metric == "same-target-edges":
-  hausdorff_same_target_edges(metric_name, dir_path_micro,
-                              target_mesh_path, dir_path_aniso)
+  hausdorff_same_target_edges(args.base_mesh[:-4], metric_name,
+                              target_mesh_path, dir_path_micro, dir_path_aniso)
