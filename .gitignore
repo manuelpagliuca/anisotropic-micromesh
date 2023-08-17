@@ -1,8 +1,7 @@
 # Folders
-debug
-release
-dependencies
-notes
+Debug
+Release
+Dependencies
 .qtc_clangd
 
 
