@@ -26,15 +26,15 @@ int main(int argc, char *argv[])
     QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_124.obj)", "base-mesh");
     parser.addOption(baseMeshOption);
 
-    QCommandLineOption metricOption("metric", "Metric option (default: same-target-edges)", "same-target-edges");
-    parser.addOption(metricOption);
+    QCommandLineOption criterionOption("criterion", "Criterion option (default: same-target-edges)", "same-target-edges");
+    parser.addOption(criterionOption);
 
     QCommandLineOption presetFileNameOption("preset", "Preset file name (default: )", "preset");
     parser.addOption(presetFileNameOption);
 
     parser.process(a);
 
-    QString metric = parser.value(metricOption);
+    QString criterion = parser.value(criterionOption);
     QString nSamples = parser.value(samplesOption);
     QString minEdge = parser.value(minEdgeOption);
     QString maxEdge = parser.value(maxEdgeOption);
@@ -42,13 +42,13 @@ int main(int argc, char *argv[])
     QString baseMesh = parser.value(baseMeshOption);
     QString presetFileName = parser.value(presetFileNameOption);
 
-    if (metric.isEmpty())           metric = "same-target-edges";
-    if (nSamples.isEmpty())         nSamples = "5";
-    if (minEdge.isEmpty())          minEdge = "0.7";
-    if (maxEdge.isEmpty())          maxEdge = "10.0";
-    if (targetMesh.isEmpty())       targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty())         baseMesh = "pallas_124.obj";
-    if (presetFileName.isEmpty())   presetFileName = "";
+    if (criterion.isEmpty())      criterion = "same-target-edges";
+    if (nSamples.isEmpty())       nSamples = "5";
+    if (minEdge.isEmpty())        minEdge = "0.7";
+    if (maxEdge.isEmpty())        maxEdge = "10.0";
+    if (targetMesh.isEmpty())     targetMesh = "pallas_5000.obj";
+    if (baseMesh.isEmpty())       baseMesh = "pallas_124.obj";
+    if (presetFileName.isEmpty()) presetFileName = "";
 
     QLocale locale(QLocale::C);
     minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
@@ -58,10 +58,10 @@ int main(int argc, char *argv[])
       w.loadBaseMesh(baseMesh);
       w.loadTargetMesh(targetMesh);
 
-      if (metric == "same-target-edges") {
+      if (criterion == "same-target-edges") {
         qDebug() << "Generating samples for anisotropic and isotropic schemes with same target edge lenght.";
         w.exportDisplacedSamplesSameTargetEdgeMetric(nSamples.toInt(), minEdge.toDouble(), maxEdge.toDouble());
-      } else if(metric == "same-microfaces") {
+      } else if(criterion == "same-microfaces") {
         qDebug() << "Generating samples for anisotropic and isotropic schemes with same amount of microfaces.";
         w.exportDisplacedSamplesWithSameFacesAmount(minEdge.toDouble(), maxEdge.toDouble(), presetFileName);
       }
