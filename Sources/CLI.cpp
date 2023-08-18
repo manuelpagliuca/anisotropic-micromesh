@@ -68,10 +68,17 @@ void Mainwindow::exportSameMicrofacesPresets(double minEdge, double maxEdge)
 {
   Mesh micro, aniso;
   std::vector<float> microDisplacements, anisoDisplacements;
-  std::string outputFileName = "./Output/Evaluation/same_microfaces/presets/" +
+
+  std::string minEdgeStr = std::to_string(minEdge);
+  std::string maxEdgeStr = std::to_string(maxEdge);
+  minEdgeStr = minEdgeStr.substr(0, minEdgeStr.find(".") + 3); // Extract 2 decimal places
+  maxEdgeStr = maxEdgeStr.substr(0, maxEdgeStr.find(".") + 3); // Extract 2 decimal places
+
+  std::string outputFilePath = "./Output/Evaluation/same_microfaces/presets/" +
                                 baseMeshNameAndDetail +
-                                "_micro_aniso_target_lengths_matches.txt";
-  QFile presetFile (outputFileName.c_str());
+                                "_minEdge_" + minEdgeStr +
+                                "_maxEdge_" + maxEdgeStr + ".txt";
+  QFile presetFile (outputFilePath.c_str());
 
   if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qDebug() << "Failed to open file for writing.";
@@ -130,6 +137,8 @@ void Mainwindow::exportSameMicrofacesPresets(double minEdge, double maxEdge)
       }
     }
   }
+
+  qDebug() << "Preset generated at " << QString::fromStdString(outputFilePath);
 
   presetFile.close();
 }
