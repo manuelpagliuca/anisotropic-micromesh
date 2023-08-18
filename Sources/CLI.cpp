@@ -64,25 +64,23 @@ void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double
     }
 }
 
-void Mainwindow::exportSameMicrofacesPresets(double minEdge, double maxEdge)
+QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
 {
   Mesh micro, aniso;
   std::vector<float> microDisplacements, anisoDisplacements;
 
   std::string minEdgeStr = std::to_string(minEdge);
   std::string maxEdgeStr = std::to_string(maxEdge);
-  minEdgeStr = minEdgeStr.substr(0, minEdgeStr.find(".") + 3); // Extract 2 decimal places
-  maxEdgeStr = maxEdgeStr.substr(0, maxEdgeStr.find(".") + 3); // Extract 2 decimal places
+  minEdgeStr = minEdgeStr.substr(0, minEdgeStr.find(".") + 3);
+  maxEdgeStr = maxEdgeStr.substr(0, maxEdgeStr.find(".") + 3);
 
-  std::string outputFilePath = "./Output/Evaluation/same_microfaces/presets/" +
-                                baseMeshNameAndDetail +
-                                "_minEdge_" + minEdgeStr +
-                                "_maxEdge_" + maxEdgeStr + ".txt";
-  QFile presetFile (outputFilePath.c_str());
+  QString presetFileName = QString::fromStdString(baseMeshNameAndDetail + "_minEdge_" + minEdgeStr + "_maxEdge_" + maxEdgeStr + ".txt");
+  QString outputFilePath = QString::fromStdString("./Output/Evaluation/same_microfaces/presets/") + presetFileName;
+  QFile presetFile (outputFilePath);
 
   if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
     qDebug() << "Failed to open file for writing.";
-    return;
+    return QString("");
   }
 
   std::vector<int> microMeshFaces;
@@ -138,19 +136,20 @@ void Mainwindow::exportSameMicrofacesPresets(double minEdge, double maxEdge)
     }
   }
 
-  qDebug() << "Preset generated at " << QString::fromStdString(outputFilePath);
+  qDebug() << "Preset generated at " << outputFilePath;
 
   presetFile.close();
+  return presetFileName;
 }
 
 void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge, QString presetFileName)
 {
-  if (!presetFileName.isEmpty()) {
-    QString presetDirPath(QString::fromStdString("./Output/Evaluation/same_microfaces/presets/") + presetFileName);
-    exportDisplacedSamples(presetDirPath);
-  } else {
-    exportSameMicrofacesPresets(minEdge, maxEdge);
+  if (presetFileName.isEmpty()) {
+    presetFileName = exportSameMicrofacesPreset(minEdge, maxEdge);
   }
+
+  QString presetDirPath(QString::fromStdString("./Output/Evaluation/same_microfaces/presets/") + presetFileName);
+  exportDisplacedSamples(presetDirPath);
 }
 
 void Mainwindow::exportDisplacedSamples(const QString presetDirPath)

@@ -68,7 +68,7 @@ int main(int argc, char *argv[])
     } else if (cmd == "gen-samples-presets") {
       qDebug() << "Generating same-microfaces samples presets for anisotropic and isotropic schemes.";
       w.loadBaseMesh(baseMesh);
-      w.exportSameMicrofacesPresets(minEdge.toDouble(), maxEdge.toDouble());
+      w.exportSameMicrofacesPreset(minEdge.toDouble(), maxEdge.toDouble());
     }
     exit(0);
   }
