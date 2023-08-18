@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     QCommandLineOption metricOption("metric", "Metric option (default: same-target-edges)", "same-target-edges");
     parser.addOption(metricOption);
 
-    QCommandLineOption presetFileNameOption("preset-path", "Preset path (default: )", "preset-path");
+    QCommandLineOption presetFileNameOption("preset", "Preset file name (default: )", "preset");
     parser.addOption(presetFileNameOption);
 
     parser.process(a);

@@ -146,22 +146,17 @@ void Mainwindow::exportSameMicrofacesPresets(double minEdge, double maxEdge)
 void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge, QString presetFileName)
 {
   if (!presetFileName.isEmpty()) {
-    QString microDirPath(QString::fromStdString("./Output/Evaluation/same_microfaces/") + presetFileName);
-    QFile presetFile = QFile(microDirPath.toStdString().c_str());
-
-    if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
-      qDebug() << "Failed to open preset file for writing.";
-      return;
-    }
-
-    exportDisplacedSamples(presetFile);
+    QString presetDirPath(QString::fromStdString("./Output/Evaluation/same_microfaces/presets/") + presetFileName);
+    exportDisplacedSamples(presetDirPath);
   } else {
     exportSameMicrofacesPresets(minEdge, maxEdge);
   }
 }
 
-void Mainwindow::exportDisplacedSamples(QFile &presetFile)
+void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
 {
+  QFile presetFile = QFile(presetDirPath);
+
   if (!presetFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
     qDebug() << "Failed to open file for reading.";
     return;
@@ -212,6 +207,7 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
         + "_faces_" + std::to_string(faces);
 
       micro.exportOBJ(microFilePath.c_str());
+      qDebug() << "Micromesh sample exported " + QString::fromStdString(microFilePath);
 
       Mesh aniso = baseMesh;
 
@@ -242,6 +238,7 @@ void Mainwindow::exportDisplacedSamples(QFile &presetFile)
         + "_faces_" + std::to_string(faces);
 
       aniso.exportOBJ(anisoFilePath.c_str());
+      qDebug() << "Anisotropic micro-mesh sample exported " + QString::fromStdString(anisoFilePath);
     }
   }
 
