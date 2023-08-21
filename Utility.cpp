@@ -1,4 +1,4 @@
-#include "Headers/Utility.h"
+#include "Utility.h"
 
 int nearestRoundPow2(float edgeLength)
 {

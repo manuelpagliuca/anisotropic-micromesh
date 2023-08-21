@@ -9,33 +9,33 @@ TARGET = "anisotropic_micromesh"
 INCLUDEPATH += $$PWD/dependencies
 
 SOURCES += \
-  Sources/CLI.cpp \
-  Sources/GLWidget.cpp \
-  Sources/MeshDebug.cpp \
-  Sources/MeshTest.cpp \
-  Sources/MeshUtils.cpp \
-  Sources/Ray.cpp \
-  Sources/Utility.cpp \
-  Sources/BoundingBox.cpp \
-  Sources/Mainwindow.cpp \
-  Sources/Mesh.cpp \
-  Sources/Shader.cpp \
-  Sources/Main.cpp \
-  Sources/Trackball.cpp
+  CLI.cpp \
+  GLWidget.cpp \
+  MeshDebug.cpp \
+  MeshTest.cpp \
+  MeshUtils.cpp \
+  Ray.cpp \
+  Utility.cpp \
+  BoundingBox.cpp \
+  Mainwindow.cpp \
+  Mesh.cpp \
+  Shader.cpp \
+  Main.cpp \
+  Trackball.cpp
 
 HEADERS += \
-  Headers/BoundingBox.h \
-  Headers/Debug.h \
-  Headers/Edge.h \
-  Headers/Face.h \
-  Headers/GLWidget.h \
-  Headers/Mainwindow.h \
-  Headers/Mesh.h \
-  Headers/Ray.h \
-  Headers/Shader.h \
-  Headers/Trackball.h \
-  Headers/Utility.h \
-  Headers/Vertex.h
+  BoundingBox.h \
+  Debug.h \
+  Edge.h \
+  Face.h \
+  GLWidget.h \
+  Mainwindow.h \
+  Mesh.h \
+  Ray.h \
+  Shader.h \
+  Trackball.h \
+  Utility.h \
+  Vertex.h
 
 FORMS += \
   mainwindow.ui

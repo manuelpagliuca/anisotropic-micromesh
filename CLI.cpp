@@ -1,4 +1,4 @@
-#include "Headers/Mainwindow.h"
+#include "Mainwindow.h"
 
 void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double minEdge, double maxEdge)
 {
