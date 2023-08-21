@@ -20,9 +20,11 @@ void Mainwindow::initUI()
   ui.actionVertex_displacement->setEnabled(false);
   ui.exportCurrentOBJ->setEnabled(false);
   ui.exportCurrentOFF->setEnabled(false);
+  ui.radioTargetEdgeLength->setEnabled(false);
+  ui.radioTargetMicroFaces->setEnabled(false);
   ui.wireframeToggle->toggle();
 
-  // Edge length slider
+  // Target edge length slider
   ui.edgeLengthSlider->setEnabled(true);
   int minIntValue = 90;    // 1.0
   int maxIntValue = 1000;   // 10.0
@@ -31,6 +33,9 @@ void Mainwindow::initUI()
   int numDecimalValues = (maxIntValue - minIntValue) / (decimalPrecision * 100);
   ui.edgeLengthSlider->setSingleStep(numDecimalValues);
   ui.edgeLengthSlider->setValue(100); // 1.0
+
+  // Micro-faces slider
+  ui.microFacesSlider->setEnabled(false);
 
   // Displacement slider
   ui.displacementSlider->setEnabled(false);
@@ -514,6 +519,9 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
   ui.morphingGroupBox->setEnabled(true);
   ui.edgeLengthSlider->setEnabled(true);
+  ui.radioTargetEdgeLength->setEnabled(true);
+  ui.radioTargetEdgeLength->setChecked(true);
+  ui.radioTargetMicroFaces->setEnabled(true);
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
@@ -531,8 +539,9 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   ui.currentMeshLabel->setText("Subdivided mesh");
   ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
-  ui.morphingGroupBox->setEnabled(true);
-  ui.edgeLengthSlider->setEnabled(true);
+  ui.radioTargetEdgeLength->setEnabled(true);
+  ui.radioTargetEdgeLength->setChecked(true);
+  ui.radioTargetMicroFaces->setEnabled(true);
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
@@ -613,6 +622,11 @@ void Mainwindow::on_displacementSlider_valueChanged(int value) {
   ui.currentMeshLabel->setText("Projected mesh");
 }
 
+void Mainwindow::on_microFacesSlider_valueChanged(int value)
+{
+  qDebug() << "This amount of micro-faces has to be set for both the subdivision schemes...(approx)";
+}
+
 void Mainwindow::on_wireframeToggle_stateChanged()
 {
   ui.openGLWidget->wireframePaint();
@@ -679,3 +693,16 @@ void Mainwindow::on_exportCurrentOFF_clicked()
     projectedMesh.exportOFF(fileName);
 }
 
+
+void Mainwindow::on_radioTargetEdgeLength_clicked()
+{
+  ui.edgeLengthSlider->setEnabled(true);
+  ui.microFacesSlider->setEnabled(false);
+}
+
+
+void Mainwindow::on_radioTargetMicroFaces_clicked()
+{
+  ui.microFacesSlider->setEnabled(true);
+  ui.edgeLengthSlider->setEnabled(false);
+}

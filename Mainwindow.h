@@ -98,6 +98,7 @@ public slots:
 
   void on_edgeLengthSlider_valueChanged(int value);
   void on_displacementSlider_valueChanged(int value);
+  void on_microFacesSlider_valueChanged(int value);
 
   void on_target250faces_clicked();
   void on_target500faces_clicked();
@@ -111,6 +112,8 @@ public slots:
 private slots:
   void on_loadBaseMesh_clicked();
   void on_loadTargetMesh_clicked();
+  void on_radioTargetEdgeLength_clicked();
+  void on_radioTargetMicroFaces_clicked();
 };
 
 #endif // MAIN_WINDOW_H

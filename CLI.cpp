@@ -91,7 +91,7 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
     micro = baseMesh;
     micro.updateEdgesSubdivisionLevelsMicromesh(microLength);
     micro = micro.micromeshSubdivide();
-    microMeshFaces.push_back(micro.faces.size());
+    microMeshFaces.push_back(int(micro.faces.size()));
 
     #pragma omp critical
     {
@@ -107,7 +107,7 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
     aniso = baseMesh;
     aniso.updateEdgesSubdivisionLevelsAniso(anisoLength);
     aniso = aniso.anisotropicMicromeshSubdivide();
-    anisoMeshFaces.push_back(aniso.faces.size());
+    anisoMeshFaces.push_back(int(aniso.faces.size()));
 
     #pragma omp critical
     {
