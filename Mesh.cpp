@@ -333,7 +333,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     }
 
     // add microfaces
-    auto toIndexV = [&](ivec2 v) { return v.y * aniso * (v.y + 1) / 2 + v.x; };
+    auto toVertexIndex = [&](ivec2 v) { return v.y * aniso * (v.y + 1) / 2 + v.x; };
 
     for (int fy = 0; fy < m; fy++) {
       for (int fx = 0; fx < (n + aniso - 1); fx++) {
@@ -345,7 +345,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
           v2 = ivec2(n + aniso - 1, m) - v2;
         }
 
-        subdivided.addFace(k + toIndexV(v0), k + toIndexV(v1), k + toIndexV(v2));
+        subdivided.addFace(k + toVertexIndex(v0), k + toVertexIndex(v1), k + toVertexIndex(v2));
       }
     }
   }
