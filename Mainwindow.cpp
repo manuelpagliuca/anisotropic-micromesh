@@ -522,6 +522,8 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   ui.radioTargetEdgeLength->setEnabled(true);
   ui.radioTargetEdgeLength->setChecked(true);
   ui.radioTargetMicroFaces->setEnabled(true);
+  ui.microFacesSlider->setMinimum(subdividedMesh.faces.size());
+  ui.microFacesSlider->setMaximum(subdividedMesh.faces.size() * 3);
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
@@ -539,9 +541,14 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   ui.currentMeshLabel->setText("Subdivided mesh");
   ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
+  ui.morphingGroupBox->setEnabled(true);
+  ui.edgeLengthSlider->setEnabled(true);
   ui.radioTargetEdgeLength->setEnabled(true);
   ui.radioTargetEdgeLength->setChecked(true);
   ui.radioTargetMicroFaces->setEnabled(true);
+  ui.microFacesSlider->setMinimum(subdividedMesh.faces.size());
+  ui.microFacesSlider->setMaximum(subdividedMesh.faces.size() * 3);
+
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
@@ -624,7 +631,8 @@ void Mainwindow::on_displacementSlider_valueChanged(int value) {
 
 void Mainwindow::on_microFacesSlider_valueChanged(int value)
 {
-  qDebug() << "This amount of micro-faces has to be set for both the subdivision schemes...(approx)";
+  qDebug() << "Amount of micro-faces: " << value;
+  ui.microFacesCurrentValue->setText(QString::number(value));
 }
 
 void Mainwindow::on_wireframeToggle_stateChanged()

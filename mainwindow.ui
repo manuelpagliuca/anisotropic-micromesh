@@ -71,7 +71,7 @@
          <rect>
           <x>10</x>
           <y>20</y>
-          <width>71</width>
+          <width>81</width>
           <height>24</height>
          </rect>
         </property>
@@ -82,9 +82,9 @@
        <widget class="QPushButton" name="anisotropic_micromesh_subdivision">
         <property name="geometry">
          <rect>
-          <x>90</x>
+          <x>100</x>
           <y>20</y>
-          <width>141</width>
+          <width>151</width>
           <height>24</height>
          </rect>
         </property>
@@ -160,9 +160,9 @@
        <widget class="QLabel" name="microFacesCurrentValue">
         <property name="geometry">
          <rect>
-          <x>290</x>
+          <x>280</x>
           <y>90</y>
-          <width>21</width>
+          <width>31</width>
           <height>16</height>
          </rect>
         </property>
@@ -196,7 +196,7 @@
          <rect>
           <x>10</x>
           <y>20</y>
-          <width>61</width>
+          <width>71</width>
           <height>24</height>
          </rect>
         </property>
@@ -207,7 +207,7 @@
        <widget class="QPushButton" name="target1000faces">
         <property name="geometry">
          <rect>
-          <x>150</x>
+          <x>170</x>
           <y>20</y>
           <width>71</width>
           <height>24</height>
@@ -220,9 +220,9 @@
        <widget class="QPushButton" name="target500faces">
         <property name="geometry">
          <rect>
-          <x>80</x>
+          <x>90</x>
           <y>20</y>
-          <width>61</width>
+          <width>71</width>
           <height>24</height>
          </rect>
         </property>
@@ -233,8 +233,8 @@
        <widget class="QPushButton" name="target2500faces">
         <property name="geometry">
          <rect>
-          <x>230</x>
-          <y>20</y>
+          <x>10</x>
+          <y>50</y>
           <width>71</width>
           <height>24</height>
          </rect>
@@ -246,7 +246,7 @@
        <widget class="QPushButton" name="target5000faces">
         <property name="geometry">
          <rect>
-          <x>10</x>
+          <x>90</x>
           <y>50</y>
           <width>71</width>
           <height>24</height>
@@ -272,9 +272,9 @@
        <widget class="QPushButton" name="loadTargetMesh">
         <property name="geometry">
          <rect>
-          <x>90</x>
+          <x>170</x>
           <y>50</y>
-          <width>21</width>
+          <width>31</width>
           <height>24</height>
          </rect>
         </property>
@@ -287,7 +287,7 @@
          <rect>
           <x>10</x>
           <y>130</y>
-          <width>71</width>
+          <width>81</width>
           <height>24</height>
          </rect>
         </property>
@@ -298,9 +298,9 @@
        <widget class="QPushButton" name="exportCurrentOFF">
         <property name="geometry">
          <rect>
-          <x>90</x>
+          <x>100</x>
           <y>130</y>
-          <width>71</width>
+          <width>81</width>
           <height>24</height>
          </rect>
         </property>
@@ -352,7 +352,7 @@
          <rect>
           <x>10</x>
           <y>50</y>
-          <width>81</width>
+          <width>91</width>
           <height>24</height>
          </rect>
         </property>
@@ -363,9 +363,9 @@
        <widget class="QPushButton" name="demo250faces">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>110</x>
           <y>20</y>
-          <width>81</width>
+          <width>91</width>
           <height>24</height>
          </rect>
         </property>
@@ -376,9 +376,9 @@
        <widget class="QPushButton" name="demo500faces">
         <property name="geometry">
          <rect>
-          <x>190</x>
+          <x>210</x>
           <y>20</y>
-          <width>81</width>
+          <width>91</width>
           <height>24</height>
          </rect>
         </property>
@@ -391,7 +391,7 @@
          <rect>
           <x>10</x>
           <y>20</y>
-          <width>81</width>
+          <width>91</width>
           <height>24</height>
          </rect>
         </property>
@@ -402,9 +402,9 @@
        <widget class="QPushButton" name="loadBaseMesh">
         <property name="geometry">
          <rect>
-          <x>100</x>
+          <x>110</x>
           <y>50</y>
-          <width>41</width>
+          <width>51</width>
           <height>24</height>
          </rect>
         </property>
