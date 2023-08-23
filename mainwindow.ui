@@ -856,9 +856,17 @@
     <property name="title">
      <string>File</string>
     </property>
+    <widget class="QMenu" name="menuExport">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionSubdivided_mesh"/>
+     <addaction name="actionProjected_mesh"/>
+    </widget>
     <addaction name="actionLoad"/>
     <addaction name="actionUnload"/>
-    <addaction name="actionSave"/>
+    <addaction name="menuExport"/>
+    <addaction name="separator"/>
     <addaction name="actionExit"/>
     <addaction name="separator"/>
    </widget>
@@ -914,11 +922,6 @@
     <string>Exit</string>
    </property>
   </action>
-  <action name="actionSave">
-   <property name="text">
-    <string>Save as...</string>
-   </property>
-  </action>
   <action name="actionUnload">
    <property name="text">
     <string>Unload mesh</string>
@@ -962,6 +965,16 @@
   <action name="actionUniform_subdivision">
    <property name="text">
     <string>Uniform subdivision</string>
+   </property>
+  </action>
+  <action name="actionSubdivided_mesh">
+   <property name="text">
+    <string>Subdivided mesh</string>
+   </property>
+  </action>
+  <action name="actionProjected_mesh">
+   <property name="text">
+    <string>Projected mesh</string>
    </property>
   </action>
  </widget>

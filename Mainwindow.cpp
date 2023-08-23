@@ -13,7 +13,6 @@ Mainwindow::Mainwindow(QWidget *parent) : QMainWindow(parent)
 
 void Mainwindow::initUI()
 {
-  ui.actionSave->setEnabled(false);
   ui.actionSubdivide->setEnabled(false);
   ui.actionUnload->setEnabled(false);
   ui.actionWireframe->setEnabled(false);
@@ -22,6 +21,9 @@ void Mainwindow::initUI()
   ui.exportCurrentOFF->setEnabled(false);
   ui.radioTargetEdgeLength->setEnabled(false);
   ui.radioTargetMicroFaces->setEnabled(false);
+  ui.actionSubdivided_mesh->setEnabled(false);
+  ui.actionProjected_mesh->setEnabled(false);
+
   ui.wireframeToggle->toggle();
 
   // Target edge length slider
@@ -66,7 +68,6 @@ void Mainwindow::setBaseMeshAndUI(const Mesh &mesh)
 {
   baseMesh = mesh;
   ui.openGLWidget->loadMeshData(baseMesh);
-  ui.actionSave->setEnabled(true);
   ui.actionSubdivide->setEnabled(true);
   ui.actionWireframe->setEnabled(true);
   ui.actionUnload->setEnabled(true);
@@ -286,8 +287,13 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
   else if (ev->key() == Qt::Key_5) on_actionLoad_triggered();
 }
 
-void Mainwindow::on_actionSave_triggered()
+void Mainwindow::on_actionProjected_mesh_triggered()
 {
+  if (!projectedMesh.isValid()) {
+    qDebug() << "There isn't a subdivision scheme applied to the base mesh.";
+    return;
+  }
+
   QString filePath = QFileDialog::getSaveFileName(this,
                                                   tr("Save Mesh"), "./Models",
                                                   tr("OFF File (*.off);;OBJ File (*.obj)"));
@@ -298,9 +304,32 @@ void Mainwindow::on_actionSave_triggered()
     std::string fileNameExt = filePath.mid(filePath.lastIndexOf("/")).toStdString();
     std::string fileName = fileNameExt.substr(1, fileNameExt.size() - 5);
 
-    if (ext == ".off") baseMesh.exportOFF(fileName, filePath);
-    else if (ext == ".obj") baseMesh.exportOBJ(fileName, filePath);
+    if (ext == ".off") projectedMesh.exportOFF(fileName, filePath);
+    else if (ext == ".obj") projectedMesh.exportOBJ(fileName, filePath);
   }
+}
+
+void Mainwindow::on_actionSubdivided_mesh_triggered()
+{
+  if (!subdividedMesh.isValid()) {
+    qDebug() << "There is no displacement applied to the subdivided mesh.";
+    return;
+  }
+
+  QString filePath = QFileDialog::getSaveFileName(this,
+                                                  tr("Save Mesh"), "./Models",
+                                                  tr("OFF File (*.off);;OBJ File (*.obj)"));
+
+  if (!filePath.isEmpty())
+  {
+    std::string ext = filePath.mid(filePath.lastIndexOf(".")).toStdString();
+    std::string fileNameExt = filePath.mid(filePath.lastIndexOf("/")).toStdString();
+    std::string fileName = fileNameExt.substr(1, fileNameExt.size() - 5);
+
+    if (ext == ".off") subdividedMesh.exportOFF(fileName, filePath);
+    else if (ext == ".obj") subdividedMesh.exportOBJ(fileName, filePath);
+  }
+
 }
 
 void Mainwindow::on_actionLoad_triggered()
@@ -434,11 +463,12 @@ void Mainwindow::on_actionUniform_subdivision_triggered()
 void Mainwindow::on_actionUnload_triggered()
 {
   ui.openGLWidget->unloadMeshData();
-  ui.actionSave->setEnabled(false);
   ui.actionSubdivide->setEnabled(false);
   ui.actionUnload->setEnabled(false);
   ui.actionWireframe->setEnabled(false);
   ui.actionVertex_displacement->setEnabled(false);
+  ui.actionProjected_mesh->setEnabled(false);
+  ui.actionSubdivided_mesh->setEnabled(false);
 }
 
 void Mainwindow::on_actionWireframe_triggered()
@@ -513,10 +543,13 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   ui.subdivisionSchemeLabel->setText("Micromesh");
   baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.micromeshSubdivide();
+
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.currentMeshLabel->setText("Subdivided mesh");
   ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
+
+  ui.actionSubdivided_mesh->setEnabled(true);
   ui.morphingGroupBox->setEnabled(true);
   ui.edgeLengthSlider->setEnabled(true);
 
@@ -541,8 +574,11 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
   ui.openGLWidget->updateMeshData(subdividedMesh);
   ui.currentMeshLabel->setText("Subdivided mesh");
+
   ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
+
+  ui.actionSubdivided_mesh->setEnabled(true);
   ui.morphingGroupBox->setEnabled(true);
   ui.edgeLengthSlider->setEnabled(true);
 
@@ -565,6 +601,7 @@ void Mainwindow::on_target250faces_clicked()
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ250));
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
+  ui.actionProjected_mesh->setEnabled(true);
 }
 
 void Mainwindow::on_target500faces_clicked()
@@ -573,6 +610,7 @@ void Mainwindow::on_target500faces_clicked()
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ500));
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
+  ui.actionProjected_mesh->setEnabled(true);
 }
 
 void Mainwindow::on_target1000faces_clicked()
@@ -581,6 +619,7 @@ void Mainwindow::on_target1000faces_clicked()
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ1000));
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
+  ui.actionProjected_mesh->setEnabled(true);
 }
 
 void Mainwindow::on_target2500faces_clicked()
@@ -589,6 +628,7 @@ void Mainwindow::on_target2500faces_clicked()
   setTargetAndResetDisplacementSlider(Mesh ::parseOBJ(pallasOBJ2500));
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
+  ui.actionProjected_mesh->setEnabled(true);
 }
 
 void Mainwindow::on_target5000faces_clicked()
@@ -597,6 +637,7 @@ void Mainwindow::on_target5000faces_clicked()
   setTargetAndResetDisplacementSlider(Mesh::parseOBJ(pallasOBJ5000));
   ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
   ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
+  ui.actionProjected_mesh->setEnabled(true);
 }
 
 void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
@@ -664,6 +705,7 @@ void Mainwindow::on_loadTargetMesh_clicked()
 
     ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
     ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
+    ui.actionProjected_mesh->setEnabled(true);
   }
 }
 

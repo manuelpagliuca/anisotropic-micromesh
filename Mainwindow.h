@@ -77,7 +77,8 @@ private:
 public slots:
   void on_actionLoad_triggered();
   void on_actionUnload_triggered();
-  void on_actionSave_triggered();
+  void on_actionProjected_mesh_triggered();
+  void on_actionSubdivided_mesh_triggered();
   void on_actionExit_triggered();
 
   void on_actionWireframe_triggered();
