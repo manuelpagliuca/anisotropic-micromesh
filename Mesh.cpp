@@ -286,13 +286,15 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
   Mesh subdivided = Mesh();
 
   for (const Face& f: faces) {
-    int w0, w1, w2; // w2 is the shortest edge
+    // w2 is the shortest edge
+    int w0, w1, w2;
 
+    // rule for setting w2 always as the shortest edge
     if (edges[f.edgesIndices[2]].subdivisions > edges[f.edgesIndices[1]].subdivisions) {
-      // 1 is the smallest edge
+      // f.edgesIndices[1] is the smallest edge
       w0 = 2; w1 = 0; w2 = 1;
     } else if (edges[f.edgesIndices[2]].subdivisions > edges[f.edgesIndices[0]].subdivisions) {
-      // 0 is the smallest edge
+      // f.edgesIndices[0] is the smallest edge
       w0 = 1; w1 = 2; w2 = 0;
     } else {
       w0 = 0, w1 = 1, w2 = 2;
