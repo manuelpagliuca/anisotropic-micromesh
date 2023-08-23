@@ -209,15 +209,19 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   return mesh;
 }
 
-void Mesh::exportOFF(const std::string &fileName) const
+void Mesh::exportOFF(const std::string &fileName, QString filePath) const
 {
   std::ostringstream oss;
   std::string fileNameExt = fileName + ".off";
-  std::string filePath = "./Output/" + fileNameExt;
-  std::ofstream fileStream(filePath.c_str(), std::ios::out);
+
+  if (filePath.isEmpty()) {
+    filePath = QString::fromStdString("./Output/" + fileNameExt);
+  }
+
+  std::ofstream fileStream(filePath.toStdString().c_str(), std::ios::out);
 
   if (!fileStream.is_open()) {
-    printf("Failed to open \'%s\'. File doesn't exist.", filePath.c_str());
+    printf("Failed to open \'%s\'. File doesn't exist.", filePath.toStdString().c_str());
     return;
   }
 
@@ -245,15 +249,19 @@ void Mesh::exportOFF(const std::string &fileName) const
   qDebug() << fileNameExt.c_str() << "has been exported.";
 }
 
-void Mesh::exportOBJ(const std::string &fName) const
+void Mesh::exportOBJ(const std::string &fName, QString filePath) const
 {
   std::ostringstream oss;
   std::string fileNameExt = fName + ".obj";
-  std::string filePath = "./Output/" + fileNameExt;
-  std::ofstream fileStream(filePath.c_str(), std::ios::out);
+
+  if (filePath.isEmpty()) {
+    filePath = QString::fromStdString("./Output/" + fileNameExt);
+  }
+
+  std::ofstream fileStream(filePath.toStdString().c_str(), std::ios::out);
 
   if (!fileStream.is_open()) {
-    printf("Failed to open \'%s\'. File doesn't exist.", filePath.c_str());
+    printf("Failed to open \'%s\'. File doesn't exist.", filePath.toStdString().c_str());
     return;
   }
 

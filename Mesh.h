@@ -83,8 +83,8 @@ public:
   std::vector<float> getDisplacements(const Mesh &target);
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);
-  void exportOFF(const std::string &fileName) const;
-  void exportOBJ(const std::string &fileName) const;
+  void exportOFF(const std::string &fileName, QString filePath = QString("")) const;
+  void exportOBJ(const std::string &fileName, QString filePath = QString("")) const;
 
 protected:
   void updateGL() {}

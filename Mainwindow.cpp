@@ -26,7 +26,7 @@ void Mainwindow::initUI()
 
   // Target edge length slider
   ui.edgeLengthSlider->setEnabled(true);
-  int minIntValue = 90;    // 1.0
+  int minIntValue = 10;    // 1.0
   int maxIntValue = 1000;   // 10.0
   ui.edgeLengthSlider->setRange(minIntValue, maxIntValue);
   double decimalPrecision = 0.01;
@@ -289,7 +289,7 @@ void Mainwindow::keyPressEvent(QKeyEvent *ev)
 void Mainwindow::on_actionSave_triggered()
 {
   QString filePath = QFileDialog::getSaveFileName(this,
-                                                  tr("Save Mesh"), "../Models",
+                                                  tr("Save Mesh"), "./Models",
                                                   tr("OFF File (*.off);;OBJ File (*.obj)"));
 
   if (!filePath.isEmpty())
@@ -298,8 +298,8 @@ void Mainwindow::on_actionSave_triggered()
     std::string fileNameExt = filePath.mid(filePath.lastIndexOf("/")).toStdString();
     std::string fileName = fileNameExt.substr(1, fileNameExt.size() - 5);
 
-    if (ext == ".off") baseMesh.exportOFF(fileName);
-    else if (ext == ".obj") baseMesh.exportOBJ(fileName);
+    if (ext == ".off") baseMesh.exportOFF(fileName, filePath);
+    else if (ext == ".obj") baseMesh.exportOBJ(fileName, filePath);
   }
 }
 
@@ -519,11 +519,13 @@ void Mainwindow::on_micromesh_subdivision_clicked()
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
   ui.morphingGroupBox->setEnabled(true);
   ui.edgeLengthSlider->setEnabled(true);
+
   ui.radioTargetEdgeLength->setEnabled(true);
   ui.radioTargetEdgeLength->setChecked(true);
   ui.radioTargetMicroFaces->setEnabled(true);
-  ui.microFacesSlider->setMinimum(subdividedMesh.faces.size());
-  ui.microFacesSlider->setMaximum(subdividedMesh.faces.size() * 3);
+
+  ui.microFacesSlider->setMinimum(int(subdividedMesh.faces.size()));
+  ui.microFacesSlider->setMaximum(int(subdividedMesh.faces.size() * 3));
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
@@ -543,12 +545,13 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
   ui.morphingGroupBox->setEnabled(true);
   ui.edgeLengthSlider->setEnabled(true);
+
   ui.radioTargetEdgeLength->setEnabled(true);
   ui.radioTargetEdgeLength->setChecked(true);
   ui.radioTargetMicroFaces->setEnabled(true);
-  ui.microFacesSlider->setMinimum(subdividedMesh.faces.size());
-  ui.microFacesSlider->setMaximum(subdividedMesh.faces.size() * 3);
 
+  ui.microFacesSlider->setMinimum(int(subdividedMesh.faces.size()));
+  ui.microFacesSlider->setMaximum(int(subdividedMesh.faces.size() * 3));
 
   if (ui.displacementSlider->isEnabled()) {
     disableDisplacementSlider();
