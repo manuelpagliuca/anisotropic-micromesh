@@ -56,7 +56,7 @@ protected:
 
   std::string extractFileName(const std::string& fullPath);
 
-private:
+public:
   Ui::mainWindowClass ui;
   std::string readFile(const char *file_loc);
 

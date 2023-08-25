@@ -29,8 +29,11 @@ int main(int argc, char *argv[])
     QCommandLineOption criterionOption("criterion", "Criterion option (default: same-target-edges)", "same-target-edges");
     parser.addOption(criterionOption);
 
-    QCommandLineOption presetFileNameOption("preset", "Preset file name (default: )", "preset");
+    QCommandLineOption presetFileNameOption("preset", "Preset file name", "preset");
     parser.addOption(presetFileNameOption);
+
+    QCommandLineOption microfacesAmountOption("microfaces", "Microfaces amount (default: two times base-mesh faces)", "microfaces");
+    parser.addOption(microfacesAmountOption);
 
     parser.process(a);
 
@@ -41,21 +44,24 @@ int main(int argc, char *argv[])
     QString targetMesh = parser.value(targetOption);
     QString baseMesh = parser.value(baseMeshOption);
     QString presetFileName = parser.value(presetFileNameOption);
+    QString microfacesAmount = parser.value(microfacesAmountOption);
 
-    if (criterion.isEmpty())      criterion = "same-target-edges";
-    if (nSamples.isEmpty())       nSamples = "5";
-    if (minEdge.isEmpty())        minEdge = "0.7";
-    if (maxEdge.isEmpty())        maxEdge = "10.0";
-    if (targetMesh.isEmpty())     targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty())       baseMesh = "pallas_124.obj";
-    if (presetFileName.isEmpty()) presetFileName = "";
+    if (criterion.isEmpty())        criterion = "same-target-edges";
+    if (nSamples.isEmpty())         nSamples = "5";
+    if (minEdge.isEmpty())          minEdge = "0.7";
+    if (maxEdge.isEmpty())          maxEdge = "10.0";
+    if (targetMesh.isEmpty())       targetMesh = "pallas_5000.obj";
+    if (baseMesh.isEmpty())         baseMesh = "pallas_124.obj";
+    if (presetFileName.isEmpty())   presetFileName = "";
+    if (microfacesAmount.isEmpty()) microfacesAmount = "";
 
     QLocale locale(QLocale::C);
     minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
     maxEdge = locale.toString(maxEdge.toDouble(), 'f', 1);
 
+    w.loadBaseMesh(baseMesh);
+
     if (cmd == "gen-samples") {
-      w.loadBaseMesh(baseMesh);
       w.loadTargetMesh(targetMesh);
 
       if (criterion == "same-target-edges") {
@@ -67,14 +73,17 @@ int main(int argc, char *argv[])
       }
     } else if (cmd == "gen-samples-preset") {
       qDebug() << "Generating same-microfaces samples presets for anisotropic and isotropic schemes.";
-      w.loadBaseMesh(baseMesh);
       w.exportSameMicrofacesPreset(minEdge.toDouble(), maxEdge.toDouble());
+    } else if (cmd == "gen-sample") {
+      int microfaces = int(w.baseMesh.faces.size()) * 2;
+      if (microfacesAmount.toInt() > microfaces) microfaces = microfacesAmount.toInt();
+      qDebug() << "Generating the sample according to the given microfaces amount : " << microfaces;
     }
+
     exit(0);
   }
 
   w.on_demo124faces_clicked();
   w.show();
-
   return a.exec();
 }
