@@ -66,24 +66,25 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
   dir_list = glob.glob(os.path.join(dir_path_micro, "*"))
   outputDir = ""
 
-  for file in dir_list:
-    if base_mesh_name in file:
-      outputDir = file
+
+  for mesh_dir in dir_list:
+    if base_mesh_name in mesh_dir:
+      outputDir = mesh_dir
 
   file_list = glob.glob(os.path.join(outputDir, "*"))
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
   with open(f"{outputDir}/hausdorff_{base_mesh_name}_to_{target_mesh_faces}.txt", "w") as output_file:
     output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
-    ms = pymeshlab.MeshSet()
-    ms.load_new_mesh(target_mesh_path)
-    i = 1
+
     for displaced_mesh_path in displaced_meshes:
+      ms = pymeshlab.MeshSet()
+      ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
       output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
-      i = i + 1
+      distances = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1, samplenum=4066)
 
-      for key, value in ms.get_hausdorff_distance(sampledmesh = 0, targetmesh = i, samplenum = 4066).items():
+      for key, value in distances.items():
         output_file.write(str(value) + " ")
 
       output_file.write("\n")
@@ -107,10 +108,9 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
-
       output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
 
-      for key, value in ms.get_hausdorff_distance(sampledmesh = 0, targetmesh = i, samplenum = 4066).items():
+      for key, value in ms.get_hausdorff_distance(sampledmesh = 0, targetmesh = 1, samplenum = 4066).items():
         output_file.write(str(value) + " ")
 
       output_file.write("\n")
@@ -173,8 +173,8 @@ args = parser.parse_args()
 
 # Setup paths
 criterion_name = args.criterion.replace("-", "_")
-dir_path_micro = f"./Output/Evaluation/{criterion_name}/micro"
-dir_path_aniso = f"./Output/Evaluation/{criterion_name}/aniso"
+dir_path_micro = f"./Output/Evaluation/same_microfaces/micro"
+dir_path_aniso = f"./Output/Evaluation/same_microfaces/aniso"
 target_mesh_path = "./Models/" + args.target_mesh
 target_mesh_faces = extract_last_integer_number_from_string(args.target_mesh[:-4])
 exe_path = os.path.join(os.getcwd(), "Debug", "anisotropic_micromesh.exe")  # Should be changed to Release

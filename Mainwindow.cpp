@@ -28,13 +28,13 @@ void Mainwindow::initUI()
 
   // Target edge length slider
   ui.edgeLengthSlider->setEnabled(true);
-  int minIntValue = 10;    // 4.0
+  int minIntValue = 10;    // 0.1
   int maxIntValue = 2000;   // 20.0
   ui.edgeLengthSlider->setRange(minIntValue, maxIntValue);
   double decimalPrecision = 0.01;
   int numDecimalValues = (maxIntValue - minIntValue) / (decimalPrecision * 100);
   ui.edgeLengthSlider->setSingleStep(numDecimalValues);
-  ui.edgeLengthSlider->setValue(100); // 1.0
+  ui.edgeLengthSlider->setValue(1000); // 10.0
 
   // Micro-faces slider
   ui.microFacesSlider->setEnabled(false);
@@ -91,7 +91,7 @@ void Mainwindow::disableSubdivisionsBox()
 void Mainwindow::disableEdgeLengthSlider()
 {
   ui.edgeLengthSlider->setEnabled(false);
-  ui.edgeLengthSlider->setValue(100);
+  ui.edgeLengthSlider->setValue(1000);
   subdividedMesh = projectedMesh = Mesh();
 }
 
