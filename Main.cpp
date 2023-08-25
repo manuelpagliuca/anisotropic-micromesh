@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
 
     if (criterion.isEmpty())                               criterion = "same-target-edges";
     if (nSamples.isEmpty())                                nSamples = "5";
-    if (minEdge.isEmpty())                                 minEdge = "1.0";
+    if (minEdge.isEmpty())                                 minEdge = "0.5";
     if (maxEdge.isEmpty())                                 maxEdge = "10.0";
     if (targetMesh.isEmpty())                              targetMesh = "pallas_5000.obj";
     if (baseMesh.isEmpty())                                baseMesh = "pallas_124.obj";
@@ -79,6 +79,7 @@ int main(int argc, char *argv[])
       qDebug() << "Generating same-microfaces samples presets for anisotropic and isotropic schemes.";
       w.exportSameMicrofacesPreset(minEdge.toDouble(), maxEdge.toDouble());
     } else if (cmd == "gen-sample") {
+      w.loadTargetMesh(targetMesh);
       int microFaces = int(w.baseMesh.faces.size()) * 2;
       if (microfacesAmount.toInt() > microFaces) microFaces = microfacesAmount.toInt();
       qDebug() << "Generating the sample according to the given microfaces amount : " << microFaces;

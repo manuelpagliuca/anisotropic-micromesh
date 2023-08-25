@@ -246,6 +246,8 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
 
 void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionScheme, double minEdge, double maxEdge)
 {
+  assert(baseMesh.isValid() == true);
+
   double targetEdgeLength = binarSearchTargetEdgeLength(microFaces, subdivisionScheme, minEdge, maxEdge);
 
   if (subdivisionScheme == "aniso") {
@@ -256,10 +258,25 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
     subdividedMesh = baseMesh.micromeshSubdivide();
   }
 
-  qDebug() << "Given " << microFaces
-           << " we need a target edge length of: "
-           << targetEdgeLength << ", level of : "
-           << subdividedMesh.faces.size();
+  assert(subdividedMesh.isValid() == true);
+  assert(targetMesh.isValid() == true);
+
+  std::vector<float> displacements = subdividedMesh.getDisplacements(targetMesh);
+  projectedMesh = subdividedMesh;
+
+  int vertexIdx = 0;
+
+  for (const float &disp : displacements)
+    projectedMesh.displaceVertex(vertexIdx++, disp);
+
+  QString fileName = QString::fromStdString("displacedTo") +
+                     QString::number(targetMesh.faces.size()) +
+                     "_ApprxMicroFaces_" +
+                     QString::number(microFaces);
+
+  projectedMesh.exportOBJ(("Evaluation/same_microfaces/" + subdivisionScheme + "/" +
+                           QString::fromStdString(baseMeshNameAndDetail) +
+                           "/" + fileName).toStdString());
 }
 
 double Mainwindow::binarSearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
@@ -293,7 +310,6 @@ double Mainwindow::binarSearchTargetEdgeLength(int targetMicroFaces, QString sub
     }
 
     if (cFaces == aFaces || cFaces == bFaces) {
-      qDebug () << cFaces << aFaces << bFaces;
       return abs(targetMicroFaces - aFaces) < abs(targetMicroFaces - bFaces) ? a : b;
     }
 
