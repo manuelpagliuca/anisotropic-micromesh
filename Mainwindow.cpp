@@ -28,8 +28,8 @@ void Mainwindow::initUI()
 
   // Target edge length slider
   ui.edgeLengthSlider->setEnabled(true);
-  int minIntValue = 10;    // 1.0
-  int maxIntValue = 1000;   // 10.0
+  int minIntValue = 10;    // 4.0
+  int maxIntValue = 2000;   // 20.0
   ui.edgeLengthSlider->setRange(minIntValue, maxIntValue);
   double decimalPrecision = 0.01;
   int numDecimalValues = (maxIntValue - minIntValue) / (decimalPrecision * 100);
@@ -673,10 +673,20 @@ void Mainwindow::on_displacementSlider_valueChanged(int value) {
   ui.currentMeshLabel->setText("Projected mesh");
 }
 
-void Mainwindow::on_microFacesSlider_valueChanged(int value)
+void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
 {
-  qDebug() << "Amount of micro-faces: " << value;
-  ui.microFacesCurrentValue->setText(QString::number(value));
+  ui.microFacesCurrentValue->setText(QString::number(microFaces));
+
+  QString subdivisionScheme = isAniso ? QString("aniso") : QString("micro");
+  double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, 1.0, 20.0);
+
+  if (!isAniso) {
+    baseMesh.updateEdgesSubdivisionLevelsMicromesh(targetEdgeLength);
+    subdividedMesh = baseMesh.micromeshSubdivide();
+  } else {
+    baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
+    subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
+  }
 }
 
 void Mainwindow::on_wireframeToggle_stateChanged()

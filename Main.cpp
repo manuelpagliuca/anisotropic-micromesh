@@ -14,10 +14,10 @@ int main(int argc, char *argv[])
     QCommandLineOption samplesOption("n", "Number of samples option (default: 5)", "n");
     parser.addOption(samplesOption);
 
-    QCommandLineOption minEdgeOption("min-edge", "Minimum edge value (default: 0.7)", "min-edge");
+    QCommandLineOption minEdgeOption("min-edge", "Minimum edge value (default: 1.0)", "min-edge");
     parser.addOption(minEdgeOption);
 
-    QCommandLineOption maxEdgeOption("max-edge", "Maximum edge value (default: 10.0)", "max-edge");
+    QCommandLineOption maxEdgeOption("max-edge", "Maximum edge value (default: 20.0)", "max-edge");
     parser.addOption(maxEdgeOption);
 
     QCommandLineOption targetOption("target-mesh", "Target mesh (default: pallas_5000.obj)", "target-mesh");
@@ -52,8 +52,8 @@ int main(int argc, char *argv[])
 
     if (criterion.isEmpty())                               criterion = "same-target-edges";
     if (nSamples.isEmpty())                                nSamples = "5";
-    if (minEdge.isEmpty())                                 minEdge = "0.5";
-    if (maxEdge.isEmpty())                                 maxEdge = "10.0";
+    if (minEdge.isEmpty())                                 minEdge = "1.0";
+    if (maxEdge.isEmpty())                                 maxEdge = "20.0";
     if (targetMesh.isEmpty())                              targetMesh = "pallas_5000.obj";
     if (baseMesh.isEmpty())                                baseMesh = "pallas_124.obj";
     if (presetFileName.isEmpty())                          presetFileName = "";
@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
       w.loadTargetMesh(targetMesh);
       int microFaces = int(w.baseMesh.faces.size()) * 2;
       if (microfacesAmount.toInt() > microFaces) microFaces = microfacesAmount.toInt();
-      qDebug() << "Generating the sample according to the given microfaces amount : " << microFaces;
+      qDebug() << "Generating a sample with: " << microFaces << " micro-faces.";
       w.exportDisplacedBaseMesh(microFaces, subdivisionScheme, minEdge.toDouble(), maxEdge.toDouble());
     }
 

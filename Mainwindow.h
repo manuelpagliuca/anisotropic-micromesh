@@ -34,7 +34,7 @@ public:
   void exportDisplacedSamplesWithSameFacesAmount(double minEdge = 1.0, double maxEdge = 10.0, QString presetFileName = "");
   void exportDisplacedSamples(const QString presetDirPath);
   void exportDisplacedBaseMesh(int microFaces, QString subdivisionScheme, double a = 1.0, double b = 10.0);
-  double binarSearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b);
+  double binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b);
 
   void loadBaseMesh(const QString &fileName);
   void loadTargetMesh(const QString &fileName);
@@ -101,7 +101,7 @@ public slots:
 
   void on_edgeLengthSlider_valueChanged(int value);
   void on_displacementSlider_valueChanged(int value);
-  void on_microFacesSlider_valueChanged(int value);
+  void on_microFacesSlider_valueChanged(int microFaces);
 
   void on_target250faces_clicked();
   void on_target500faces_clicked();

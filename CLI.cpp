@@ -248,7 +248,7 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
 {
   assert(baseMesh.isValid() == true);
 
-  double targetEdgeLength = binarSearchTargetEdgeLength(microFaces, subdivisionScheme, minEdge, maxEdge);
+  double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, minEdge, maxEdge);
 
   if (subdivisionScheme == "aniso") {
     baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
@@ -279,7 +279,7 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
                            "/" + fileName).toStdString());
 }
 
-double Mainwindow::binarSearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
+double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
 {
   int aFaces, bFaces;
 
