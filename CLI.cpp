@@ -243,3 +243,70 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
 
   presetFile.close();
 }
+
+void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionScheme, double minEdge, double maxEdge)
+{
+  double targetEdgeLength = binarSearchTargetEdgeLength(microFaces, subdivisionScheme, minEdge, maxEdge);
+
+  if (subdivisionScheme == "aniso") {
+    baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
+    subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
+  } else {
+    baseMesh.updateEdgesSubdivisionLevelsMicromesh(targetEdgeLength);
+    subdividedMesh = baseMesh.micromeshSubdivide();
+  }
+
+  qDebug() << "Given " << microFaces
+           << " we need a target edge length of: "
+           << targetEdgeLength << ", level of : "
+           << subdividedMesh.faces.size();
+}
+
+double Mainwindow::binarSearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
+{
+  int aFaces, bFaces;
+
+  if (subdivisionScheme == "aniso") {
+    baseMesh.updateEdgesSubdivisionLevelsAniso(a);
+    aFaces = int(baseMesh.anisotropicMicromeshSubdivide().faces.size());
+
+    baseMesh.updateEdgesSubdivisionLevelsAniso(b);
+    bFaces = int(baseMesh.anisotropicMicromeshSubdivide().faces.size());
+  } else {
+    baseMesh.updateEdgesSubdivisionLevelsMicromesh(a);
+    aFaces = int(baseMesh.micromeshSubdivide().faces.size());
+
+    baseMesh.updateEdgesSubdivisionLevelsMicromesh(b);
+    bFaces = int(baseMesh.micromeshSubdivide().faces.size());
+  }
+
+  while (true) {
+    double c = (a + b) / 2.0;
+    int cFaces;
+
+    if (subdivisionScheme == "aniso") {
+      baseMesh.updateEdgesSubdivisionLevelsAniso(c);
+      cFaces = int(baseMesh.anisotropicMicromeshSubdivide().faces.size());
+    } else {
+      baseMesh.updateEdgesSubdivisionLevelsMicromesh(c);
+      cFaces = int(baseMesh.micromeshSubdivide().faces.size());
+    }
+
+    if (cFaces == aFaces || cFaces == bFaces) {
+      qDebug () << cFaces << aFaces << bFaces;
+      return abs(targetMicroFaces - aFaces) < abs(targetMicroFaces - bFaces) ? a : b;
+    }
+
+    if (cFaces == targetMicroFaces) return c;
+
+    if (cFaces < targetMicroFaces) {
+      b = c;
+      bFaces = cFaces;
+    }
+
+    if (cFaces > targetMicroFaces) {
+      a = c;
+      aFaces = cFaces;
+    }
+  }
+}

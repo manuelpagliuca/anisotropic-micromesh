@@ -35,6 +35,9 @@ int main(int argc, char *argv[])
     QCommandLineOption microfacesAmountOption("microfaces", "Microfaces amount (default: two times base-mesh faces)", "microfaces");
     parser.addOption(microfacesAmountOption);
 
+    QCommandLineOption subdivisionSchemeOption("scheme", "Scheme (default: micro)", "scheme");
+    parser.addOption(subdivisionSchemeOption);
+
     parser.process(a);
 
     QString criterion = parser.value(criterionOption);
@@ -45,15 +48,17 @@ int main(int argc, char *argv[])
     QString baseMesh = parser.value(baseMeshOption);
     QString presetFileName = parser.value(presetFileNameOption);
     QString microfacesAmount = parser.value(microfacesAmountOption);
+    QString subdivisionScheme = parser.value(subdivisionSchemeOption);
 
-    if (criterion.isEmpty())        criterion = "same-target-edges";
-    if (nSamples.isEmpty())         nSamples = "5";
-    if (minEdge.isEmpty())          minEdge = "0.7";
-    if (maxEdge.isEmpty())          maxEdge = "10.0";
-    if (targetMesh.isEmpty())       targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty())         baseMesh = "pallas_124.obj";
-    if (presetFileName.isEmpty())   presetFileName = "";
-    if (microfacesAmount.isEmpty()) microfacesAmount = "";
+    if (criterion.isEmpty())                               criterion = "same-target-edges";
+    if (nSamples.isEmpty())                                nSamples = "5";
+    if (minEdge.isEmpty())                                 minEdge = "1.0";
+    if (maxEdge.isEmpty())                                 maxEdge = "10.0";
+    if (targetMesh.isEmpty())                              targetMesh = "pallas_5000.obj";
+    if (baseMesh.isEmpty())                                baseMesh = "pallas_124.obj";
+    if (presetFileName.isEmpty())                          presetFileName = "";
+    if (microfacesAmount.isEmpty())                        microfacesAmount = "";
+    if (subdivisionScheme.isEmpty() || subdivisionScheme != "aniso") subdivisionScheme = "micro";
 
     QLocale locale(QLocale::C);
     minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
@@ -63,7 +68,6 @@ int main(int argc, char *argv[])
 
     if (cmd == "gen-samples") {
       w.loadTargetMesh(targetMesh);
-
       if (criterion == "same-target-edges") {
         qDebug() << "Generating samples for anisotropic and isotropic schemes with same target edge lenght.";
         w.exportDisplacedSamplesSameTargetEdgeMetric(nSamples.toInt(), minEdge.toDouble(), maxEdge.toDouble());
@@ -75,9 +79,10 @@ int main(int argc, char *argv[])
       qDebug() << "Generating same-microfaces samples presets for anisotropic and isotropic schemes.";
       w.exportSameMicrofacesPreset(minEdge.toDouble(), maxEdge.toDouble());
     } else if (cmd == "gen-sample") {
-      int microfaces = int(w.baseMesh.faces.size()) * 2;
-      if (microfacesAmount.toInt() > microfaces) microfaces = microfacesAmount.toInt();
-      qDebug() << "Generating the sample according to the given microfaces amount : " << microfaces;
+      int microFaces = int(w.baseMesh.faces.size()) * 2;
+      if (microfacesAmount.toInt() > microFaces) microFaces = microfacesAmount.toInt();
+      qDebug() << "Generating the sample according to the given microfaces amount : " << microFaces;
+      w.exportDisplacedBaseMesh(microFaces, subdivisionScheme, minEdge.toDouble(), maxEdge.toDouble());
     }
 
     exit(0);
