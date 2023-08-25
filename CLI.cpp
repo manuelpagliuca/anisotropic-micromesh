@@ -277,6 +277,7 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
   projectedMesh.exportOBJ(("Evaluation/same_microfaces/" + subdivisionScheme + "/" +
                            QString::fromStdString(baseMeshNameAndDetail) +
                            "/" + fileName).toStdString());
+  qDebug() << projectedMesh.faces.size();
 }
 
 double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
@@ -299,6 +300,7 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString su
 
   while (true) {
     double c = (a + b) / 2.0;
+
     int cFaces;
 
     if (subdivisionScheme == "aniso") {
