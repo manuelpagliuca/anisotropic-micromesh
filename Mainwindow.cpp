@@ -537,60 +537,84 @@ void Mainwindow::on_demo1000faces_clicked()
   disableEdgeLengthSlider();
 }
 
+// Triggered when "Micro-mesh" button is clicked
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
   isAniso = false;
-  ui.subdivisionSchemeLabel->setText("Micromesh");
+
+  // Setting target edge length + micromesh subdivision scheme
   baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.micromeshSubdivide();
 
+  // Updating mesh data
   ui.openGLWidget->updateMeshData(subdividedMesh);
+
+  // Updating text labels (scheme, current mesh, sub-mesh vertices and faces)
+  ui.subdivisionSchemeLabel->setText("Micromesh");
   ui.currentMeshLabel->setText("Subdivided mesh");
   ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
 
-  ui.actionSubdivided_mesh->setEnabled(true);
+  // Enable displacement group box
   ui.morphingGroupBox->setEnabled(true);
-  ui.edgeLengthSlider->setEnabled(true);
 
-  ui.radioTargetEdgeLength->setEnabled(true);
-  ui.radioTargetEdgeLength->setChecked(true);
-  ui.radioTargetMicroFaces->setEnabled(true);
+  // Allow switching to subdivided mesh through keyboard
+  ui.actionSubdivided_mesh->setEnabled(true);
 
-  ui.microFacesSlider->setMinimum(int(subdividedMesh.faces.size()));
-  ui.microFacesSlider->setMaximum(int(subdividedMesh.faces.size() * 3));
+  // If no slider is active, enable the edge length slider and the radio buttons + check the edge length radio
+  if (!ui.edgeLengthSlider->isEnabled() && !ui.microFacesSlider->isEnabled()) {
+    ui.edgeLengthSlider->setEnabled(true);
+    ui.radioTargetEdgeLength->setEnabled(true);
+    ui.radioTargetMicroFaces->setEnabled(true);
+    ui.radioTargetEdgeLength->setChecked(true);
+  }
 
+  // If the displacement slider is enabled it has to be reset to 0
   if (ui.displacementSlider->isEnabled()) {
+    // Delete target and projected mesh
     disableDisplacementSlider();
+    // Reset labels for target vertices and faces
     resetTargetMeshLabels();
   }
 }
 
+// Triggered when "Anisotropic Micro-mesh" button is clicked
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
   isAniso = true;
-  ui.subdivisionSchemeLabel->setText("Anisotropic M.");
+
+  // Setting target edge length + anisotropic subdivision
   baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
   subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
-  ui.openGLWidget->updateMeshData(subdividedMesh);
-  ui.currentMeshLabel->setText("Subdivided mesh");
 
+  // Updating mesh data
+  ui.openGLWidget->updateMeshData(subdividedMesh);
+
+  // Updating text labels (scheme, current mesh, sub-mesh vertices and faces)
+  ui.subdivisionSchemeLabel->setText("Anisotropic M.");
+  ui.currentMeshLabel->setText("Subdivided mesh");
   ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
   ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
 
-  ui.actionSubdivided_mesh->setEnabled(true);
+  // Enable displacement group box
   ui.morphingGroupBox->setEnabled(true);
-  ui.edgeLengthSlider->setEnabled(true);
 
-  ui.radioTargetEdgeLength->setEnabled(true);
-  ui.radioTargetEdgeLength->setChecked(true);
-  ui.radioTargetMicroFaces->setEnabled(true);
+  // Allow switching to subdivided mesh through keyboard
+  ui.actionSubdivided_mesh->setEnabled(true);
 
-  ui.microFacesSlider->setMinimum(int(subdividedMesh.faces.size()));
-  ui.microFacesSlider->setMaximum(int(subdividedMesh.faces.size() * 3));
+  // If no slider is active, enable the edge length slider and the radio buttons + check the edge length radio
+  if (!ui.edgeLengthSlider->isEnabled() && !ui.microFacesSlider->isEnabled()) {
+    ui.edgeLengthSlider->setEnabled(true);
+    ui.radioTargetEdgeLength->setEnabled(true);
+    ui.radioTargetMicroFaces->setEnabled(true);
+    ui.radioTargetEdgeLength->setChecked(true);
+  }
 
+  // If the displacement slider is enabled it has to be reset to 0
   if (ui.displacementSlider->isEnabled()) {
+    // Delete target and projected mesh
     disableDisplacementSlider();
+    // Reset labels for target vertices and faces
     resetTargetMeshLabels();
   }
 }
