@@ -50,14 +50,14 @@ int main(int argc, char *argv[])
     QString microfacesAmount = parser.value(microfacesAmountOption);
     QString subdivisionScheme = parser.value(subdivisionSchemeOption);
 
-    if (criterion.isEmpty())                               criterion = "same-target-edges";
-    if (nSamples.isEmpty())                                nSamples = "5";
-    if (minEdge.isEmpty())                                 minEdge = "1.0";
-    if (maxEdge.isEmpty())                                 maxEdge = "20.0";
-    if (targetMesh.isEmpty())                              targetMesh = "pallas_5000.obj";
-    if (baseMesh.isEmpty())                                baseMesh = "pallas_124.obj";
-    if (presetFileName.isEmpty())                          presetFileName = "";
-    if (microfacesAmount.isEmpty())                        microfacesAmount = "";
+    if (criterion.isEmpty())        criterion = "same-target-edges";
+    if (nSamples.isEmpty())         nSamples = "5";
+    if (minEdge.isEmpty())          minEdge = "1.0";
+    if (maxEdge.isEmpty())          maxEdge = "20.0";
+    if (targetMesh.isEmpty())       targetMesh = "pallas_5000.obj";
+    if (baseMesh.isEmpty())         baseMesh = "pallas_124.obj";
+    if (presetFileName.isEmpty())   presetFileName = "";
+    if (microfacesAmount.isEmpty()) microfacesAmount = "";
     if (subdivisionScheme.isEmpty() || subdivisionScheme != "aniso") subdivisionScheme = "micro";
 
     QLocale locale(QLocale::C);

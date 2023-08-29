@@ -353,6 +353,7 @@ void Mainwindow::on_actionLoad_triggered()
     }
 
     baseMeshNameAndDetail = extractFileName(filePath.toStdString());
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
   }
 }
 
@@ -493,6 +494,7 @@ void Mainwindow::on_demo124faces_clicked()
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
 }
 
 void Mainwindow::on_demo250faces_clicked()
@@ -507,6 +509,7 @@ void Mainwindow::on_demo250faces_clicked()
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
 }
 
 void Mainwindow::on_demo500faces_clicked()
@@ -521,6 +524,7 @@ void Mainwindow::on_demo500faces_clicked()
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
 }
 
 void Mainwindow::on_demo1000faces_clicked()
@@ -535,6 +539,7 @@ void Mainwindow::on_demo1000faces_clicked()
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
 }
 
 // Triggered when "Micro-mesh" button is clicked
@@ -702,8 +707,9 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
   ui.microFacesCurrentValue->setText(QString::number(microFaces));
 
   QString subdivisionScheme = isAniso ? QString("aniso") : QString("micro");
-  double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, 1.0, 20.0);
 
+  double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, 1.0, 20.0);
+\
   if (!isAniso) {
     baseMesh.updateEdgesSubdivisionLevelsMicromesh(targetEdgeLength);
     subdividedMesh = baseMesh.micromeshSubdivide();
@@ -711,6 +717,10 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
     baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
     subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
   }
+
+  ui.openGLWidget->updateMeshData(subdividedMesh);
+
+  ui.subdividedMeshFaces->setText(QString::number(subdividedMesh.faces.size()));
 }
 
 void Mainwindow::on_wireframeToggle_stateChanged()
