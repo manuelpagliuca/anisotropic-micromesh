@@ -8,7 +8,7 @@
 
 
 * models pallas cat-> author
-* model orc -> https://www.cgtrader.com/free-3d-print-models/art/sculptures/orc-bust-d7a81f2f-6e47-45a7-88ce-108ea008be67
+* model orc -> https://www.cgtrader.com/free-3d-print-models/art/sculptures/orc-bust-d7a81f2f-6e47-45a7-88ce-108ea008be67ggi
 * dragon -> https://www.cgtrader.com/free-3d-models/animals/reptile/dragon-f03649c0-cf42-4c8b-9edc-849703314a7b
 ## Script commands
 

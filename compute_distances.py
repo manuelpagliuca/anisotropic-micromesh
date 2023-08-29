@@ -74,90 +74,58 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
   with open(f"{outputDir}/hausdorff_{base_mesh_name}_to_{target_mesh_faces}.txt", "w") as output_file:
-    output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
+    output_file.write("microFaces RMS max mean min\n")
 
     for displaced_mesh_path in displaced_meshes:
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
-      output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
+      output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)))
       distances = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1, samplenum=4066)
 
       for key, value in distances.items():
-        output_file.write(str(value) + " ")
-
-      output_file.write("\n")
+        if key == "n_samples" or key == "diag_mesh_0" or key == "diag_mesh_1" or key == "min":
+          continue
+        if isinstance(value, (int, float)):
+          value = round(value, 4)
+        output_file.write(" & " + str(value))
+      output_file.write("\\\\ \n")
+      print("Computed distances for: " + displaced_mesh_path)
   output_file.close()
 
   print(f"Hausdorff's distances > {outputDir}/hausdorff_microfaces_micro.txt")
 
   dir_list = glob.glob(os.path.join(dir_path_aniso, "*"))
 
-  for file in dir_list:
-    if base_mesh_name in file:
-      outputDir = file
+  for mesh_dir in dir_list:
+    if base_mesh_name in mesh_dir:
+      outputDir = mesh_dir
 
   file_list = glob.glob(os.path.join(outputDir, "*"))
+
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
 
   with open(f"{outputDir}/hausdorff_{base_mesh_name}_to_{target_mesh_faces}.txt", "w") as output_file:
-    output_file.write("microFaces RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
+    output_file.write("microFaces RMS max mean min\n")
 
     for displaced_mesh_path in displaced_meshes:
       ms = pymeshlab.MeshSet()
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
-      output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
+      output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)))
+      distances = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1, samplenum=4066)
 
-      for key, value in ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1, samplenum=4066).items():
-        output_file.write(str(value) + " ")
-
-      output_file.write("\n")
+      for key, value in distances.items():
+        if key == "n_samples" or key == "diag_mesh_0" or key == "diag_mesh_1" or key == "min":
+          continue
+        if isinstance(value, (int, float)):
+          value = round(value, 4)
+        output_file.write(" & " + str(value))
+      output_file.write("\\\\ \n")
+      print("Computed distances for: " + displaced_mesh_path)
   output_file.close()
+
   print(f"Hausdorff's distances > {outputDir}/hausdorff_microfaces_aniso.txt")
-
-  file_list = glob.glob(os.path.join(dir_path_micro, "*"))
-  displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
-
-  with open(f"./Output/Evaluation/{criterion_name}/micro/hausdorff_{base_mesh_name}.txt", "w") as output_file:
-    output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
-
-    for displaced_mesh_path in displaced_meshes:
-      ms = pymeshlab.MeshSet()
-      ms.load_new_mesh(target_mesh_path)
-      ms.load_new_mesh(displaced_mesh_path)
-
-      output_file.write(str(extract_last_decimal_number_from_string(displaced_mesh_path)) + " ")
-
-      for key, value in ms.get_hausdorff_distance().items():
-        output_file.write(str(value) + " ")
-
-      output_file.write("\n")
-
-  print(
-      f"Hausdorff's distances > ./Output/Evaluation/{criterion_name}/micro/hausdorff_{base_mesh_name}.txt")
-
-  file_list = glob.glob(os.path.join(dir_path_aniso, "*"))
-  displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
-
-  with open(f"./Output/Evaluation/{criterion_name}/aniso/hausdorff_{base_mesh_name}.txt", "w") as output_file:
-    output_file.write("edgeLength RMS diag_mesh_0 diag_mesh_1 max mean min n_samples\n")
-
-    for displaced_mesh_path in displaced_meshes:
-      ms = pymeshlab.MeshSet()
-      ms.load_new_mesh(target_mesh_path)
-      ms.load_new_mesh(displaced_mesh_path)
-
-      output_file.write(str(extract_last_decimal_number_from_string(displaced_mesh_path)) + " ")
-
-      for key, value in ms.get_hausdorff_distance().items():
-        output_file.write(str(value) + " ")
-
-      output_file.write("\n")
-  print(
-      f"Hausdorff's distances > ./Output/Evaluation/{criterion_name}/aniso/hausdorff_{base_mesh_name}.txt")
-
-  output_file.close()
 
 
 # Parse args
@@ -199,28 +167,28 @@ if args.target_mesh is not None:
 
 params.append("--scheme=micro")
 
-for i in range(1000, 110000, 1000):
-  params.append(f"--microfaces={i}")
-  try:
-    print([exe_path, "gen-sample"] + params)
-    subprocess.check_call([exe_path, "gen-sample"] + params)
-  except subprocess.CalledProcessError as e:
-    print(f"Error while executing the command: {e}")
-  except FileNotFoundError as e:
-    print(f"File not found: {e}")
+# for i in range(1000, 110000, 1000):
+#   params.append(f"--microfaces={i}")
+#   try:
+#     print([exe_path, "gen-sample"] + params)
+#     subprocess.check_call([exe_path, "gen-sample"] + params)
+#   except subprocess.CalledProcessError as e:
+#     print(f"Error while executing the command: {e}")
+#   except FileNotFoundError as e:
+#     print(f"File not found: {e}")
 
-params.pop()
-params.append("--scheme=aniso")
+# params.pop()
+# params.append("--scheme=aniso")
 
-for i in range(1000, 110000, 1000):
-  params.append(f"--microfaces={i}")
-  try:
-    print([exe_path, "gen-sample"] + params)
-    subprocess.check_call([exe_path, "gen-sample"] + params)
-  except subprocess.CalledProcessError as e:
-    print(f"Error while executing the command: {e}")
-  except FileNotFoundError as e:
-    print(f"File not found: {e}")
+# for i in range(1000, 110000, 1000):
+# params.append(f"--microfaces={i}")
+# try:
+#   print([exe_path, "gen-sample"] + params)
+#   subprocess.check_call([exe_path, "gen-sample"] + params)
+# except subprocess.CalledProcessError as e:
+#   print(f"Error while executing the command: {e}")
+# except FileNotFoundError as e:
+#   print(f"File not found: {e}")
 
 hausdorff_same_microfaces(args.base_mesh[:-4], target_mesh_faces,
                           target_mesh_path, dir_path_micro, dir_path_aniso)
