@@ -66,7 +66,6 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
   dir_list = glob.glob(os.path.join(dir_path_micro, "*"))
   outputDir = ""
 
-
   for mesh_dir in dir_list:
     if base_mesh_name in mesh_dir:
       outputDir = mesh_dir
@@ -110,13 +109,12 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
       ms.load_new_mesh(displaced_mesh_path)
       output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)) + " ")
 
-      for key, value in ms.get_hausdorff_distance(sampledmesh = 0, targetmesh = 1, samplenum = 4066).items():
+      for key, value in ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1, samplenum=4066).items():
         output_file.write(str(value) + " ")
 
       output_file.write("\n")
   output_file.close()
   print(f"Hausdorff's distances > {outputDir}/hausdorff_microfaces_aniso.txt")
-
 
   file_list = glob.glob(os.path.join(dir_path_micro, "*"))
   displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
@@ -161,6 +159,7 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
 
   output_file.close()
 
+
 # Parse args
 parser = argparse.ArgumentParser(description="Description of your application.")
 parser.add_argument("--min-edge", type=float, help="Parameter 1 (min-edge)")
@@ -177,7 +176,8 @@ dir_path_micro = f"./Output/Evaluation/same_microfaces/micro"
 dir_path_aniso = f"./Output/Evaluation/same_microfaces/aniso"
 target_mesh_path = "./Models/" + args.target_mesh
 target_mesh_faces = extract_last_integer_number_from_string(args.target_mesh[:-4])
-exe_path = os.path.join(os.getcwd(), "Debug", "anisotropic_micromesh.exe")  # Should be changed to Release
+# Should be changed to Release
+exe_path = os.path.join(os.getcwd(), "Debug", "anisotropic_micromesh.exe")
 
 if args.clean:
   delete_files_in_directory(dir_path_micro)
@@ -199,7 +199,7 @@ if args.target_mesh is not None:
 
 params.append("--scheme=micro")
 
-for i in range(1000, 11000, 1000):
+for i in range(1000, 110000, 1000):
   params.append(f"--microfaces={i}")
   try:
     print([exe_path, "gen-sample"] + params)
@@ -212,7 +212,7 @@ for i in range(1000, 11000, 1000):
 params.pop()
 params.append("--scheme=aniso")
 
-for i in range(1000, 11000, 1000):
+for i in range(1000, 110000, 1000):
   params.append(f"--microfaces={i}")
   try:
     print([exe_path, "gen-sample"] + params)
@@ -222,4 +222,5 @@ for i in range(1000, 11000, 1000):
   except FileNotFoundError as e:
     print(f"File not found: {e}")
 
-hausdorff_same_microfaces(args.base_mesh[:-4], target_mesh_faces, target_mesh_path, dir_path_micro, dir_path_aniso)
+hausdorff_same_microfaces(args.base_mesh[:-4], target_mesh_faces,
+                          target_mesh_path, dir_path_micro, dir_path_aniso)

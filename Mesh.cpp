@@ -437,7 +437,6 @@ void Mesh::updateVertexNormals()
   }
 }
 
-
 void Mesh::updateEdges()
 {
   edges.clear();
