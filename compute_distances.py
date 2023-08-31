@@ -81,7 +81,7 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
       output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)))
-      distances = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1, samplenum=4066)
+      distances = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1)
 
       for key, value in distances.items():
         if key == "n_samples" or key == "diag_mesh_0" or key == "diag_mesh_1" or key == "min":
@@ -113,7 +113,7 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
       ms.load_new_mesh(target_mesh_path)
       ms.load_new_mesh(displaced_mesh_path)
       output_file.write(str(extract_last_integer_number_from_string(displaced_mesh_path)))
-      distances = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1, samplenum=4066)
+      distances = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1)
 
       for key, value in distances.items():
         if key == "n_samples" or key == "diag_mesh_0" or key == "diag_mesh_1" or key == "min":
