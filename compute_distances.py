@@ -134,12 +134,10 @@ parser.add_argument("--min-edge", type=float, help="Parameter 1 (min-edge)")
 parser.add_argument("--max-edge", type=float, help="Parameter 2 (max-edge)")
 parser.add_argument("--base-mesh", default="pallas_5000.obj", help="Parameter 3 (base-mesh)")
 parser.add_argument("--target-mesh", default="pallas_124.obj", help="Parameter 4 (target)")
-parser.add_argument("--criterion", default="same-target-edges", help="Parameter 5 (criterion)")
 parser.add_argument("--clean", help="Parameter 6 (clean flag)", action="store_true")
 args = parser.parse_args()
 
 # Setup paths
-criterion_name = args.criterion.replace("-", "_")
 dir_path_micro = f"./Output/Evaluation/same_microfaces/micro"
 dir_path_aniso = f"./Output/Evaluation/same_microfaces/aniso"
 target_mesh_path = "./Models/" + args.target_mesh
@@ -167,28 +165,28 @@ if args.target_mesh is not None:
 
 params.append("--scheme=micro")
 
-# for i in range(1000, 110000, 1000):
-#   params.append(f"--microfaces={i}")
-#   try:
-#     print([exe_path, "gen-sample"] + params)
-#     subprocess.check_call([exe_path, "gen-sample"] + params)
-#   except subprocess.CalledProcessError as e:
-#     print(f"Error while executing the command: {e}")
-#   except FileNotFoundError as e:
-#     print(f"File not found: {e}")
+for i in range(1000, 110000, 1000):
+  params.append(f"--microfaces={i}")
+  try:
+    print([exe_path, "gen-sample"] + params)
+    subprocess.check_call([exe_path, "gen-sample"] + params)
+  except subprocess.CalledProcessError as e:
+    print(f"Error while executing the command: {e}")
+  except FileNotFoundError as e:
+    print(f"File not found: {e}")
 
-# params.pop()
-# params.append("--scheme=aniso")
+params.pop()
+params.append("--scheme=aniso")
 
-# for i in range(1000, 110000, 1000):
-# params.append(f"--microfaces={i}")
-# try:
-#   print([exe_path, "gen-sample"] + params)
-#   subprocess.check_call([exe_path, "gen-sample"] + params)
-# except subprocess.CalledProcessError as e:
-#   print(f"Error while executing the command: {e}")
-# except FileNotFoundError as e:
-#   print(f"File not found: {e}")
+for i in range(1000, 110000, 1000):
+params.append(f"--microfaces={i}")
+try:
+  print([exe_path, "gen-sample"] + params)
+  subprocess.check_call([exe_path, "gen-sample"] + params)
+except subprocess.CalledProcessError as e:
+  print(f"Error while executing the command: {e}")
+except FileNotFoundError as e:
+  print(f"File not found: {e}")
 
 hausdorff_same_microfaces(args.base_mesh[:-4], target_mesh_faces,
                           target_mesh_path, dir_path_micro, dir_path_aniso)
