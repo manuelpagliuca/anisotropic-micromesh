@@ -130,8 +130,8 @@ def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_pat
 
 # Parse args
 parser = argparse.ArgumentParser(description="Description of your application.")
-parser.add_argument("--min-edge", type=float, help="Parameter 1 (min-edge)")
-parser.add_argument("--max-edge", type=float, help="Parameter 2 (max-edge)")
+parser.add_argument("--min-edge", default=1.0, type=float, help="Parameter 1 (min-edge)")
+parser.add_argument("--max-edge", default=10.0, type=float, help="Parameter 2 (max-edge)")
 parser.add_argument("--base-mesh", default="pallas_5000.obj", help="Parameter 3 (base-mesh)")
 parser.add_argument("--target-mesh", default="pallas_124.obj", help="Parameter 4 (target)")
 parser.add_argument("--clean", help="Parameter 6 (clean flag)", action="store_true")
@@ -142,7 +142,8 @@ dir_path_micro = f"./Output/Evaluation/same_microfaces/micro"
 dir_path_aniso = f"./Output/Evaluation/same_microfaces/aniso"
 target_mesh_path = "./Models/" + args.target_mesh
 target_mesh_faces = extract_last_integer_number_from_string(args.target_mesh[:-4])
-# Should be changed to Release
+
+# Should be changed to Release ?
 exe_path = os.path.join(os.getcwd(), "Debug", "anisotropic_micromesh.exe")
 
 if args.clean:

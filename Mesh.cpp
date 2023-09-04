@@ -359,9 +359,10 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
         ivec2 v0(fx, fy), v1(fx, fy + 1), v2(fx + 1, fy + 1);
 
         if (fx > (fy + 1) * aniso - 1) { // flip "red" triangle
-          v0 = ivec2(n + aniso - 1, m) - v0;
-          v1 = ivec2(n + aniso - 1, m) - v1;
-          v2 = ivec2(n + aniso - 1, m) - v2;
+          ivec2 rotate = ivec2(n + aniso - 1, m);
+          v0 = rotate - v0;
+          v1 = rotate - v1;
+          v2 = rotate - v2;
         }
 
         #pragma omp criticals
