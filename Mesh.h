@@ -18,7 +18,7 @@
 #include "Vertex.h"
 #include "Face.h"
 #include "BoundingBox.h"
-#include "Ray.h"
+#include "Line.h"
 
 using namespace glm;
 

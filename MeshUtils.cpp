@@ -9,19 +9,14 @@ float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, const
     vec3 v1 = target.vertices[f.index[1]].pos;
     vec3 v2 = target.vertices[f.index[2]].pos;
 
-    Ray forwardRay = Ray(origin, direction);
-    Ray backwardRay = Ray(origin, -direction);
+    Line line = Line(origin, direction);
 
-    float forwardDisp, backDisp;
+    float disp;
 
-    bool forwardIntersect = forwardRay.intersectTriangle(v0, v1, v2, forwardDisp);
-    bool backwardIntersect = backwardRay.intersectTriangle(v0, v1, v2, backDisp);
+    bool intersect = line.intersectTriangle(v0, v1, v2, disp);
 
-    if (forwardIntersect)
-      minDisp = (abs(minDisp) < abs(forwardDisp)) ? minDisp : forwardDisp;
-
-    if (backwardIntersect)
-      minDisp = (abs(minDisp) < abs(backDisp)) ? minDisp : -backDisp;
+    if (intersect)
+      minDisp = (abs(minDisp) < abs(disp)) ? minDisp : disp;
   }
 
   return minDisp;

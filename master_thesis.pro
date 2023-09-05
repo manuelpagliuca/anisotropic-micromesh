@@ -11,6 +11,7 @@ INCLUDEPATH += $$PWD/dependencies
 SOURCES += \
   CLI.cpp \
   GLWidget.cpp \
+  Line.cpp \
   MeshDebug.cpp \
   MeshTest.cpp \
   MeshUtils.cpp \
@@ -29,6 +30,7 @@ HEADERS += \
   Edge.h \
   Face.h \
   GLWidget.h \
+  Line.h \
   Mainwindow.h \
   Mesh.h \
   Ray.h \
