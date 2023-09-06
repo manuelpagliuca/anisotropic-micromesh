@@ -13,16 +13,17 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, const Mes
 
     float distance;
     bool intersect = line.intersectTriangle(v0, v1, v2, distance);
-
-    if (intersect)
-      minDistance = fabsf(minDistance) < fabsf(distance) ? minDistance : distance;
+//    if (intersect)
+//      minDistance = fabsf(minDistance) < fabsf(distance) ? minDistance : distance;
 
     float xMax = maxInt3(v0.x, v1.x, v2.x);
     float xMin = minInt3(v0.x, v1.x, v2.x);
     float xMiddle = (xMax - xMin) / 2.f;
 
-    if (fabsf(origin.x - xMiddle) - target.R < minDistance) {
+    if (intersect && fabsf(origin.x - xMiddle) - target.R < minDistance) {
+      minDistance = distance;
     }
+
   }
 
   return minDistance;

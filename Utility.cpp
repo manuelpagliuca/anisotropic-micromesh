@@ -45,3 +45,43 @@ int maxIntIndex(int arr[])
 
   return maxIdx;
 }
+
+float maxFloat2(float a, float b)
+{
+  return (a >= b) ? a : b;
+}
+
+float maxFloat3(float a, float b, float c)
+{
+  return maxFloat2(maxFloat2(a, b), c);
+}
+
+float minFloat2(float a, float b)
+{
+  return (a < b) ? a : b;
+}
+
+float minFloat3(float a, float b, float c)
+{
+  return minFloat2(minFloat2(a, b), c);
+}
+
+double maxDouble2(double a, double b)
+{
+  return (a >= b) ? a : b;
+}
+
+double maxDouble3(double a, double b, double c)
+{
+  return maxDouble2(maxDouble2(a, b), c);
+}
+
+double minDouble2(double a, double b)
+{
+  return (a < b) ? a : b;
+}
+
+double minDouble3(double a, double b, double c)
+{
+  return minDouble2(minDouble2(a, b), c);
+}

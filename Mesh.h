@@ -36,7 +36,7 @@ public:
   Mesh();
   ~Mesh();
 
-  void computeR() const;
+  void computeR();
 
   // Vertex
   int addVertex(vec3 pos);

@@ -9,17 +9,17 @@ Mesh::~Mesh()
   edges.clear();
 }
 
-void Mesh::computeR() const
+void Mesh::computeR()
 {
   R = -INF;
 
   for (Face &f: faces) {
     float x0 = vertices.at(f.index[0]).pos.x;
-    float x1 = vertices.at(f.index[0]).pos.x;
-    float x2 = vertices.at(f.index[0]).pos.x;
+    float x1 = vertices.at(f.index[1]).pos.x;
+    float x2 = vertices.at(f.index[2]).pos.x;
 
-    float xMax = maxInt3(x0, x1, x2);
-    float xMin = minInt3(x0, x1, x2);
+    float xMax = maxFloat3(x0, x1, x2);
+    float xMin = minFloat3(x0, x1, x2);
     float halfExt = (xMax - xMin) / 2.f;
 
     if (R < halfExt) R = halfExt;
