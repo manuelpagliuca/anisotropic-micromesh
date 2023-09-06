@@ -31,8 +31,12 @@ public:
 
   BoundingBox bbox;
 
+  float R;
+
   Mesh();
   ~Mesh();
+
+  void computeR() const;
 
   // Vertex
   int addVertex(vec3 pos);
@@ -47,7 +51,6 @@ public:
   uint getFaceSubdivisionLevel(int index) const;
   float getAvgFacesDoubleArea() const;
 
-
   // Edge
   int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
   float getAvgEdgeLength() const;
@@ -57,7 +60,6 @@ public:
   // Get
   std::vector<float> getPositionsVector() const;
   std::vector<uint> getFacesVector() const;
-
 
   // Subdivision
   Mesh subdivide();
@@ -79,7 +81,7 @@ public:
 
   // Utils
   void removeDuplicatedVertices();
-  float minimumDisplacement(const vec3 &origin, const vec3 &direction, const Mesh &target);
+  float minimumDistance(const vec3 &origin, const vec3 &direction, const Mesh &target);
   std::vector<float> getDisplacements(const Mesh &target);
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);

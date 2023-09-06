@@ -1,8 +1,8 @@
 #include "Mesh.h"
 
-float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, const Mesh &target)
+float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, const Mesh &target)
 {
-  float minDisp = INF;
+  float minDistance = INF;
 
   for (const Face &f : target.faces) {
     vec3 v0 = target.vertices[f.index[0]].pos;
@@ -11,15 +11,21 @@ float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, const
 
     Line line = Line(origin, direction);
 
-    float disp;
-
-    bool intersect = line.intersectTriangle(v0, v1, v2, disp);
+    float distance;
+    bool intersect = line.intersectTriangle(v0, v1, v2, distance);
 
     if (intersect)
-      minDisp = (abs(minDisp) < abs(disp)) ? minDisp : disp;
+      minDistance = fabsf(minDistance) < fabsf(distance) ? minDistance : distance;
+
+    float xMax = maxInt3(v0.x, v1.x, v2.x);
+    float xMin = minInt3(v0.x, v1.x, v2.x);
+    float xMiddle = (xMax - xMin) / 2.f;
+
+    if (fabsf(origin.x - xMiddle) - target.R < minDistance) {
+    }
   }
 
-  return minDisp;
+  return minDistance;
 }
 
 std::vector<float> Mesh::getDisplacements(const Mesh &target)
@@ -27,7 +33,7 @@ std::vector<float> Mesh::getDisplacements(const Mesh &target)
   std::vector<float> displacements;
 
   for (const Vertex &v : vertices)
-    displacements.push_back(minimumDisplacement(v.pos, v.norm, target));
+    displacements.push_back(minimumDistance(v.pos, v.norm, target));
 
   return displacements;
 }
@@ -106,6 +112,7 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
+  mesh.computeR();
 
   return mesh;
 }
@@ -200,6 +207,7 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
+  mesh.computeR();
 
   return mesh;
 }

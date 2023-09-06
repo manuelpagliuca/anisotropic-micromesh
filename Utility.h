@@ -15,5 +15,7 @@ int nearestCeilPow2(float edgeLength);
 int maxInt2(int a, int b);
 int maxInt3(int a, int b, int c);
 int maxIntIndex(int arr[]);
+int minInt2(int a, int b);
+int minInt3(int a, int b, int c);
 
 #endif // UTILITY_H

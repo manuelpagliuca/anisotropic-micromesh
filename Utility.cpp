@@ -20,6 +20,16 @@ int maxInt3(int a, int b, int c)
   return maxInt2(maxInt2(a, b), c);
 }
 
+int minInt2(int a, int b)
+{
+  return (a < b) ? a : b;
+}
+
+int minInt3(int a, int b, int c)
+{
+  return minInt2(minInt2(a, b), c);
+}
+
 int maxIntIndex(int arr[])
 {
   int maxIdx = 0;

@@ -9,6 +9,23 @@ Mesh::~Mesh()
   edges.clear();
 }
 
+void Mesh::computeR() const
+{
+  R = -INF;
+
+  for (Face &f: faces) {
+    float x0 = vertices.at(f.index[0]).pos.x;
+    float x1 = vertices.at(f.index[0]).pos.x;
+    float x2 = vertices.at(f.index[0]).pos.x;
+
+    float xMax = maxInt3(x0, x1, x2);
+    float xMin = minInt3(x0, x1, x2);
+    float halfExt = (xMax - xMin) / 2.f;
+
+    if (R < halfExt) R = halfExt;
+  }
+}
+
 int Mesh::addVertex(vec3 pos)
 {
   Vertex v;
@@ -87,6 +104,7 @@ std::vector<float> Mesh::getPositionsVector() const
 std::vector<uint> Mesh::getFacesVector() const
 {
   std::vector<uint> indices;
+
   for (const Face &f : faces) {
     indices.push_back(f.index[0]);
     indices.push_back(f.index[1]);
