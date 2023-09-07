@@ -5,11 +5,10 @@
 [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](mailto:pagliuca.manuel@gmail.com)
 
 ## About the project
-This is my final project for master's degree course in Computer Science
-This is the final project for the master's degree course in Computer Science, A.Y. 2022/2023.
+Final project for the master's degree in Computer Science A.A. 2022/2023.
 
 ### Abstract
-The objective of this thesis is to empirically investigate the imaginable performance for data structures suitable for effectively representing extreme-resolution 3D polygonal surfaces designed for multi-resolution rendering on GPUs.
+This thesis aims to empirically investigate the imaginable performance for data structures suitable for effectively representing extreme-resolution 3D polygonal surfaces designed for multi-resolution rendering on GPUs.
 
 To this end, supporting algorithms will be designed, implemented, and tested that transform "traditional" (i.e., indexed) high-resolution triangular meshes into the analyzed data structures, and then measure the approximation errors introduced through appropriate geometric measurements.
 
@@ -33,7 +32,7 @@ Models that I've used for the empirical analysis:
 ## Python script (empirical analysis)
 TODO: set the x number of samples to use
 
-Executing this script will generate **x** samples for both the subdivision schemes (classic and anisotropic). For both batches of samples, a table (as a text file) containing the Hausdorff distances toward the target mesh will be built.
+Executing this script will generate **x** samples for both the subdivision schemes (classic and anisotropic). A table (as a text file) containing the Hausdorff distances toward the target mesh will be built for both batches of samples.
 
 The table will be ordered by the number of micro-faces used, this will allow the comparison of one sample of a table with a sample of the other table, using the number of micro-faces as the comparative criteria.
 - As an example, with the two given tables it is possible to compare the distance for the **micro-mesh** sample of 10,000 micro-faces will be tested against the 10,000 **anisotropic micro-mesh** sample
