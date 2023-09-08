@@ -9,7 +9,7 @@ Mesh::~Mesh()
   edges.clear();
 }
 
-void Mesh::computeR()
+void Mesh::updateXmiddleAndR()
 {
   R = -INF;
 
@@ -20,6 +20,7 @@ void Mesh::computeR()
 
     float xMax = maxFloat3(x0, x1, x2);
     float xMin = minFloat3(x0, x1, x2);
+    f.xMiddle = (xMax + xMin) / 2.f;
     float halfExt = (xMax - xMin) / 2.f;
 
     if (R < halfExt) R = halfExt;

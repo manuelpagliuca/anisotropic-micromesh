@@ -4,7 +4,19 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, const Mes
 {
   float minDistance = INF;
 
+  // sort faces by xMiddle
+  sort(target.faces);
+
   for (const Face &f : target.faces) {
+    // quick rejection test
+    if (abs(origin.x - f.xMiddle) - target.R < abs(minDistance)) {
+      break;
+    }
+
+    if (abs(origin.x - f.xMiddle) + target.R < abs(minDistance)) {
+      continue;
+    }
+
     vec3 v0 = target.vertices[f.index[0]].pos;
     vec3 v1 = target.vertices[f.index[1]].pos;
     vec3 v2 = target.vertices[f.index[2]].pos;
@@ -13,17 +25,10 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, const Mes
 
     float distance;
     bool intersect = line.intersectTriangle(v0, v1, v2, distance);
-//    if (intersect)
-//      minDistance = fabsf(minDistance) < fabsf(distance) ? minDistance : distance;
 
-    float xMax = maxInt3(v0.x, v1.x, v2.x);
-    float xMin = minInt3(v0.x, v1.x, v2.x);
-    float xMiddle = (xMax - xMin) / 2.f;
-
-    if (intersect && fabsf(origin.x - xMiddle) - target.R < minDistance) {
-      minDistance = distance;
+    if (intersect) {
+      minDistance = (abs(minDistance) < abs(distance)) ? minDistance : distance;
     }
-
   }
 
   return minDistance;
@@ -113,7 +118,7 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
-  mesh.computeR();
+  mesh.updateXmiddleAndR();
 
   return mesh;
 }
@@ -208,7 +213,7 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
-  mesh.computeR();
+  mesh.updateXmiddleAndR();
 
   return mesh;
 }
