@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <algorithm>
 
 #include <QtOpenGL>
 #include <GLM/vec3.hpp>
@@ -81,8 +82,8 @@ public:
 
   // Utils
   void removeDuplicatedVertices();
-  float minimumDistance(const vec3 &origin, const vec3 &direction, const Mesh &target);
-  std::vector<float> getDisplacements(const Mesh &target);
+  float minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target);
+  std::vector<float> getDisplacements(Mesh &target);
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);
   void exportOFF(const std::string &fileName, QString filePath = QString("")) const;

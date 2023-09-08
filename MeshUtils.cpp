@@ -1,20 +1,20 @@
 #include "Mesh.h"
 
-float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, const Mesh &target)
+float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
   float minDistance = INF;
 
   // sort faces by xMiddle
-  sort(target.faces);
+  std::sort(target.faces.begin(), target.faces.end());
 
   for (const Face &f : target.faces) {
     // quick rejection test
-    if (abs(origin.x - f.xMiddle) - target.R < abs(minDistance)) {
-      break;
+    if (f.xMiddle - origin.x - target.R < -abs(minDistance)) {
+      continue;
     }
 
-    if (abs(origin.x - f.xMiddle) + target.R < abs(minDistance)) {
-      continue;
+    if (f.xMiddle - origin.x + target.R > abs(minDistance)) {
+      break;
     }
 
     vec3 v0 = target.vertices[f.index[0]].pos;
@@ -34,7 +34,7 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, const Mes
   return minDistance;
 }
 
-std::vector<float> Mesh::getDisplacements(const Mesh &target)
+std::vector<float> Mesh::getDisplacements(Mesh &target)
 {
   std::vector<float> displacements;
 
