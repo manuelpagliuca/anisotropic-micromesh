@@ -1,13 +1,30 @@
 #include "Mesh.h"
 
+void Mesh::intersectTriangle(int fIndex, Line line, float &minDistance)
+{
+  vec3 v0 = vertices[faces.at(fIndex).index[0]].pos;
+  vec3 v1 = vertices[faces.at(fIndex).index[1]].pos;
+  vec3 v2 = vertices[faces.at(fIndex).index[2]].pos;
+
+  float distance;
+  bool intersect = line.intersectTriangle(v0, v1, v2, distance);
+
+  if (intersect) {
+    minDistance = (abs(minDistance) < abs(distance)) ? minDistance : distance;
+  }
+}
+
 float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
   float minDistance = INF;
 
-  // sort faces by xMiddle
-  std::sort(target.faces.begin(), target.faces.end());
+  Line line = Line(origin, direction);
 
-  for (const Face &f : target.faces) {
+  std::sort(target.faces.begin(), target.faces.end()); // by xMiddle
+
+  for (int i = 0; i < target.faces.size(); i++) {
+    Face f = target.faces.at(i);
+
     // quick rejection test
     if (f.xMiddle - origin.x - target.R < -abs(minDistance)) {
       continue;
@@ -17,18 +34,7 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
       break;
     }
 
-    vec3 v0 = target.vertices[f.index[0]].pos;
-    vec3 v1 = target.vertices[f.index[1]].pos;
-    vec3 v2 = target.vertices[f.index[2]].pos;
-
-    Line line = Line(origin, direction);
-
-    float distance;
-    bool intersect = line.intersectTriangle(v0, v1, v2, distance);
-
-    if (intersect) {
-      minDistance = (abs(minDistance) < abs(distance)) ? minDistance : distance;
-    }
+    target.intersectTriangle(i, line, minDistance);
   }
 
   return minDistance;
@@ -295,3 +301,4 @@ void Mesh::exportOBJ(const std::string &fName, QString filePath) const
 
   qDebug() << fileNameExt.c_str() << "has been exported.";
 }
+
