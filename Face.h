@@ -11,8 +11,7 @@ struct Face
   glm::vec3 norm;
   float xMiddle;
 
-  bool operator<(const Face& other) const
-  {
+  bool operator<(const Face& other) const {
     return xMiddle < other.xMiddle;
   }
 };
