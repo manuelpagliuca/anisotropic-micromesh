@@ -6,12 +6,11 @@ void Mesh::intersectTriangle(int fIndex, Line line, float &minDistance)
   vec3 v1 = vertices[faces.at(fIndex).index[1]].pos;
   vec3 v2 = vertices[faces.at(fIndex).index[2]].pos;
 
-  float distance;
-  bool intersect = line.intersectTriangle(v0, v1, v2, distance);
+  float newDistance;
+  bool intersect = line.intersectTriangle(v0, v1, v2, newDistance);
 
-  if (intersect) {
-    minDistance = (abs(minDistance) < abs(distance)) ? minDistance : distance;
-  }
+  if (intersect)
+    minDistance = abs(minDistance) < abs(newDistance) ? minDistance : newDistance;
 }
 
 float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
@@ -19,50 +18,58 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
   float minDistance = INF;
   Line line = Line(origin, direction);
 
-  std::sort(target.faces.begin(), target.faces.end()); // by xMiddle
+  int i = -1;                   // first after origin.x
+  int j = target.faces.size();  // last before origin.x
 
-  std::vector<Face>::iterator it = std::lower_bound(target.faces.begin(), target.faces.end(), origin.x,
-    [](const Face& face, float x) {
-      return face.xMiddle < x;
-  });
-
-  int i = -1, j = int(target.faces.size()) + 1;
-
-  if (it != target.faces.end()) {
-    if (it != target.faces.begin()) {
-      j = std::distance(target.faces.begin(), it - 1);
-    } else {
-      j = -1;
-    }
-
-    if (it + 1 != target.faces.end()) {
-      i = std::distance(target.faces.begin(), it + 1);
-    } else {
-      i = int(target.faces.size()) + 1;
-    }
+  while (j != i + 1) {
+    int m = (i + j) / 2;
+    if (target.faces.at(m).xMiddle > origin.x)
+      j = m;
+    else
+      i = m;
   }
 
-  target.intersectTriangle(std::distance(target.faces.begin(), it), line, minDistance);
+  assert(i < 0 || target.faces.at(i).xMiddle <= origin.x);
+  assert(j == target.faces.size() || target.faces.at(j).xMiddle >= origin.x);
 
-  while (i >= 0 && j < target.faces.size()) {
+  while (i >= 0 || j < target.faces.size()) {
     if (i >= 0) {
-      if (target.faces.at(i).xMiddle - origin.x - target.R < -abs(minDistance)) {
+      // early rejection test
+      if (target.faces.at(i).xMiddle - origin.x + target.R < -abs(minDistance)) {
+        // stop leftmost search
         i = -1;
+      } else {
+        target.intersectTriangle(i, line, minDistance);
+        i--;
       }
-
-      target.intersectTriangle(i, line, minDistance);
-      i--;
     }
 
-    if (j > target.faces.size()) {
-      if (target.faces.at(j).xMiddle - origin.x + target.R > abs(minDistance)) {
+    if (j < target.faces.size()) {
+      // early rejection test
+      if (target.faces.at(j).xMiddle - origin.x - target.R > abs(minDistance)) {
+        // stop rightmost search
         j = int(target.faces.size());
+      } else {
+        target.intersectTriangle(j, line, minDistance);
+        j++;
       }
-
-      target.intersectTriangle(j, line, minDistance);
-      j++;
     }
   }
+
+  assert(minDistance != INF);
+  assert(minDistance != -INF);
+  assert(std::isnan(minDistance) != true);
+
+  return minDistance;
+}
+
+float Mesh::minimumDistanceBruteForce(const vec3 &origin, const vec3 &direction, Mesh &target)
+{
+  float minDistance = INF;
+  Line line = Line(origin, direction);
+
+  for (int i = 0; i < target.faces.size(); i++)
+    target.intersectTriangle(i, line, minDistance);
 
   return minDistance;
 }
@@ -152,6 +159,8 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
   mesh.updateVertexNormals();
   mesh.updateEdges();
   mesh.updateXmiddleAndR();
+
+  std::sort(mesh.faces.begin(), mesh.faces.end());
 
   return mesh;
 }
@@ -247,6 +256,8 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   mesh.updateVertexNormals();
   mesh.updateEdges();
   mesh.updateXmiddleAndR();
+
+  std::sort(mesh.faces.begin(), mesh.faces.end());
 
   return mesh;
 }

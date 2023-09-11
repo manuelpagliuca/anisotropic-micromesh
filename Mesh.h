@@ -20,6 +20,7 @@
 #include "Face.h"
 #include "BoundingBox.h"
 #include "Line.h"
+#include "Ray.h"
 
 using namespace glm;
 
@@ -83,6 +84,7 @@ public:
   // Utils
   void removeDuplicatedVertices();
   float minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target);
+  float minimumDistanceBruteForce(const vec3 &origin, const vec3 &direction, Mesh &target);
   std::vector<float> getDisplacements(Mesh &target);
   static Mesh parseOFF(const std::string &rawOFF);
   static Mesh parseOBJ(const std::string &rawOBJ);
