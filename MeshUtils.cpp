@@ -16,26 +16,28 @@ void Mesh::intersectTriangle(int fIndex, Line line, float &minDistance)
 float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
   float minDistance = INF;
-  Line line = Line(origin, direction);
 
-  int i = -1;                   // first after origin.x
-  int j = target.faces.size();  // last before origin.x
+  Line line = Line(origin, direction);
+  float posOrigin = origin[maxAxis];
+
+  int i = -1;                   // first after posOrigin
+  int j = target.faces.size();  // last before posOrigin
 
   while (j != i + 1) {
     int m = (i + j) / 2;
-    if (target.faces.at(m).xMiddle > origin.x)
+    if (target.faces.at(m).posMiddle > posOrigin)
       j = m;
     else
       i = m;
   }
 
-  assert(i < 0 || target.faces.at(i).xMiddle <= origin.x);
-  assert(j == target.faces.size() || target.faces.at(j).xMiddle >= origin.x);
+  assert(i < 0 || target.faces.at(i).posMiddle <= posOrigin);
+  assert(j == target.faces.size() || target.faces.at(j).posMiddle >= posOrigin);
 
   while (i >= 0 || j < target.faces.size()) {
     if (i >= 0) {
       // early rejection test
-      if (target.faces.at(i).xMiddle - origin.x + target.R < -abs(minDistance)) {
+      if (target.faces.at(i).posMiddle - posOrigin + target.R < -abs(minDistance)) {
         // stop leftmost search
         i = -1;
       } else {
@@ -46,7 +48,7 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
 
     if (j < target.faces.size()) {
       // early rejection test
-      if (target.faces.at(j).xMiddle - origin.x - target.R > abs(minDistance)) {
+      if (target.faces.at(j).posMiddle - posOrigin - target.R > abs(minDistance)) {
         // stop rightmost search
         j = int(target.faces.size());
       } else {
@@ -158,7 +160,7 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
-  mesh.updateXmiddleAndR();
+  mesh.updatePosMiddleAndR();
 
   std::sort(mesh.faces.begin(), mesh.faces.end());
 
@@ -255,7 +257,7 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
   mesh.updateFaceNormals();
   mesh.updateVertexNormals();
   mesh.updateEdges();
-  mesh.updateXmiddleAndR();
+  mesh.updatePosMiddleAndR();
 
   std::sort(mesh.faces.begin(), mesh.faces.end());
 

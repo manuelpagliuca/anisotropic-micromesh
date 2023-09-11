@@ -353,7 +353,7 @@ void Mainwindow::on_actionLoad_triggered()
     }
 
     baseMeshNameAndDetail = extractFileName(filePath.toStdString());
-  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
+    ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
   }
 }
 

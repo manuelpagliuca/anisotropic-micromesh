@@ -9,10 +9,10 @@ struct Face
   uint index[3];
   uint edgesIndices[3]; // 0, 1 and 2
   glm::vec3 norm;
-  float xMiddle;
+  float posMiddle;
 
   bool operator<(const Face& other) const {
-    return xMiddle < other.xMiddle;
+    return posMiddle < other.posMiddle;
   }
 };
 

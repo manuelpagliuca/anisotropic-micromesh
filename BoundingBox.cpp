@@ -20,6 +20,17 @@ float BoundingBox::radius() const
   return diagonal() / 2.0f;
 }
 
+int BoundingBox::maxAxis() const
+{
+  vec3 ext = maxPoint - minPoint;
+
+  if (ext.x > ext.y && ext.x > ext.z)
+      return 0;
+  if (ext.y > ext.z)
+      return 1;
+  return 2;
+}
+
 void BoundingBox::init(const vec3 point)
 {
   minPoint = maxPoint = point;

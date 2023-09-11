@@ -9,18 +9,18 @@ Mesh::~Mesh()
   edges.clear();
 }
 
-void Mesh::updateXmiddleAndR()
+void Mesh::updatePosMiddleAndR()
 {
   R = -INF;
 
   for (Face &f: faces) {
-    float x0 = vertices.at(f.index[0]).pos.x;
-    float x1 = vertices.at(f.index[1]).pos.x;
-    float x2 = vertices.at(f.index[2]).pos.x;
+    float pos0 = vertices.at(f.index[0]).pos[maxAxis];
+    float pos1 = vertices.at(f.index[1]).pos[maxAxis];
+    float pos2 = vertices.at(f.index[2]).pos[maxAxis];
 
-    float xMax = maxFloat3(x0, x1, x2);
-    float xMin = minFloat3(x0, x1, x2);
-    f.xMiddle = (xMax + xMin) / 2.f;
+    float xMax = maxFloat3(pos0, pos1, pos2);
+    float xMin = minFloat3(pos0, pos1, pos2);
+    f.posMiddle = (xMax + xMin) / 2.f;
     float halfExt = (xMax - xMin) / 2.f;
 
     if (R < halfExt) R = halfExt;
@@ -307,7 +307,7 @@ Mesh Mesh::micromeshSubdivide()
 
   subdivided.updateBoundingBox();
   subdivided.updateEdges();
-  subdivided.removeDuplicatedVertices();
+//  subdivided.removeDuplicatedVertices();
 
   return subdivided;
 }
@@ -392,7 +392,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 
   subdivided.updateBoundingBox();
   subdivided.updateEdges();
-  subdivided.removeDuplicatedVertices();
+//  subdivided.removeDuplicatedVertices();
 
   return subdivided;
 }
@@ -560,6 +560,7 @@ void Mesh::updateBoundingBox()
   bbox.init(vertices[0].pos);
   for (Vertex &v : vertices)
     bbox.includeAnotherPoint(v.pos);
+  maxAxis = bbox.maxAxis();
 }
 
 bool Mesh::enforceMicromesh(const Face &f)

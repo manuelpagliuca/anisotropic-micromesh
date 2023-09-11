@@ -14,9 +14,12 @@ class BoundingBox
 public:
   BoundingBox() {}
   BoundingBox(vec3 point);
+
   vec3 center() const;
   float diagonal() const;
   float radius() const;
+
+  int maxAxis() const;
 
   void init(const vec3 point);
   void includeAnotherPoint(const vec3 point);

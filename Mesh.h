@@ -33,12 +33,13 @@ public:
 
   BoundingBox bbox;
 
-  float R;
+  float R;  // maximal extension on maxAxis (x,y,z) of the largest bbox of all faces
+  int maxAxis; // position on maxAxis (x,y or z) of the center of the bbox of this face
 
   Mesh();
   ~Mesh();
 
-  void updateXmiddleAndR();
+  void updatePosMiddleAndR();
 
   // Vertex
   int addVertex(vec3 pos);
