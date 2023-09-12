@@ -7,8 +7,10 @@
 #include "Mesh.h"
 
 #define PRINT_VECTOR(x) std::cout << #x << ": " << glm::to_string(x) << std::endl;
-
 #define INF std::numeric_limits<float>::infinity()
+#define HIGH_RES_FACTOR 150
+#define MIN_TARGET_EDGE_LENGTH 0.1
+#define MAX_TARGET_EDGE_LENGTH 20.0
 
 int nearestRoundPow2(float edgeLength);
 int nearestCeilPow2(float edgeLength);

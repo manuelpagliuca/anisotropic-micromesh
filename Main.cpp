@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
         if (nSamples.isEmpty())
             nSamples = "5";
         if (minEdge.isEmpty())
-            minEdge = "1.0";
+            minEdge = "0.1";
         if (maxEdge.isEmpty())
             maxEdge = "20.0";
         if (targetMesh.isEmpty())
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
         else if (cmd == "gen-sample")
         {
             w.loadTargetMesh(targetMesh);
-            int microFaces = int(w.baseMesh.faces.size()) * 2;
+            int microFaces = int(w.targetMesh.faces.size()) * 2;
             microFaces = microfacesAmount.toInt() > microFaces ? microfacesAmount.toInt() : microFaces;
             qDebug() << "Generating a sample with: " << microFaces << " micro-faces.";
             w.exportDisplacedBaseMesh(microFaces, subdivisionScheme, minEdge.toDouble(), maxEdge.toDouble());

@@ -273,22 +273,22 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
                        "_ApprxMicroFaces_" +
                        QString::number(microFaces);
 
-    QString outputDir = QDir("Evaluation/same_microfaces/" + subdivisionScheme + "/" +
-                  QString::fromStdString(baseMeshNameAndDetail) + "/");
+    QDir outputDir =
+        QDir("Evaluation/same_microfaces/" + subdivisionScheme + "/" +
+        QString::fromStdString(baseMeshNameAndDetail) + "/");
 
     if (!outputDir.exists())
     {
         if (!outputDir.mkpath("."))
         {
-            qDebug() << "Error during the creation of the directory: " << microDir;
+            qDebug() << "Error during the creation of the directory: " << outputDir;
             return;
         }
     }
 
-    projectedMesh.exportOBJ(("Evaluation/same_microfaces/" + subdivisionScheme + "/" +
-                             QString::fromStdString(baseMeshNameAndDetail) +
-                             "/" + fileName)
-                                .toStdString());
+    QString outputPath = outputDir.path() + "/";
+
+    projectedMesh.exportOBJ(fileName.toStdString().c_str(), outputPath);
 }
 
 double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
@@ -312,11 +312,13 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString su
         bFaces = int(baseMesh.micromeshSubdivide().faces.size());
     }
 
+
     while (true)
     {
         double c = (a + b) / 2.0;
 
         int cFaces;
+        qDebug() << aFaces << bFaces;
 
         if (subdivisionScheme == "aniso")
         {

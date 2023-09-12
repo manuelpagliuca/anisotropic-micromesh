@@ -17,6 +17,7 @@
 #include <omp.h>
 
 #include "Mesh.h"
+#include "Utility.h"
 
 #define MICROFACES_LIMIT 3000000
 

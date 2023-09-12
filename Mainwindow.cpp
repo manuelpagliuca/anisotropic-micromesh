@@ -395,7 +395,6 @@ void Mainwindow::on_actionLoad_triggered()
         }
 
         baseMeshNameAndDetail = extractFileName(filePath.toStdString());
-        ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 100);
     }
 }
 
@@ -552,8 +551,6 @@ void Mainwindow::on_demo124faces_clicked()
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
     disableEdgeLengthSlider();
-
-    ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 100);
 }
 
 void Mainwindow::on_demo250faces_clicked()
@@ -571,8 +568,6 @@ void Mainwindow::on_demo250faces_clicked()
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
     disableEdgeLengthSlider();
-
-    ui.microFacesSlider->setRange(int(baseMesh.faces.size()), MICROFACES_LIMIT);
 }
 
 void Mainwindow::on_demo500faces_clicked()
@@ -590,8 +585,6 @@ void Mainwindow::on_demo500faces_clicked()
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
     disableEdgeLengthSlider();
-
-    ui.microFacesSlider->setRange(int(baseMesh.faces.size()), MICROFACES_LIMIT);
 }
 
 void Mainwindow::on_demo1000faces_clicked()
@@ -609,8 +602,6 @@ void Mainwindow::on_demo1000faces_clicked()
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
     disableEdgeLengthSlider();
-
-    ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 100);
 }
 
 // Triggered when "Micro-mesh" button is clicked
@@ -787,7 +778,7 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
 
     QString subdivisionScheme = isAniso ? QString("aniso") : QString("micro");
 
-    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, 1.0, 20.0);
+    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, MIN_TARGET_EDGE_LENGTH, MAX_TARGET_EDGE_LENGTH);
 
     if (!isAniso)
     {
@@ -891,4 +882,7 @@ void Mainwindow::on_radioTargetMicroFaces_clicked()
 {
     ui.microFacesSlider->setEnabled(true);
     ui.edgeLengthSlider->setEnabled(false);
+
+    ui.microFacesSlider->setMaximum(int(baseMesh.faces.size()) * HIGH_RES_FACTOR);
+    ui.microFacesSlider->setMinimum(int(baseMesh.faces.size()));
 }

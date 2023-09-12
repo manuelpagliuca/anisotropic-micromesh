@@ -536,6 +536,7 @@ void Mesh::setInitialEdgeSubdivisionLevels(float targetEdgeLength)
         edges.at(f.edgesIndices[1]).subdivisions = nearestRoundPow2(l1);
         edges.at(f.edgesIndices[2]).subdivisions = nearestRoundPow2(l2);
     }
+    qDebug() << "Setting subdivisions levels according to target edge length " << targetEdgeLength;
 }
 
 void Mesh::updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength)
@@ -554,6 +555,7 @@ void Mesh::updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength)
         }
 
         count++;
+
         if (!changeAnything)
             break;
     }

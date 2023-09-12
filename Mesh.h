@@ -14,8 +14,8 @@
 #include <GLM/gtx/intersect.hpp>
 #include <map>
 #include <utility>
-#include "Utility.h"
 
+#include "Utility.h"
 #include "Edge.h"
 #include "Vertex.h"
 #include "Face.h"
