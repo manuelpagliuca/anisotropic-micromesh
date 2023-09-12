@@ -2,176 +2,196 @@
 
 void Mesh::intersectTriangle(int fIndex, Line line, float &minDistance)
 {
-  vec3 v0 = vertices[faces.at(fIndex).index[0]].pos;
-  vec3 v1 = vertices[faces.at(fIndex).index[1]].pos;
-  vec3 v2 = vertices[faces.at(fIndex).index[2]].pos;
+    vec3 v0 = vertices[faces.at(fIndex).index[0]].pos;
+    vec3 v1 = vertices[faces.at(fIndex).index[1]].pos;
+    vec3 v2 = vertices[faces.at(fIndex).index[2]].pos;
 
-  float newDistance;
-  bool intersect = line.intersectTriangle(v0, v1, v2, newDistance);
+    float newDistance;
+    bool intersect = line.intersectTriangle(v0, v1, v2, newDistance);
 
-  if (intersect)
-    minDistance = abs(minDistance) < abs(newDistance) ? minDistance : newDistance;
+    if (intersect)
+        minDistance = abs(minDistance) < abs(newDistance) ? minDistance : newDistance;
 }
 
 float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
-  float minDistance = INF;
+    float minDistance = INF;
 
-  Line line = Line(origin, direction);
-  float posOrigin = origin[maxAxis];
+    Line line = Line(origin, direction);
+    float posOrigin = origin[maxAxis];
 
-  int i = -1;                   // first after posOrigin
-  int j = int(target.faces.size());  // last before posOrigin
+    int i = -1;                       // first after posOrigin
+    int j = int(target.faces.size()); // last before posOrigin
 
-  while (j != i + 1) {
-    int m = (i + j) / 2;
-    if (target.faces.at(m).posMiddle > posOrigin)
-      j = m;
-    else
-      i = m;
-  }
-
-  assert(i < 0 || target.faces.at(i).posMiddle <= posOrigin);
-  assert(j == target.faces.size() || target.faces.at(j).posMiddle >= posOrigin);
-
-  while (i >= 0 || j < target.faces.size()) {
-    if (i >= 0) {
-      // early rejection test
-      if (target.faces.at(i).posMiddle - posOrigin + target.R < -abs(minDistance)) {
-        // stop leftmost search
-        i = -1;
-      } else {
-        target.intersectTriangle(i, line, minDistance);
-        i--;
-      }
+    while (j != i + 1)
+    {
+        int m = (i + j) / 2;
+        if (target.faces.at(m).posMiddle > posOrigin)
+            j = m;
+        else
+            i = m;
     }
 
-    if (j < target.faces.size()) {
-      // early rejection test
-      if (target.faces.at(j).posMiddle - posOrigin - target.R > abs(minDistance)) {
-        // stop rightmost search
-        j = int(target.faces.size());
-      } else {
-        target.intersectTriangle(j, line, minDistance);
-        j++;
-      }
+    assert(i < 0 || target.faces.at(i).posMiddle <= posOrigin);
+    assert(j == target.faces.size() || target.faces.at(j).posMiddle >= posOrigin);
+
+    while (i >= 0 || j < target.faces.size())
+    {
+        if (i >= 0)
+        {
+            // early rejection test
+            if (target.faces.at(i).posMiddle - posOrigin + target.R < -abs(minDistance))
+            {
+                // stop leftmost search
+                i = -1;
+            }
+            else
+            {
+                target.intersectTriangle(i, line, minDistance);
+                i--;
+            }
+        }
+
+        if (j < target.faces.size())
+        {
+            // early rejection test
+            if (target.faces.at(j).posMiddle - posOrigin - target.R > abs(minDistance))
+            {
+                // stop rightmost search
+                j = int(target.faces.size());
+            }
+            else
+            {
+                target.intersectTriangle(j, line, minDistance);
+                j++;
+            }
+        }
     }
-  }
 
-  assert(minDistance != INF);
-  assert(minDistance != -INF);
-  assert(std::isnan(minDistance) != true);
+    assert(minDistance != INF);
+    assert(minDistance != -INF);
+    assert(std::isnan(minDistance) != true);
 
-  return minDistance;
+    return minDistance;
 }
 
 float Mesh::minimumDistanceBruteForce(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
-  float minDistance = INF;
-  Line line = Line(origin, direction);
+    float minDistance = INF;
+    Line line = Line(origin, direction);
 
-  for (int i = 0; i < target.faces.size(); i++)
-    target.intersectTriangle(i, line, minDistance);
+    for (int i = 0; i < target.faces.size(); i++)
+        target.intersectTriangle(i, line, minDistance);
 
-  return minDistance;
+    return minDistance;
 }
 
 std::vector<float> Mesh::getDisplacements(Mesh &target)
 {
-  std::vector<float> displacements;
+    std::vector<float> displacements;
 
-  for (const Vertex &v : vertices)
-    displacements.push_back(minimumDistance(v.pos, v.norm, target));
+    for (const Vertex &v : vertices)
+        displacements.push_back(minimumDistance(v.pos, v.norm, target));
 
-  return displacements;
+    return displacements;
 }
 
 void Mesh::removeDuplicatedVertices()
 {
-  std::unordered_set<Vertex> uniqueVertices;
+    std::unordered_set<Vertex> uniqueVertices;
 
-  for (const Vertex &v : vertices)
-    uniqueVertices.insert(v);
+    for (const Vertex &v : vertices)
+        uniqueVertices.insert(v);
 
-  for (Face &f : faces) {
-    Vertex v0 = vertices.at(f.index[0]);
-    Vertex v1 = vertices.at(f.index[1]);
-    Vertex v2 = vertices.at(f.index[2]);
+    for (Face &f : faces)
+    {
+        Vertex v0 = vertices.at(f.index[0]);
+        Vertex v1 = vertices.at(f.index[1]);
+        Vertex v2 = vertices.at(f.index[2]);
 
-    auto it0 = uniqueVertices.find(v0);
-    auto it1 = uniqueVertices.find(v1);
-    auto it2 = uniqueVertices.find(v2);
+        auto it0 = uniqueVertices.find(v0);
+        auto it1 = uniqueVertices.find(v1);
+        auto it2 = uniqueVertices.find(v2);
 
-    if (it0 != uniqueVertices.end()) {
-      f.index[0] = std::distance(uniqueVertices.begin(), it0);
+        if (it0 != uniqueVertices.end())
+        {
+            f.index[0] = std::distance(uniqueVertices.begin(), it0);
+        }
+
+        if (it1 != uniqueVertices.end())
+        {
+            f.index[1] = std::distance(uniqueVertices.begin(), it1);
+        }
+
+        if (it2 != uniqueVertices.end())
+        {
+            f.index[2] = std::distance(uniqueVertices.begin(), it2);
+        }
     }
 
-    if (it1 != uniqueVertices.end()) {
-      f.index[1] = std::distance(uniqueVertices.begin(), it1);
-    }
-
-    if (it2 != uniqueVertices.end()) {
-      f.index[2] = std::distance(uniqueVertices.begin(), it2);
-    }
-  }
-
-  vertices = std::vector(uniqueVertices.begin(), uniqueVertices.end());
+    vertices = std::vector(uniqueVertices.begin(), uniqueVertices.end());
 }
 
 Mesh Mesh::parseOFF(const std::string &rawOFF)
 {
-  if (rawOFF.empty()) {
-    Mesh empty = Mesh();
-    return empty;
-  }
-
-  std::istringstream iss(rawOFF);
-  std::string line;
-
-  std::getline(iss, line);
-
-  if (line != "OFF") {
-    std::cerr << "Wrong format!" << std::endl;
-    Mesh corr_mesh = Mesh();
-    return Mesh();
-  }
-
-  int numVertices, numFaces, numEdges;
-  iss >> numVertices >> numFaces >> numEdges;
-  std::getline(iss, line);
-
-  Mesh mesh = Mesh();
-  int nTotal = numVertices + numFaces + 0; // todo: atm no edges
-
-  for (int i = 0; i < nTotal; i++) {
-    if (i < numVertices) {
-      float x, y, z;
-      iss >> x >> y >> z;
-      mesh.addVertex(vec3(x, y, z));
-    } else if (i >= numVertices && i < numVertices + numFaces) {
-      int n_vrtx, v1, v2, v3;
-      iss >> n_vrtx >> v1 >> v2 >> v3;
-      mesh.addFace(v1, v2, v3);
+    if (rawOFF.empty())
+    {
+        Mesh empty = Mesh();
+        return empty;
     }
-    // else
-    //{
-    //	 TODO: no edge atm
-    //	 std::vector<uint> idx_edge = std::vector<uint>(4);
-    //	 iss >> idx_edge[0] >> idx_edge[1] >> idx_edge[2] >> idx_edge[3];
-    //	 mesh.edges.push_back(idx_edge);
-    // }
+
+    std::istringstream iss(rawOFF);
+    std::string line;
+
     std::getline(iss, line);
-  }
 
-  mesh.updateBoundingBox();
-  mesh.updateFaceNormals();
-  mesh.updateVertexNormals();
-  mesh.updateEdges();
-  mesh.updatePosMiddleAndR();
+    if (line != "OFF")
+    {
+        std::cerr << "Wrong format!" << std::endl;
+        Mesh corr_mesh = Mesh();
+        return Mesh();
+    }
 
-  std::sort(mesh.faces.begin(), mesh.faces.end());
+    int numVertices, numFaces, numEdges;
+    iss >> numVertices >> numFaces >> numEdges;
+    std::getline(iss, line);
 
-  return mesh;
+    Mesh mesh = Mesh();
+    int nTotal = numVertices + numFaces + 0; // todo: atm no edges
+
+    for (int i = 0; i < nTotal; i++)
+    {
+        if (i < numVertices)
+        {
+            float x, y, z;
+            iss >> x >> y >> z;
+            mesh.addVertex(vec3(x, y, z));
+        }
+        else if (i >= numVertices && i < numVertices + numFaces)
+        {
+            int n_vrtx, v1, v2, v3;
+            iss >> n_vrtx >> v1 >> v2 >> v3;
+            mesh.addFace(v1, v2, v3);
+        }
+        // else
+        //{
+        //	 TODO: no edge atm
+        //	 std::vector<uint> idx_edge = std::vector<uint>(4);
+        //	 iss >> idx_edge[0] >> idx_edge[1] >> idx_edge[2] >> idx_edge[3];
+        //	 mesh.edges.push_back(idx_edge);
+        // }
+        std::getline(iss, line);
+    }
+
+    mesh.updateBoundingBox();
+    mesh.updateFaceNormals();
+    mesh.updateVertexNormals();
+    mesh.updateEdges();
+    mesh.updatePosMiddleAndR();
+
+    std::sort(mesh.faces.begin(), mesh.faces.end());
+
+    return mesh;
 }
 
 /*
@@ -186,166 +206,177 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
 
 Mesh Mesh::parseOBJ(const std::string &raw_obj)
 {
-  Mesh mesh = Mesh();
+    Mesh mesh = Mesh();
 
-  if (raw_obj.empty()) {
-    std::cerr << "The .obj file is empty, a null mesh has been returned." << std::endl;
+    if (raw_obj.empty())
+    {
+        std::cerr << "The .obj file is empty, a null mesh has been returned." << std::endl;
+        return mesh;
+    }
+
+    std::istringstream in(raw_obj);
+    std::string line;
+
+    std::vector<vec3> positions;
+    std::vector<vec2> texels;
+    std::vector<vec3> normals;
+    std::vector<uvec3> faces;
+
+    while (std::getline(in, line))
+    {
+        if (line.substr(0, 2) == "v ")
+        {
+            std::istringstream is(line.substr(2));
+            vec3 vpos;
+            float x, y, z;
+            is >> x;
+            is >> y;
+            is >> z;
+            vpos = vec3(x, y, z);
+            positions.push_back(vpos);
+        }
+
+        if (line.substr(0, 3) == "vt ")
+        {
+            std::istringstream is(line.substr(3));
+            vec2 tex;
+            float u, v;
+            is >> u;
+            is >> v;
+            tex = vec2(u, v);
+            texels.push_back(tex);
+        }
+
+        if (line.substr(0, 3) == "vn ")
+        {
+            std::istringstream is(line.substr(3));
+            vec3 normal;
+            float x, y, z;
+            is >> x;
+            is >> y;
+            is >> z;
+            normal = vec3(x, y, z);
+            normals.push_back(normal);
+        }
+
+        if (line.substr(0, 2) == "f ")
+        {
+            // TODO: atm not considering textures, vn indices, ...
+            std::istringstream is(line.substr(2));
+            std::string dump;
+            int i1, i2, i3;
+            is >> i1;
+            is >> dump;
+            is >> i2;
+            is >> dump;
+            is >> i3;
+            faces.push_back(uvec3(--i1, --i2, --i3));
+        }
+    }
+
+    for (const vec3 &pos : positions)
+        mesh.addVertex(pos);
+
+    int i = 0;
+    for (Vertex &v : mesh.vertices)
+    {
+        v.norm = normals[i];
+        i++;
+    }
+
+    for (const vec3 &f : faces)
+        mesh.addFace(f[0], f[1], f[2]);
+
+    mesh.updateBoundingBox();
+    mesh.updateFaceNormals();
+    mesh.updateVertexNormals();
+    mesh.updateEdges();
+    mesh.updatePosMiddleAndR();
+
+    std::sort(mesh.faces.begin(), mesh.faces.end());
+
     return mesh;
-  }
-
-  std::istringstream in(raw_obj);
-  std::string line;
-
-  std::vector<vec3> positions;
-  std::vector<vec2> texels;
-  std::vector<vec3> normals;
-  std::vector<uvec3> faces;
-
-  while (std::getline(in, line)) {
-    if (line.substr(0, 2) == "v ") {
-      std::istringstream is(line.substr(2));
-      vec3 vpos;
-      float x, y, z;
-      is >> x;
-      is >> y;
-      is >> z;
-      vpos = vec3(x, y, z);
-      positions.push_back(vpos);
-    }
-
-    if (line.substr(0, 3) == "vt ") {
-      std::istringstream is(line.substr(3));
-      vec2 tex;
-      float u, v;
-      is >> u;
-      is >> v;
-      tex = vec2(u, v);
-      texels.push_back(tex);
-    }
-
-    if (line.substr(0, 3) == "vn ") {
-      std::istringstream is(line.substr(3));
-      vec3 normal;
-      float x, y, z;
-      is >> x;
-      is >> y;
-      is >> z;
-      normal = vec3(x, y, z);
-      normals.push_back(normal);
-    }
-
-    if (line.substr(0, 2) == "f ") {
-      // TODO: atm not considering textures, vn indices, ...
-      std::istringstream is(line.substr(2));
-      std::string dump;
-      int i1, i2, i3;
-      is >> i1;
-      is >> dump;
-      is >> i2;
-      is >> dump;
-      is >> i3;
-      faces.push_back(uvec3(--i1, --i2, --i3));
-    }
-  }
-
-  for (const vec3 &pos : positions)
-    mesh.addVertex(pos);
-
-  int i = 0;
-  for (Vertex &v : mesh.vertices) {
-    v.norm = normals[i];
-    i++;
-  }
-
-  for (const vec3 &f : faces)
-    mesh.addFace(f[0], f[1], f[2]);
-
-  mesh.updateBoundingBox();
-  mesh.updateFaceNormals();
-  mesh.updateVertexNormals();
-  mesh.updateEdges();
-  mesh.updatePosMiddleAndR();
-
-  std::sort(mesh.faces.begin(), mesh.faces.end());
-
-  return mesh;
 }
 
 void Mesh::exportOFF(const std::string &fileName, QString filePath) const
 {
-  std::ostringstream oss;
-  std::string fileNameExt = fileName + ".off";
+    std::ostringstream oss;
+    std::string fileNameExt = fileName + ".off";
 
-  if (filePath.isEmpty()) {
-    filePath = QString::fromStdString("./Output/" + fileNameExt);
-  }
+    if (filePath.isEmpty())
+    {
+        filePath = QString::fromStdString("./Output/" + fileNameExt);
+    }
 
-  std::ofstream fileStream(filePath.toStdString().c_str(), std::ios::out);
+    std::ofstream fileStream(filePath.toStdString().c_str(), std::ios::out);
 
-  if (!fileStream.is_open()) {
-    printf("Failed to open \'%s\'. File doesn't exist.", filePath.toStdString().c_str());
-    return;
-  }
+    if (!fileStream.is_open())
+    {
+        printf("Failed to open \'%s\'. File doesn't exist.", filePath.toStdString().c_str());
+        return;
+    }
 
-  fileStream
-      << "OFF"
-      << "\n"
-      << vertices.size() << " "
-      << faces.size() << " "
-      << 0 << std::endl; // todo: atm the # of edges is 0
-
-  for (const Vertex &v : vertices)
     fileStream
-        << v.pos.x << " "
-        << v.pos.y << " "
-        << v.pos.z << std::endl;
+        << "OFF"
+        << "\n"
+        << vertices.size() << " "
+        << faces.size() << " "
+        << 0 << std::endl; // todo: atm the # of edges is 0
 
-  for (const Face &f : faces)
-    fileStream
-        << 3
-        << " " << f.index[0]
-        << " " << f.index[1]
-        << " " << f.index[2] << std::endl;
+    for (const Vertex &v : vertices)
+        fileStream
+            << v.pos.x << " "
+            << v.pos.y << " "
+            << v.pos.z << std::endl;
 
-  fileStream.close();
-  qDebug() << fileNameExt.c_str() << "has been exported.";
+    for (const Face &f : faces)
+        fileStream
+            << 3
+            << " " << f.index[0]
+            << " " << f.index[1]
+            << " " << f.index[2] << std::endl;
+
+    fileStream.close();
+    qDebug() << fileNameExt.c_str() << "has been exported.";
 }
 
 void Mesh::exportOBJ(const std::string &fName, QString filePath) const
 {
-  std::ostringstream oss;
-  std::string fileNameExt = fName + ".obj";
+    std::ostringstream oss;
+    std::string fileNameExt = fName + ".obj";
 
-  if (filePath.isEmpty()) {
-    filePath = QString::fromStdString("./Output/" + fileNameExt);
-  }
+    if (filePath.isEmpty())
+    {
+        filePath = QString::fromStdString("./Output/" + fileNameExt);
+    }
 
-  std::ofstream fileStream(filePath.toStdString().c_str(), std::ios::out);
+    std::ofstream fileStream(filePath.toStdString().c_str(), std::ios::out);
 
-  if (!fileStream.is_open()) {
-    printf("Failed to open \'%s\'. File doesn't exist.", filePath.toStdString().c_str());
-    return;
-  }
+    if (!fileStream.is_open())
+    {
+        printf("Failed to open \'%s\'. File doesn't exist.", filePath.toStdString().c_str());
+        return;
+    }
 
-  for (const Vertex &v : vertices) {
-    fileStream << std::setprecision(6) << std::fixed
-               << "vn " << v.norm.x
-               << " " << v.norm.y
-               << " " << v.norm.z << std::endl;
-    fileStream << std::setprecision(6) << std::fixed
-               << "v " << v.pos.x
-               << " " << v.pos.y
-               << " " << v.pos.z << std::endl;
-  }
+    for (const Vertex &v : vertices)
+    {
+        fileStream << std::setprecision(6) << std::fixed
+                   << "vn " << v.norm.x
+                   << " " << v.norm.y
+                   << " " << v.norm.z << std::endl;
+        fileStream << std::setprecision(6) << std::fixed
+                   << "v " << v.pos.x
+                   << " " << v.pos.y
+                   << " " << v.pos.z << std::endl;
+    }
 
-  for (const Face &f : faces)
-    fileStream << "f "
-               << f.index[0] + 1 << "//" << f.index[0] + 1 << " "
-               << f.index[1] + 1 << "//" << f.index[1] + 1 << " "
-               << f.index[2] + 1 << "//" << f.index[2] + 1 << std::endl;
+    for (const Face &f : faces)
+        fileStream << "f "
+                   << f.index[0] + 1 << "//" << f.index[0] + 1 << " "
+                   << f.index[1] + 1 << "//" << f.index[1] + 1 << " "
+                   << f.index[2] + 1 << "//" << f.index[2] + 1 << std::endl;
 
-  fileStream.close();
+    fileStream.close();
 
-  qDebug() << fileNameExt.c_str() << "has been exported.";
+    qDebug() << fileNameExt.c_str() << "has been exported.";
 }
-

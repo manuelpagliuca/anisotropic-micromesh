@@ -19,37 +19,37 @@ using namespace glm;
 
 class GLWidget : public QOpenGLWidget, protected QOpenGLExtraFunctions
 {
-  Q_OBJECT
+    Q_OBJECT
 
 public:
-  explicit GLWidget(QWidget *parent);
+    explicit GLWidget(QWidget *parent);
 
-  void loadMeshData(const Mesh &mesh);
-  void updateMeshData(const Mesh &mesh);
-  void unloadMeshData();
+    void loadMeshData(const Mesh &mesh);
+    void updateMeshData(const Mesh &mesh);
+    void unloadMeshData();
 
-  void wireframePaint();
-  void saveLastModel();
-  TrackBall trackBall;
+    void wireframePaint();
+    void saveLastModel();
+    TrackBall trackBall;
 
 protected:
-  void paintGL() override;
-  void initializeGL() override;
+    void paintGL() override;
+    void initializeGL() override;
 
 private:
-  std::vector<float> vertices;
-  std::vector<unsigned int> faces;
+    std::vector<float> vertices;
+    std::vector<unsigned int> faces;
 
-  std::string readFile(const char *fileLocation) const;
-  GLuint createShader(GLenum type, const GLchar *source);
-  void initializeShaders();
+    std::string readFile(const char *fileLocation) const;
+    GLuint createShader(GLenum type, const GLchar *source);
+    void initializeShaders();
 
-  GLuint shaderProgram;
-  GLuint vShader, fShader;
-  GLint modelLocation, wireLocation;
-  mat4 model;
+    GLuint shaderProgram;
+    GLuint vShader, fShader;
+    GLint modelLocation, wireLocation;
+    mat4 model;
 
-  bool wireframeMode = false;
+    bool wireframeMode = false;
 };
 
 #endif // GL_WIDGET_H

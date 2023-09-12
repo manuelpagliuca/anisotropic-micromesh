@@ -12,13 +12,17 @@ struct Vertex
     glm::vec3 norm;
     glm::vec2 tex;
 
-    bool operator==(const Vertex &v) const {
+    bool operator==(const Vertex &v) const
+    {
         return v.pos == pos && v.norm == norm && v.tex == tex;
     }
 };
 
-namespace std {
-  template <> struct hash<Vertex> {
+namespace std
+{
+    template <>
+    struct hash<Vertex>
+    {
         size_t operator()(const Vertex &v) const
         {
             size_t hash = 0;

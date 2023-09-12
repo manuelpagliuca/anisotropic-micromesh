@@ -12,24 +12,24 @@ using namespace glm;
 class BoundingBox
 {
 public:
-  BoundingBox() {}
-  BoundingBox(vec3 point);
+    BoundingBox() {}
+    BoundingBox(vec3 point);
 
-  vec3 center() const;
-  float diagonal() const;
-  float radius() const;
+    vec3 center() const;
+    float diagonal() const;
+    float radius() const;
 
-  int maxAxis() const;
+    int maxAxis() const;
 
-  void init(const vec3 point);
-  void includeAnotherPoint(const vec3 point);
-  mat4 centering() const;
+    void init(const vec3 point);
+    void includeAnotherPoint(const vec3 point);
+    mat4 centering() const;
 
-  void printf() const;
+    void printf() const;
 
 private:
-  vec3 minPoint;
-  vec3 maxPoint;
+    vec3 minPoint;
+    vec3 maxPoint;
 };
 
 #endif // BOUNDING_BOX_H
