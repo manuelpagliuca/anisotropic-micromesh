@@ -61,7 +61,7 @@ void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double
       + "_disp_100_edge_" + std::to_string(length);
 
     projectedMesh.exportOBJ(pathAndName.c_str());
-    }
+  }
 }
 
 QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
@@ -85,7 +85,6 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
 
   std::vector<int> microMeshFaces;
 
-  #pragma omp parallel for
   for (int microLengthIdx = 0; microLengthIdx < ((maxEdge - minEdge) / 0.01); ++microLengthIdx) {
     double microLength = minEdge + microLengthIdx * 0.01;
     micro = baseMesh;
@@ -93,15 +92,12 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
     micro = micro.micromeshSubdivide();
     microMeshFaces.push_back(int(micro.faces.size()));
 
-    #pragma omp critical
-    {
+
       qDebug() << "Progress (microMeshFaces): " << microLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", microLength: " << microLength;
-    }
   }
 
   std::vector<int> anisoMeshFaces;
 
-  #pragma omp parallel for
   for (int anisoLengthIdx = 0; anisoLengthIdx < ((maxEdge - minEdge) / 0.01); ++anisoLengthIdx) {
     double anisoLength = minEdge + anisoLengthIdx * 0.01;
     aniso = baseMesh;
@@ -109,17 +105,14 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
     aniso = aniso.anisotropicMicromeshSubdivide();
     anisoMeshFaces.push_back(int(aniso.faces.size()));
 
-    #pragma omp critical
-    {
-      qDebug() << "Progress (anisoMeshFaces): " << anisoLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", anisoLength: " << anisoLength;;
-    }
+
+    qDebug() << "Progress (anisoMeshFaces): " << anisoLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", anisoLength: " << anisoLength;;
   }
 
   QTextStream out(&presetFile);
   out << "Micro\t| Aniso\t| Faces\n";
   int lastFacesMatch = -1;
 
-  #pragma omp parallel for
   for (size_t i = 0; i < microMeshFaces.size(); ++i) {
     for (size_t j = 0; j < anisoMeshFaces.size(); ++j) {
       if (microMeshFaces[i] == anisoMeshFaces[j] && microMeshFaces[i] != lastFacesMatch) {
@@ -128,10 +121,7 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
         double microLength = minEdge + i * 0.01;
         double anisoLength = minEdge + j * 0.01;
 
-        #pragma omp critical
-        {
-          out << microLength << "\t| " << anisoLength << "\t| " << microMeshFaces[i] << "\n";
-        }
+        out << microLength << "\t| " << anisoLength << "\t| " << microMeshFaces[i] << "\n";
       }
     }
   }

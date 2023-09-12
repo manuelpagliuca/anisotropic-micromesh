@@ -247,21 +247,17 @@ Mesh Mesh::micromeshSubdivide()
     int k = int(subdivided.vertices.size());
 
     // add microvertices
-    #pragma omp parallel for
     for (int vy = 0; vy <= n; vy++) {
-      #pragma omp parallel for
       for (int vx = 0; vx <= vy; vx++) {
         float c = vx / float(n);
         float a = vy / float(n);
         vec3 bary = vec3((1 - a), (a - c), c);
 
-        #pragma omp critical
         subdivided.vertices.push_back(getSurfaceVertex(f, bary));
       }
     }
 
     // add microfaces
-    #pragma omp parallel for
     for (int fy = 0; fy < n; fy++) {
       for (int fx = 0; fx < n; fx++) {
         ivec2 v0(fx, fy), v1(fx, fy + 1), v2(fx + 1, fy + 1);
@@ -272,34 +268,27 @@ Mesh Mesh::micromeshSubdivide()
           v2 = ivec2(n, n) - v2;
         }
 
-        #pragma omp critical
         subdivided.addFace(k + toIndexV(v0), k + toIndexV(v1), k + toIndexV(v2));
       }
     }
 
     if (subLvlEdge0 < subLvlMax) {
-      #pragma omp parallel for
       for (int vy = 1; vy < n; vy += 2) {
         int delta = (vy < n/2) ? -1 : +1;
-        #pragma omp critical
         subdivided.vertices[k + toIndex(0, vy)] = subdivided.vertices[k + toIndex(0, vy + delta)];
       }
     }
 
     if (subLvlEdge1 < subLvlMax) {
-      #pragma omp parallel for
       for (int vx = 1; vx < n; vx += 2) {
         int delta = (vx < n/2) ? -1 : +1;
-        #pragma omp critical
         subdivided.vertices[k + toIndex(vx, n)] = subdivided.vertices[k + toIndex(vx + delta, n)];
       }
     }
 
     if (subLvlEdge2 < subLvlMax) {
-      #pragma omp parallel for
       for (int vxy = 1; vxy < n; vxy += 2) {
         int delta = (vxy < n/2) ? +1 : -1;
-        #pragma omp critical
         subdivided.vertices[k + toIndex(vxy, vxy)] = subdivided.vertices[k + toIndex(vxy + delta, vxy + delta)];
       }
     }
@@ -307,7 +296,7 @@ Mesh Mesh::micromeshSubdivide()
 
   subdivided.updateBoundingBox();
   subdivided.updateEdges();
-//  subdivided.removeDuplicatedVertices();
+  subdivided.removeDuplicatedVertices();
 
   return subdivided;
 }
@@ -344,11 +333,9 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     int k = int(subdivided.vertices.size());
 
     // add microvertices
-    #pragma omp parallel for
     for (int vy = 0; vy <= m; vy++) {
       int lastVx = vy * aniso + aniso - 1;
       if (vy == m) lastVx -= aniso - 1;
-      #pragma omp parallel for
       for (int vx = 0; vx <= lastVx; vx++) {
         // Number of vertical segments -> m - vx / aniso;
         // Number of vertical segments below the microvertex -> m - vy;
@@ -363,7 +350,6 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
         bary[w1] = c;
         bary[w2] = a;
 
-        #pragma omp critical
         subdivided.vertices.push_back(getSurfaceVertex(f, bary));
       }
     }
@@ -371,9 +357,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     // add microfaces
     auto toVertexIndex = [&](ivec2 v) { return v.y * aniso * (v.y + 1) / 2 + v.x; };
 
-    #pragma omp parallel for
     for (int fy = 0; fy < m; fy++) {
-      #pragma omp parallel for
       for (int fx = 0; fx < (n + aniso - 1); fx++) {
         ivec2 v0(fx, fy), v1(fx, fy + 1), v2(fx + 1, fy + 1);
 
@@ -384,7 +368,6 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
           v2 = rotate - v2;
         }
 
-        #pragma omp criticals
         subdivided.addFace(k + toVertexIndex(v0), k + toVertexIndex(v1), k + toVertexIndex(v2));
       }
     }
@@ -392,7 +375,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 
   subdivided.updateBoundingBox();
   subdivided.updateEdges();
-//  subdivided.removeDuplicatedVertices();
+  subdivided.removeDuplicatedVertices();
 
   return subdivided;
 }
@@ -400,7 +383,6 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 // This function fixes the edges which are downscaled but should be higher scale
 void Mesh::fixEdgesSubdivisionLevels()
 {
-  #pragma omp parallel for
   for (Edge &e: edges) {
     if (e.faces[0] == -1 || e.faces[1] == -1) continue;
     uint eMax0 = getFaceSubdivisionLevel(e.faces[0]);
@@ -408,7 +390,6 @@ void Mesh::fixEdgesSubdivisionLevels()
 
     // if the edge is between two triangles N + 1 and it is N
     if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0) {
-      #pragma omp critical
       e.subdivisions = eMax0;
     }
   }
@@ -416,24 +397,21 @@ void Mesh::fixEdgesSubdivisionLevels()
 
 void Mesh::updateFaceNormals()
 {
-  #pragma omp parallel for
   for (int i = 0; i < faces.size(); i++) {
     Face &f = faces[i];
     vec3 v0 = vertices[f.index[0]].pos;
     vec3 v1 = vertices[f.index[1]].pos;
     vec3 v2 = vertices[f.index[2]].pos;
+
     f.norm = normalize(cross(v1 - v0, v2 - v0));
   }
 }
 
 void Mesh::updateVertexNormals()
 {
-  #pragma omp parallel for
-  for (int i = 0; i < vertices.size(); i++) {
+  for (int i = 0; i < vertices.size(); i++)
     vertices[i].norm = vec3(0, 0, 0);
-  }
 
-  #pragma omp parallel for
   for (int i = 0; i < faces.size(); i++) {
     Face &f = faces[i];
     Vertex &v0 = vertices[f.index[0]];
@@ -441,20 +419,13 @@ void Mesh::updateVertexNormals()
     Vertex &v2 = vertices[f.index[2]];
     vec3 faceNormal = f.norm;
 
-    #pragma omp atomic
     v0.norm += faceNormal;
-
-    #pragma omp atomic
     v1.norm += faceNormal;
-
-    #pragma omp atomic
     v2.norm += faceNormal;
   }
 
-  #pragma omp parallel for
-  for (int i = 0; i < vertices.size(); i++) {
+  for (int i = 0; i < vertices.size(); i++)
     vertices[i].norm = normalize(vertices[i].norm);
-  }
 }
 
 void Mesh::updateEdges()
@@ -463,10 +434,8 @@ void Mesh::updateEdges()
 
   std::map<AvailableEdge, EdgeLocation> matingPool;
 
-  #pragma omp parallel for
   for (int i = 0; i < faces.size(); i++) {
     Face &f = faces[i];
-    #pragma omp parallel for
     for (int faceEdge = 0; faceEdge < 3; faceEdge++) {
       AvailableEdge edgeToCheck = AvailableEdge(f.index[faceEdge], f.index[(faceEdge + 1) % 3]);
 
@@ -492,7 +461,6 @@ void Mesh::updateEdges()
 
 void Mesh::setInitialEdgeSubdivisionLevels(float targetEdgeLength)
 {
-  #pragma omp parallel for
   for (int i = 0; i < faces.size(); i++) {
     const Face &f = faces[i];
 
@@ -504,12 +472,9 @@ void Mesh::setInitialEdgeSubdivisionLevels(float targetEdgeLength)
     float l1 = length(vertices.at(v2).pos - vertices.at(v1).pos) / targetEdgeLength;
     float l2 = length(vertices.at(v0).pos - vertices.at(v2).pos) / targetEdgeLength;
 
-    #pragma omp critical
-    {
-      edges.at(f.edgesIndices[0]).subdivisions = nearestRoundPow2(l0);
-      edges.at(f.edgesIndices[1]).subdivisions = nearestRoundPow2(l1);
-      edges.at(f.edgesIndices[2]).subdivisions = nearestRoundPow2(l2);
-    }
+    edges.at(f.edgesIndices[0]).subdivisions = nearestRoundPow2(l0);
+    edges.at(f.edgesIndices[1]).subdivisions = nearestRoundPow2(l1);
+    edges.at(f.edgesIndices[2]).subdivisions = nearestRoundPow2(l2);
   }
 }
 
@@ -522,7 +487,6 @@ void Mesh::updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength)
   while (true) {
     bool changeAnything = false;
 
-    #pragma omp parallel for reduction(||: changeAnything)
     for (Face &f : faces) {
       changeAnything |= enforceMicromesh(f);
     }
@@ -543,7 +507,6 @@ void Mesh::updateEdgesSubdivisionLevelsAniso(float targetEdgeLength)
   while (true) {
     bool changeAnything = false;
 
-    #pragma omp parallel for reduction(||: changeAnything)
     for (Face &f : faces) {
       changeAnything |= enforceAnisotropicMicromesh(f);
     }
@@ -575,7 +538,6 @@ bool Mesh::enforceMicromesh(const Face &f)
 
   uint max = uint(maxInt3(edgeSubdivision[0], edgeSubdivision[1], edgeSubdivision[2]));
 
-  #pragma omp parallel for reduction(||: changeAnything)
   for (int i = 0; i < 3; i++) {
     uint &eSub = edgeSubdivision[i];
     if (eSub < (max - 1) && (max > 0)) {
@@ -584,12 +546,10 @@ bool Mesh::enforceMicromesh(const Face &f)
     }
   }
 
-  #pragma omp critical
-  {
-    edges[f.edgesIndices[0]].subdivisions = edgeSubdivision[0];
-    edges[f.edgesIndices[1]].subdivisions = edgeSubdivision[1];
-    edges[f.edgesIndices[2]].subdivisions = edgeSubdivision[2];
-  }
+
+  edges[f.edgesIndices[0]].subdivisions = edgeSubdivision[0];
+  edges[f.edgesIndices[1]].subdivisions = edgeSubdivision[1];
+  edges[f.edgesIndices[2]].subdivisions = edgeSubdivision[2];
 
   return changeAnything;
 }
@@ -619,7 +579,6 @@ bool Mesh::enforceAnisotropicMicromesh(const Face &f)
 
   int maxEdgeMinor = maxInt2(edgeSubdivisionsLowerThenMax[0], edgeSubdivisionsLowerThenMax[1]);
 
-  #pragma omp parallel for reduction(||: changeAnything)
   for (int j = 0; j < 3; j++) {
     uint &e = edgeSubdivisions[j];
     if (e == maxEdgeMinor) {
@@ -629,12 +588,9 @@ bool Mesh::enforceAnisotropicMicromesh(const Face &f)
     }
   }
 
-  #pragma omp critical
-  {
-    edges[f.edgesIndices[0]].subdivisions = edgeSubdivisions[0];
-    edges[f.edgesIndices[1]].subdivisions = edgeSubdivisions[1];
-    edges[f.edgesIndices[2]].subdivisions = edgeSubdivisions[2];
-  }
+  edges[f.edgesIndices[0]].subdivisions = edgeSubdivisions[0];
+  edges[f.edgesIndices[1]].subdivisions = edgeSubdivisions[1];
+  edges[f.edgesIndices[2]].subdivisions = edgeSubdivisions[2];
 
   return changeAnything;
 }

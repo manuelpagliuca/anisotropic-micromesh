@@ -5,6 +5,7 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include <unordered_set>
 #include <algorithm>
 
 #include <QtOpenGL>

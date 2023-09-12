@@ -121,7 +121,6 @@ void Mainwindow::findTargetEdgeLengthCombinations()
   const float step = 0.01f;
   std::vector<float> matchingLengths;
 
-  #pragma omp parallel for
   for (int i = 0; i < static_cast<int>((maxEdgeLength - 1.0f) / step); ++i) {
     float microEdgeLength = 1.0f + i * step;
     baseMesh.updateEdgesSubdivisionLevelsMicromesh(microEdgeLength);
@@ -132,12 +131,9 @@ void Mainwindow::findTargetEdgeLengthCombinations()
       Mesh anisoMicromesh = baseMesh.micromeshSubdivide();
 
       if (micromesh.faces.size() == anisoMicromesh.faces.size()) {
-        #pragma omp critical
-        {
           matchingLengths.push_back(microEdgeLength);
           matchingLengths.push_back(anisoEdgeLength);
           qDebug() << "Match: " << microEdgeLength << " " << anisoEdgeLength << "\n";
-        }
       }
       qDebug() << "Step: " << microEdgeLength << ", " << anisoEdgeLength << "\n";
     }

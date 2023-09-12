@@ -21,7 +21,7 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
   float posOrigin = origin[maxAxis];
 
   int i = -1;                   // first after posOrigin
-  int j = target.faces.size();  // last before posOrigin
+  int j = int(target.faces.size());  // last before posOrigin
 
   while (j != i + 1) {
     int m = (i + j) / 2;
@@ -88,27 +88,34 @@ std::vector<float> Mesh::getDisplacements(Mesh &target)
 
 void Mesh::removeDuplicatedVertices()
 {
-  std::vector<Vertex> newVertices;
+  std::unordered_set<Vertex> uniqueVertices;
 
   for (const Vertex &v : vertices)
-    if (std::find(newVertices.begin(), newVertices.end(), v) == newVertices.end())
-      newVertices.push_back(v);
+    uniqueVertices.insert(v);
 
   for (Face &f : faces) {
-    auto it0 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[0]));
-    auto it1 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[1]));
-    auto it2 = std::find(newVertices.begin(), newVertices.end(), vertices.at(f.index[2]));
+    Vertex v0 = vertices.at(f.index[0]);
+    Vertex v1 = vertices.at(f.index[1]);
+    Vertex v2 = vertices.at(f.index[2]);
 
-    uint newIndex0 = uint(std::distance(newVertices.begin(), it0));
-    uint newIndex1 = uint(std::distance(newVertices.begin(), it1));
-    uint newIndex2 = uint(std::distance(newVertices.begin(), it2));
+    auto it0 = uniqueVertices.find(v0);
+    auto it1 = uniqueVertices.find(v1);
+    auto it2 = uniqueVertices.find(v2);
 
-    f.index[0] = newIndex0;
-    f.index[1] = newIndex1;
-    f.index[2] = newIndex2;
+    if (it0 != uniqueVertices.end()) {
+      f.index[0] = std::distance(uniqueVertices.begin(), it0);
+    }
+
+    if (it1 != uniqueVertices.end()) {
+      f.index[1] = std::distance(uniqueVertices.begin(), it1);
+    }
+
+    if (it2 != uniqueVertices.end()) {
+      f.index[2] = std::distance(uniqueVertices.begin(), it2);
+    }
   }
 
-  vertices = newVertices;
+  vertices = std::vector(uniqueVertices.begin(), uniqueVertices.end());
 }
 
 Mesh Mesh::parseOFF(const std::string &rawOFF)
