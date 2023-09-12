@@ -742,7 +742,7 @@ void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
         disableDisplacementSlider();
     }
 
-    edgeLengthCurrentValue = 0.01f * value;
+    edgeLengthCurrentValue = 0.01f * value * baseMesh.bbox.diagonal();
     ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
 
     if (subdividedMesh.isValid())
@@ -774,11 +774,16 @@ void Mainwindow::on_displacementSlider_valueChanged(int value)
 
 void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
 {
+    if (microFaces == baseMesh.faces.size())
+        return;
+
     ui.microFacesCurrentValue->setText(QString::number(microFaces));
 
     QString subdivisionScheme = isAniso ? QString("aniso") : QString("micro");
 
-    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, MIN_TARGET_EDGE_LENGTH, MAX_TARGET_EDGE_LENGTH);
+    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme,
+                                                           baseMesh.bbox.diagonal() / 10000,
+                                                           baseMesh.bbox.diagonal() / 10);
 
     if (!isAniso)
     {
@@ -792,7 +797,6 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
     }
 
     ui.openGLWidget->updateMeshData(subdividedMesh);
-
     ui.subdividedMeshFaces->setText(QString::number(subdividedMesh.faces.size()));
 }
 

@@ -70,6 +70,8 @@ public:
     Mesh subdivideNtimes(int n);
     Mesh micromeshSubdivide();
     Mesh anisotropicMicromeshSubdivide();
+    int micromeshPredictFaces() const;
+    int anisotropicMicroMeshPredictFaces() const;
 
     // Subdivision scheme
     bool enforceMicromesh(const Face &f);

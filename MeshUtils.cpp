@@ -350,7 +350,7 @@ void Mesh::exportOBJ(const std::string &fName, QString filePath) const
         filePath = QString::fromStdString("./Output");
     }
 
-    filePath += fileNameExt;
+    filePath += QString::fromStdString(fileNameExt.c_str());
 
     std::ofstream fileStream(filePath.toStdString(), std::ios::out);
 

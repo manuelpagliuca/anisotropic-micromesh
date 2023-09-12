@@ -295,40 +295,21 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString su
 {
     int aFaces, bFaces;
 
-    if (subdivisionScheme == "aniso")
-    {
-        baseMesh.updateEdgesSubdivisionLevelsAniso(a);
-        aFaces = int(baseMesh.anisotropicMicromeshSubdivide().faces.size());
-
-        baseMesh.updateEdgesSubdivisionLevelsAniso(b);
-        bFaces = int(baseMesh.anisotropicMicromeshSubdivide().faces.size());
-    }
-    else
-    {
-        baseMesh.updateEdgesSubdivisionLevelsMicromesh(a);
-        aFaces = int(baseMesh.micromeshSubdivide().faces.size());
-
-        baseMesh.updateEdgesSubdivisionLevelsMicromesh(b);
-        bFaces = int(baseMesh.micromeshSubdivide().faces.size());
-    }
-
-
     while (true)
     {
         double c = (a + b) / 2.0;
 
         int cFaces;
-        qDebug() << aFaces << bFaces;
 
         if (subdivisionScheme == "aniso")
         {
             baseMesh.updateEdgesSubdivisionLevelsAniso(c);
-            cFaces = int(baseMesh.anisotropicMicromeshSubdivide().faces.size());
+            cFaces = baseMesh.anisotropicMicroMeshPredictFaces();
         }
         else
         {
             baseMesh.updateEdgesSubdivisionLevelsMicromesh(c);
-            cFaces = int(baseMesh.micromeshSubdivide().faces.size());
+            cFaces = baseMesh.micromeshPredictFaces();
         }
 
         if (cFaces == aFaces || cFaces == bFaces)

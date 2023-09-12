@@ -249,10 +249,8 @@ Mesh Mesh::micromeshSubdivide()
 
     fixEdgesSubdivisionLevels();
 
-    auto toIndex = [&](int vx, int vy)
-    { return vy * (vy + 1) / 2 + vx; };
-    auto toIndexV = [&](ivec2 v)
-    { return v.y * (v.y + 1) / 2 + v.x; };
+    auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };
+    auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
 
     for (const Face &f : faces)
     {
@@ -428,6 +426,47 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     return subdivided;
 }
 
+int Mesh::micromeshPredictFaces() const
+{
+    assert(isValid() == true);
+
+    int count = 0;
+
+    for (const Face &f : faces)
+    {
+        int subLvlEdge0 = edges[f.edgesIndices[0]].subdivisions;
+        int subLvlEdge1 = edges[f.edgesIndices[1]].subdivisions;
+        int subLvlEdge2 = edges[f.edgesIndices[2]].subdivisions;
+
+        int subLvlMax = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
+
+        count += (1 << subLvlMax) * (1 << subLvlMax);
+    }
+
+    return count;
+}
+
+int Mesh::anisotropicMicroMeshPredictFaces() const
+{
+    assert(isValid() == true);
+
+    int count = 0;
+
+    for (const Face &f : faces)
+    {
+        int subLvlEdge0 = edges[f.edgesIndices[0]].subdivisions;
+        int subLvlEdge1 = edges[f.edgesIndices[1]].subdivisions;
+        int subLvlEdge2 = edges[f.edgesIndices[2]].subdivisions;
+
+        int subLvlMax = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
+        int subLvlMin = minInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
+
+        count += (1 << subLvlMax ) * (1 << subLvlMin);
+    }
+
+    return count;
+}
+
 // This function fixes the edges which are downscaled but should be higher scale
 void Mesh::fixEdgesSubdivisionLevels()
 {
@@ -536,7 +575,6 @@ void Mesh::setInitialEdgeSubdivisionLevels(float targetEdgeLength)
         edges.at(f.edgesIndices[1]).subdivisions = nearestRoundPow2(l1);
         edges.at(f.edgesIndices[2]).subdivisions = nearestRoundPow2(l2);
     }
-    qDebug() << "Setting subdivisions levels according to target edge length " << targetEdgeLength;
 }
 
 void Mesh::updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength)
