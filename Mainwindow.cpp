@@ -782,8 +782,8 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
     QString subdivisionScheme = isAniso ? QString("aniso") : QString("micro");
 
     double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme,
-                                                           baseMesh.bbox.diagonal() / 10000,
-                                                           baseMesh.bbox.diagonal() / 10);
+                                                           0,
+                                                           baseMesh.bbox.diagonal() * 10);
 
     if (!isAniso)
     {
