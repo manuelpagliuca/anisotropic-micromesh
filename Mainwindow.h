@@ -18,6 +18,8 @@
 
 #include "Mesh.h"
 
+#define MICROFACES_LIMIT 3000000
+
 class Mainwindow : public QMainWindow
 {
   Q_OBJECT

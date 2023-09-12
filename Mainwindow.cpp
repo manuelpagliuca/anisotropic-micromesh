@@ -349,7 +349,7 @@ void Mainwindow::on_actionLoad_triggered()
     }
 
     baseMeshNameAndDetail = extractFileName(filePath.toStdString());
-    ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
+    ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 100);
   }
 }
 
@@ -483,14 +483,18 @@ void Mainwindow::on_demo124faces_clicked()
   std::string pallasOBJ125 = readFile("./Models/pallas_124.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ125));
   baseMeshNameAndDetail = extractFileName("./Models/pallas_124.obj");
+
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+
   projectedMesh = subdividedMesh = Mesh();
+
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
-  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
+
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 100);
 }
 
 void Mainwindow::on_demo250faces_clicked()
@@ -498,14 +502,18 @@ void Mainwindow::on_demo250faces_clicked()
   std::string pallasOBJ250 = readFile("./Models/pallas_250.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ250));
   baseMeshNameAndDetail = extractFileName("./Models/pallas_250.obj");
+
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+
   projectedMesh = subdividedMesh = Mesh();
+
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
-  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
+
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), MICROFACES_LIMIT);
 }
 
 void Mainwindow::on_demo500faces_clicked()
@@ -513,14 +521,18 @@ void Mainwindow::on_demo500faces_clicked()
   std::string pallasOBJ500 = readFile("./Models/pallas_500.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ500));
   baseMeshNameAndDetail = extractFileName("./Models/pallas_500.obj");
+
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+
   projectedMesh = subdividedMesh = Mesh();
+
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
-  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
+
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), MICROFACES_LIMIT);
 }
 
 void Mainwindow::on_demo1000faces_clicked()
@@ -528,14 +540,18 @@ void Mainwindow::on_demo1000faces_clicked()
   std::string pallasOBJ1000 = readFile("./Models/pallas_1000.obj");
   setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
   baseMeshNameAndDetail = extractFileName("./Models/pallas_1000.obj");
+
   ui.currentMeshLabel->setText("Base mesh");
   ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
   ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+
   projectedMesh = subdividedMesh = Mesh();
+
   resetSubdividedMeshLabels();
   resetTargetMeshLabels();
   disableEdgeLengthSlider();
-  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 10);
+
+  ui.microFacesSlider->setRange(int(baseMesh.faces.size()), int(baseMesh.faces.size()) * 100);
 }
 
 // Triggered when "Micro-mesh" button is clicked
