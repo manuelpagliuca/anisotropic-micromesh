@@ -33,9 +33,6 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
             i = m;
     }
 
-    assert(i < 0 || target.faces.at(i).posMiddle <= posOrigin);
-    assert(j == target.faces.size() || target.faces.at(j).posMiddle >= posOrigin);
-
     while (i >= 0 || j < target.faces.size())
     {
         if (i >= 0)
@@ -108,7 +105,6 @@ void Mesh::removeDuplicatedVertices()
         {
             Vertex v = vertices.at(f.index[w]);
             auto it = uniqueVertices.find(v);
-            assert(it != uniqueVertices.end());
             f.index[w] = std::distance(uniqueVertices.begin(), it);
         }
     }

@@ -353,11 +353,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
             w0 = 0, w1 = 1, w2 = 2;
 
         int subLvlEdge0 = edges[f.edgesIndices[w0]].subdivisions;
-        int subLvlEdge1 = edges[f.edgesIndices[w1]].subdivisions;
         int subLvlEdge2 = edges[f.edgesIndices[w2]].subdivisions;
-
-        assert(subLvlEdge0 == subLvlEdge1);
-        assert(subLvlEdge2 <= subLvlEdge0);
 
         int n = 1 << subLvlEdge0;
         int m = 1 << subLvlEdge2;

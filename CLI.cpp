@@ -241,10 +241,13 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
 
 void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme)
 {
+    qDebug() << "Binary searching for target edge length...";
     edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0,  baseMesh.bbox.diagonal() / 10);
-
+    qDebug() << "Target Edge lengh of : " << edgeLengthCurrentValue << ", approx. the " <<enumToString(scheme ) << " scheme will use " << predictMicroFaces(scheme, edgeLengthCurrentValue);
+    qDebug() << "Now subdividng the base mesh according using the found target edge length";
     subdividedMesh = subdivideBaseMesh(scheme);
-
+    qDebug() << "The subdivided mesh has " << subdividedMesh.faces.size() << " microfaces";
+    qDebug() << "Starting the ray casting towards the target mesh";
     std::vector<float> displacements = subdividedMesh.getDisplacements(targetMesh);
     projectedMesh = subdividedMesh;
 

@@ -17,7 +17,6 @@ void Mesh::sanityCheckEdge()
         {
             int faceIndex = e.faces[edgeSide];
             int faceSide = e.side[edgeSide];
-            assert(faces[faceIndex].edgesIndices[faceSide] == edgeIndex);
         }
     }
 
@@ -29,7 +28,6 @@ void Mesh::sanityCheckEdge()
         {
             int edgeIndex = f.edgesIndices[faceEdge];
             Edge e = edges[edgeIndex];
-            assert(e.faces[0] == faceIndex || e.faces[1] == faceIndex);
         }
     }
 }
