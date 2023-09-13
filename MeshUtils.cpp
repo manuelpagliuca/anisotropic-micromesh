@@ -114,32 +114,27 @@ void Mesh::removeDuplicatedVertices()
         auto it2 = uniqueVertices.find(v2);
 
         if (it0 != uniqueVertices.end())
-        {
             f.index[0] = std::distance(uniqueVertices.begin(), it0);
-        }
-
         if (it1 != uniqueVertices.end())
-        {
             f.index[1] = std::distance(uniqueVertices.begin(), it1);
-        }
-
         if (it2 != uniqueVertices.end())
-        {
             f.index[2] = std::distance(uniqueVertices.begin(), it2);
-        }
     }
 
     vertices = std::vector(uniqueVertices.begin(), uniqueVertices.end());
 }
 
-void Mesh::removeDuplicatedFaces()
+void Mesh::removeDegenerateFaces()
 {
-    std::unordered_set<Face> uniqueFaces;
+    std::vector<Face> cleanFaces;
 
-    for (const Face &f: faces)
-        uniqueFaces.insert(f);
+    for (const Face &f : faces)
+        if (f.index[0] != f.index[1] &&
+            f.index[0] != f.index[2] &&
+            f.index[1] != f.index[2])
+            cleanFaces.push_back(f);
 
-    faces = std::vector(uniqueFaces.begin(), uniqueFaces.end());
+    std::swap(faces, cleanFaces);
 }
 
 Mesh Mesh::parseOFF(const std::string &rawOFF)
