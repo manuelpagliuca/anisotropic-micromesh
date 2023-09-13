@@ -608,7 +608,7 @@ void Mainwindow::on_demo1000faces_clicked()
 // Triggered when "Micro-mesh" button is clicked
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
-    isAniso = false;
+    scheme = ISOTROPIC;
 
     // Setting target edge length + micromesh subdivision scheme
     baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
@@ -651,7 +651,7 @@ void Mainwindow::on_micromesh_subdivision_clicked()
 // Triggered when "Anisotropic Micro-mesh" button is clicked
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
-    isAniso = true;
+    scheme = ANISOTROPIC;
 
     // Setting target edge length + anisotropic subdivision
     baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
@@ -748,7 +748,7 @@ void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
 
     if (subdividedMesh.isValid())
     {
-        if (isAniso)
+        if (scheme == ANISOTROPIC)
             on_anisotropic_micromesh_subdivision_clicked();
         else
             on_micromesh_subdivision_clicked();
@@ -780,21 +780,18 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
 
     ui.microFacesCurrentValue->setText(QString::number(microFaces));
 
-    QString subdivisionScheme = isAniso ? QString("aniso") : QString("micro");
 
-    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme,
-                                                           0,
-                                                           baseMesh.bbox.diagonal() * 10);
-    qDebug() << predictMicroFaces(subdivisionScheme, targetEdgeLength);
-    if (!isAniso)
+    edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0, baseMesh.bbox.diagonal() * 10);
+
+    if (scheme == ANISOTROPIC)
     {
-        baseMesh.updateEdgesSubdivisionLevelsMicromesh(targetEdgeLength);
-        subdividedMesh = baseMesh.micromeshSubdivide();
+        baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
+        subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
     }
     else
     {
-        baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
-        subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
+        baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
+        subdividedMesh = baseMesh.micromeshSubdivide();
     }
 
     ui.openGLWidget->updateMeshData(subdividedMesh);
@@ -838,7 +835,7 @@ void Mainwindow::on_exportCurrentOBJ_clicked()
 {
     std::ostringstream fileNameStream;
 
-    if (isAniso)
+    if (scheme == ANISOTROPIC)
     {
         fileNameStream << "displaced/aniso";
     }
@@ -860,7 +857,7 @@ void Mainwindow::on_exportCurrentOFF_clicked()
 {
     std::ostringstream fileNameStream;
 
-    if (isAniso)
+    if (scheme == ANISOTROPIC)
     {
         fileNameStream << "displaced/aniso";
     }

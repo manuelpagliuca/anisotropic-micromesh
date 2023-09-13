@@ -1,5 +1,17 @@
 #include "Utility.h"
 
+std::string enumToString(Scheme scheme) {
+    switch (scheme)
+    {
+        case ISOTROPIC:
+            return "micro";
+        case ANISOTROPIC:
+            return "aniso";
+        default:
+            return "unchosen";
+    }
+}
+
 int nearestRoundPow2(float edgeLength)
 {
     return max(int(round(log2(edgeLength))), 0);

@@ -13,9 +13,12 @@
 #define MAX_TARGET_EDGE_LENGTH 20.0
 
 enum Scheme {
+    UNCHOSEN,
     ISOTROPIC,
     ANISOTROPIC
 };
+
+std::string enumToString(Scheme scheme);
 
 int nearestRoundPow2(float edgeLength);
 int nearestCeilPow2(float edgeLength);

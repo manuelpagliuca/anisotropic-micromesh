@@ -12,7 +12,8 @@ void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double
     std::vector<float> displacements;
 
     morphingCurrentValue = 100;
-    isAniso = false;
+
+    scheme = ISOTROPIC;
 
     for (double length = minEdge; length < maxEdge; length += step)
     {
@@ -36,7 +37,7 @@ void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double
         projectedMesh.exportOBJ(pathAndName.c_str());
     }
 
-    isAniso = true;
+    scheme = ANISOTROPIC;
 
     for (double length = minEdge; length < maxEdge; length += step)
     {
@@ -240,15 +241,13 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
     presetFile.close();
 }
 
-void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionScheme, double minEdge, double maxEdge)
+void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme, double minEdge, double maxEdge)
 {
     assert(baseMesh.isValid() == true);
 
-    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, baseMesh.bbox.diagonal() / 10000,  baseMesh.bbox.diagonal()/10);
+    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, scheme, baseMesh.bbox.diagonal() / 10000,  baseMesh.bbox.diagonal()/10);
 
-    qDebug() << predictMicroFaces(subdivisionScheme, targetEdgeLength);
-
-    if (subdivisionScheme == "aniso")
+    if (scheme == ANISOTROPIC)
     {
         baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
         subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
@@ -276,7 +275,7 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
                        QString::number(microFaces);
 
     QDir outputDir =
-        QDir("Evaluation/same_microfaces/" + subdivisionScheme + "/" +
+        QDir("Evaluation/same_microfaces/" + QString::fromStdString(enumToString(scheme)) + "/" +
         QString::fromStdString(baseMeshNameAndDetail) + "/");
 
     if (!outputDir.exists())
@@ -293,18 +292,16 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
     projectedMesh.exportOBJ(fileName.toStdString().c_str(), outputPath);
 }
 
-double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
+double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b)
 {
     int aFaces = -1, bFaces = -2;
     int patience = 10;
-
-    qDebug() << "Target " << targetMicroFaces;
 
     while (1)
     {
         double c = (a + b) / 2.0;
 
-        int cFaces = predictMicroFaces(subdivisionScheme, c);
+        int cFaces = predictMicroFaces(scheme, c);
 
         if (cFaces == aFaces || cFaces == bFaces)
             if (patience-- == 0)
@@ -326,9 +323,9 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString su
     }
 }
 
-int Mainwindow::predictMicroFaces(QString subdivisionScheme, double edgeLength)
+int Mainwindow::predictMicroFaces(Scheme scheme, double edgeLength)
 {
-    if (subdivisionScheme == "aniso")
+    if (scheme == ANISOTROPIC)
         baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLength);
     else
         baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLength);

@@ -51,6 +51,8 @@ int main(int argc, char *argv[])
         QString microfacesAmount = parser.value(microfacesAmountOption);
         QString subdivisionScheme = parser.value(subdivisionSchemeOption);
 
+        Scheme scheme = ISOTROPIC;
+
         if (criterion.isEmpty())
             criterion = "same-target-edges";
         if (nSamples.isEmpty())
@@ -67,8 +69,8 @@ int main(int argc, char *argv[])
             presetFileName = "";
         if (microfacesAmount.isEmpty())
             microfacesAmount = "";
-        if (subdivisionScheme.isEmpty() || subdivisionScheme != "aniso")
-            subdivisionScheme = "micro";
+        if (subdivisionScheme == "aniso")
+            scheme = ANISOTROPIC;
 
         QLocale locale(QLocale::C);
         minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
@@ -101,7 +103,7 @@ int main(int argc, char *argv[])
             int microFaces = int(w.targetMesh.faces.size()) * 2;
             microFaces = microfacesAmount.toInt() > microFaces ? microfacesAmount.toInt() : microFaces;
             qDebug() << "Generating a sample with: " << microFaces << " micro-faces.";
-            w.exportDisplacedBaseMesh(microFaces, subdivisionScheme, minEdge.toDouble(), maxEdge.toDouble());
+            w.exportDisplacedBaseMesh(microFaces, scheme, minEdge.toDouble(), maxEdge.toDouble());
         }
 
         exit(0);

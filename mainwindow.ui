@@ -609,7 +609,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Subdivided mesh vertices</string>
+         <string>Micro-vertices</string>
         </property>
        </widget>
        <widget class="QLabel" name="label_6">
@@ -622,7 +622,7 @@
          </rect>
         </property>
         <property name="text">
-         <string>Subdivided mesh faces</string>
+         <string>Micro-faces</string>
         </property>
        </widget>
        <widget class="QLabel" name="baseMeshVertices">

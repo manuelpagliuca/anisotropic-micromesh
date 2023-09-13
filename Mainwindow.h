@@ -36,9 +36,9 @@ public:
     QString exportSameMicrofacesPreset(double minEdge = 1.0, double maxEdge = 10.0);
     void exportDisplacedSamplesWithSameFacesAmount(double minEdge = 1.0, double maxEdge = 10.0, QString presetFileName = "");
     void exportDisplacedSamples(const QString presetDirPath);
-    void exportDisplacedBaseMesh(int microFaces, QString subdivisionScheme, double a = 1.0, double b = 10.0);
-    double binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b);
-    int predictMicroFaces(QString subdivisionScheme, double edgeLength);
+    void exportDisplacedBaseMesh(int microFaces, Scheme scheme, double a = 1.0, double b = 10.0);
+    double binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b);
+    int predictMicroFaces(Scheme scheme, double edgeLength);
 
     void loadBaseMesh(const QString &fileName);
     void loadTargetMesh(const QString &fileName);
@@ -68,6 +68,7 @@ public:
 
     // Mesh loading
     Mesh baseMesh, subdividedMesh, targetMesh, projectedMesh, swapMesh;
+    Scheme scheme = UNCHOSEN;
     std::string baseMeshNameAndDetail;
     float edgeLengthCurrentValue;
 
@@ -76,7 +77,6 @@ public:
     QPoint newPos;
 
     // Morphing
-    bool isAniso = false;
     std::vector<float> displacementsDeltas;
     int morphingCurrentValue;
 
