@@ -53,24 +53,15 @@ int main(int argc, char *argv[])
 
         Scheme scheme = ISOTROPIC;
 
-        if (criterion.isEmpty())
-            criterion = "same-target-edges";
-        if (nSamples.isEmpty())
-            nSamples = "5";
-        if (minEdge.isEmpty())
-            minEdge = "0.1";
-        if (maxEdge.isEmpty())
-            maxEdge = "20.0";
-        if (targetMesh.isEmpty())
-            targetMesh = "original_pallas_triquad.obj";
-        if (baseMesh.isEmpty())
-            baseMesh = "pallas_124.obj";
-        if (presetFileName.isEmpty())
-            presetFileName = "";
-        if (microfacesAmount.isEmpty())
-            microfacesAmount = "0";
-        if (subdivisionScheme == "aniso")
-            scheme = ANISOTROPIC;
+        if (criterion.isEmpty())          criterion = "same-target-edges";
+        if (nSamples.isEmpty())           nSamples = "5";
+        if (minEdge.isEmpty())            minEdge = "0.1";
+        if (maxEdge.isEmpty())            maxEdge = "20.0";
+        if (targetMesh.isEmpty())         targetMesh = "original_pallas_triquad.obj";
+        if (baseMesh.isEmpty())           baseMesh = "pallas_1000.obj";
+        if (presetFileName.isEmpty())     presetFileName = "";
+        if (microfacesAmount.isEmpty())   microfacesAmount = "";
+        if (subdivisionScheme == "aniso") scheme = ANISOTROPIC;
 
         QLocale locale(QLocale::C);
         minEdge = locale.toString(minEdge.toDouble(), 'f', 1);
@@ -100,7 +91,7 @@ int main(int argc, char *argv[])
         else if (cmd == "gen-sample")
         {
             w.loadTargetMesh(targetMesh);
-            int microFaces = int(w.targetMesh.faces.size()) * 2;
+            int microFaces = microfacesAmount.isEmpty() ? w.targetMesh.faces.size() * 2 : microfacesAmount.toInt();
             microFaces = microfacesAmount.toInt() > microFaces ? microfacesAmount.toInt() : microFaces;
             qDebug() << "Generating a sample with: " << microFaces << " micro-faces.";
             w.exportDisplacedBaseMesh(microFaces, scheme);

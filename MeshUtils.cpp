@@ -69,9 +69,7 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
         }
     }
 
-    assert(minDistance != INF);
-    assert(minDistance != -INF);
-    assert(std::isnan(minDistance) != true);
+    if (minDistance == INF) minDistance = 0.0f;
 
     return minDistance;
 }
