@@ -62,6 +62,9 @@ protected:
 
     std::string extractFileName(const std::string &fullPath);
 
+private:
+    Mesh subdivideBaseMesh(Scheme scheme);
+
 public:
     Ui::mainWindowClass ui;
     std::string readFile(const char *file_loc);

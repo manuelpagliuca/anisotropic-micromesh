@@ -151,9 +151,7 @@ void Mainwindow::findTargetEdgeLengthCombinations()
         qDebug() << "Vettore salvato correttamente in matching_lengths.txt";
     }
     else
-    {
         qWarning() << "Impossibile aprire il file per la scrittura";
-    }
 }
 
 void Mainwindow::setDisplacementsDelta(std::vector<float> displacements)
@@ -435,6 +433,7 @@ void Mainwindow::on_actionExtract_displacements_triggered()
             targetMesh = Mesh::parseOBJ(file);
 
         bool isValid;
+
         int k = QInputDialog::getInt(
             this,
             tr("Insert the number of mipoint subdivision to execute"),
@@ -727,23 +726,26 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
         return;
 
     ui.microFacesCurrentValue->setText(QString::number(microFaces));
-
-
     edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0, baseMesh.bbox.diagonal() * 10);
+    subdividedMesh = subdivideBaseMesh(scheme);
 
-    if (scheme == ANISOTROPIC)
-    {
-        baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
-        subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
-    }
-    else
-    {
-        baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
-        subdividedMesh = baseMesh.micromeshSubdivide();
-    }
+    qDebug() << microFaces << predictMicroFaces(scheme, edgeLengthCurrentValue) << subdividedMesh.faces.size();
 
     ui.openGLWidget->updateMeshData(subdividedMesh);
     ui.subdividedMeshFaces->setText(QString::number(subdividedMesh.faces.size()));
+    ui.subdividedMeshVertices->setText(QString::number((subdividedMesh.vertices.size())));
+}
+
+Mesh Mainwindow::subdivideBaseMesh(Scheme scheme)
+{
+    if (scheme == ANISOTROPIC)
+    {
+        baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
+        return baseMesh.anisotropicMicromeshSubdivide();
+    }
+
+    baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
+    return baseMesh.micromeshSubdivide();
 }
 
 void Mainwindow::on_wireframeToggle_stateChanged()
@@ -784,13 +786,9 @@ void Mainwindow::on_exportCurrentOBJ_clicked()
     std::ostringstream fileNameStream;
 
     if (scheme == ANISOTROPIC)
-    {
         fileNameStream << "displaced/aniso";
-    }
     else
-    {
         fileNameStream << "displaced/micro";
-    }
 
     fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
     std::string fileName = fileNameStream.str();
@@ -806,13 +804,9 @@ void Mainwindow::on_exportCurrentOFF_clicked()
     std::ostringstream fileNameStream;
 
     if (scheme == ANISOTROPIC)
-    {
         fileNameStream << "displaced/aniso";
-    }
     else
-    {
         fileNameStream << "displaced/micro";
-    }
 
     fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
     std::string fileName = fileNameStream.str();

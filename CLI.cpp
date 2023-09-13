@@ -138,9 +138,7 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
 void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge, QString presetFileName)
 {
     if (presetFileName.isEmpty())
-    {
         presetFileName = exportSameMicrofacesPreset(minEdge, maxEdge);
-    }
 
     QString presetDirPath(QString::fromStdString("./Output/Evaluation/same_microfaces/presets/") + presetFileName);
     exportDisplacedSamples(presetDirPath);
@@ -326,8 +324,11 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme sch
 int Mainwindow::predictMicroFaces(Scheme scheme, double edgeLength)
 {
     if (scheme == ANISOTROPIC)
+    {
         baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLength);
-    else
-        baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLength);
+        return baseMesh.anisotropicMicroMeshPredictFaces();
+    }
+
+    baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLength);
     return baseMesh.micromeshPredictFaces();
 }
