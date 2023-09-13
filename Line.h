@@ -11,6 +11,8 @@ public:
     bool intersectTriangle(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, float &t);
 
 private:
+    const float EPSILON = 0.000001f;
+
     glm::vec3 origin;
     glm::vec3 direction;
 };

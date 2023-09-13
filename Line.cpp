@@ -6,8 +6,6 @@ Line::Line()
 
 bool Line::intersectTriangle(const glm::vec3 &v0, const glm::vec3 &v1, const glm::vec3 &v2, float &t)
 {
-    const float EPSILON = 0.000001f;
-
     glm::vec3 edge1, edge2, h, s, q;
     float a, f, u, v;
 
@@ -23,14 +21,12 @@ bool Line::intersectTriangle(const glm::vec3 &v0, const glm::vec3 &v1, const glm
     s = origin - v0;
     u = f * glm::dot(s, h);
 
-    if (u < 0.0f || u > 1.0f)
-        return false;
+    if ((u < 0.0f) || (u > 1.0f)) return false;
 
     q = glm::cross(s, edge1);
     v = f * glm::dot(direction, q);
 
-    if (v < 0.0f || u + v > 1.0f)
-        return false;
+    if ((v < 0.0f) || (u + v > 1.0f)) return false;
 
     t = f * glm::dot(edge2, q);
     return true;

@@ -24,10 +24,10 @@ void Mainwindow::initUI()
 
     ui.wireframeToggle->toggle();
 
-    // Disable Micro-faces slider
+    // disable microfaces slider
     ui.microFacesSlider->setEnabled(false);
 
-    // Displacement slider
+    // init displacements slider
     ui.displacementSlider->setEnabled(false);
     ui.displacementSlider->setMaximum(100);
     ui.displacementSlider->setMinimum(0);
@@ -441,6 +441,7 @@ void Mainwindow::on_actionExtract_displacements_triggered()
         {
             for (int i = 0; i < k; i++)
                 baseMesh = baseMesh.subdivide();
+
             ui.openGLWidget->updateMeshData(baseMesh);
             ui.currentMeshLabel->setText("Base mesh");
         }
@@ -453,20 +454,20 @@ void Mainwindow::on_actionExtract_displacements_triggered()
         if (!outputFilePath.isEmpty())
         {
             QFile outputFile(outputFilePath);
+
             if (outputFile.open(QIODevice::WriteOnly | QIODevice::Text))
             {
                 QTextStream stream(&outputFile);
+
                 for (float displacement : displacements)
-                {
                     stream << displacement << "\n";
-                }
+
                 outputFile.close();
+
                 qDebug() << "Displacements saved to file:" << outputFilePath;
             }
             else
-            {
                 qDebug() << "Error: Unable to open file for writing.";
-            }
         }
     }
 }
@@ -718,8 +719,8 @@ void Mainwindow::on_displacementSlider_valueChanged(int value)
     morphingCurrentValue = value;
     ui.displacementCurrentValue->setText(std::to_string(value).c_str());
 
-    if (value == 0)
-        return;
+    if (value == 0) return;
+
     projectedMesh = subdividedMesh;
 
     int vertexIdx = 0;
@@ -803,8 +804,13 @@ void Mainwindow::on_exportCurrentOFF_clicked()
     else
         fileNameStream << "displaced/micro";
 
-    fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
+    fileNameStream << baseMeshNameAndDetail << "_to_"
+                   << targetMesh.faces.size() << "_disp_"
+                   << morphingCurrentValue << "_edge_"
+                   << edgeLengthCurrentValue;
+
     std::string fileName = fileNameStream.str();
+
     if (ui.displacementSlider->value() == 0)
         subdividedMesh.exportOFF(fileName);
     else
