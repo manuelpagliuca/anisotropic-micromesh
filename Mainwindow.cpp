@@ -19,25 +19,12 @@ void Mainwindow::initUI()
     ui.actionVertex_displacement->setEnabled(false);
     ui.exportCurrentOBJ->setEnabled(false);
     ui.exportCurrentOFF->setEnabled(false);
-    ui.radioTargetEdgeLength->setEnabled(false);
-    ui.radioTargetMicroFaces->setEnabled(false);
     ui.actionSubdivided_mesh->setEnabled(false);
     ui.actionProjected_mesh->setEnabled(false);
 
     ui.wireframeToggle->toggle();
 
-    // Target edge length slider
-    ui.edgeLengthSlider->setEnabled(true);
-    int minIntValue = 10;   // 0.1
-    int maxIntValue = 2000; // 20.0
-    ui.edgeLengthSlider->setMinimum(baseMesh.bbox.diagonal() / 10000);
-    ui.edgeLengthSlider->setMaximum(baseMesh.bbox.diagonal() / 10);
-    double decimalPrecision = 0.01;
-    int numDecimalValues = (maxIntValue - minIntValue) / (decimalPrecision * 100);
-    ui.edgeLengthSlider->setSingleStep(numDecimalValues);
-    ui.edgeLengthSlider->setValue(1000); // 10.0
-
-    // Micro-faces slider
+    // Disable Micro-faces slider
     ui.microFacesSlider->setEnabled(false);
 
     // Displacement slider
@@ -80,6 +67,12 @@ void Mainwindow::setBaseMeshAndUI(const Mesh &mesh)
     ui.baseMeshVertices->setText(QString::number(baseMesh.vertices.size()));
 }
 
+void Mainwindow::setMicroFacesSliderRange()
+{
+    ui.microFacesSlider->setMaximum(20000);
+    ui.microFacesSlider->setMinimum(int(baseMesh.faces.size()));
+}
+
 void Mainwindow::disableSubdivisionsBox()
 {
     ui.subdivisionsGroupBox->setEnabled(false);
@@ -88,13 +81,6 @@ void Mainwindow::disableSubdivisionsBox()
     ui.displacementSlider->setValue(0);
     ui.exportCurrentOBJ->setEnabled(false);
     ui.exportCurrentOFF->setEnabled(false);
-}
-
-void Mainwindow::disableEdgeLengthSlider()
-{
-    ui.edgeLengthSlider->setEnabled(false);
-    ui.edgeLengthSlider->setValue(1000);
-    subdividedMesh = projectedMesh = Mesh();
 }
 
 void Mainwindow::disableDisplacementSlider()
@@ -549,9 +535,9 @@ void Mainwindow::on_demo124faces_clicked()
 
     projectedMesh = subdividedMesh = Mesh();
 
+    setMicroFacesSliderRange();
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
-    disableEdgeLengthSlider();
 }
 
 void Mainwindow::on_demo250faces_clicked()
@@ -566,9 +552,9 @@ void Mainwindow::on_demo250faces_clicked()
 
     projectedMesh = subdividedMesh = Mesh();
 
+    setMicroFacesSliderRange();
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
-    disableEdgeLengthSlider();
 }
 
 void Mainwindow::on_demo500faces_clicked()
@@ -583,9 +569,9 @@ void Mainwindow::on_demo500faces_clicked()
 
     projectedMesh = subdividedMesh = Mesh();
 
+    setMicroFacesSliderRange();
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
-    disableEdgeLengthSlider();
 }
 
 void Mainwindow::on_demo1000faces_clicked()
@@ -600,19 +586,18 @@ void Mainwindow::on_demo1000faces_clicked()
 
     projectedMesh = subdividedMesh = Mesh();
 
+    setMicroFacesSliderRange();
     resetSubdividedMeshLabels();
     resetTargetMeshLabels();
-    disableEdgeLengthSlider();
 }
 
-// Triggered when "Micro-mesh" button is clicked
 void Mainwindow::on_micromesh_subdivision_clicked()
 {
-    scheme = ISOTROPIC;
-
     // Setting target edge length + micromesh subdivision scheme
+    scheme = ISOTROPIC;
     baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
     subdividedMesh = baseMesh.micromeshSubdivide();
+
 
     // Updating mesh data
     ui.openGLWidget->updateMeshData(subdividedMesh);
@@ -623,20 +608,14 @@ void Mainwindow::on_micromesh_subdivision_clicked()
     ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
     ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
 
+    // Enable microfaces slider
+    ui.microFacesSlider->setEnabled(true);
+
     // Enable displacement group box
     ui.morphingGroupBox->setEnabled(true);
 
     // Allow switching to subdivided mesh through keyboard
     ui.actionSubdivided_mesh->setEnabled(true);
-
-    // If no slider is active, enable the edge length slider and the radio buttons + check the edge length radio
-    if (!ui.edgeLengthSlider->isEnabled() && !ui.microFacesSlider->isEnabled())
-    {
-        ui.edgeLengthSlider->setEnabled(true);
-        ui.radioTargetEdgeLength->setEnabled(true);
-        ui.radioTargetMicroFaces->setEnabled(true);
-        ui.radioTargetEdgeLength->setChecked(true);
-    }
 
     // If the displacement slider is enabled it has to be reset to 0
     if (ui.displacementSlider->isEnabled())
@@ -648,12 +627,10 @@ void Mainwindow::on_micromesh_subdivision_clicked()
     }
 }
 
-// Triggered when "Anisotropic Micro-mesh" button is clicked
 void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
 {
+    // Setting target edge length + anisotropic micromesh subdivision scheme
     scheme = ANISOTROPIC;
-
-    // Setting target edge length + anisotropic subdivision
     baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
     subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
 
@@ -666,20 +643,14 @@ void Mainwindow::on_anisotropic_micromesh_subdivision_clicked()
     ui.subdividedMeshVertices->setText(std::to_string(subdividedMesh.vertices.size()).c_str());
     ui.subdividedMeshFaces->setText(std::to_string(subdividedMesh.faces.size()).c_str());
 
+    // Enable microfaces slider
+    ui.microFacesSlider->setEnabled(true);
+
     // Enable displacement group box
     ui.morphingGroupBox->setEnabled(true);
 
     // Allow switching to subdivided mesh through keyboard
     ui.actionSubdivided_mesh->setEnabled(true);
-
-    // If no slider is active, enable the edge length slider and the radio buttons + check the edge length radio
-    if (!ui.edgeLengthSlider->isEnabled() && !ui.microFacesSlider->isEnabled())
-    {
-        ui.edgeLengthSlider->setEnabled(true);
-        ui.radioTargetEdgeLength->setEnabled(true);
-        ui.radioTargetMicroFaces->setEnabled(true);
-        ui.radioTargetEdgeLength->setChecked(true);
-    }
 
     // If the displacement slider is enabled it has to be reset to 0
     if (ui.displacementSlider->isEnabled())
@@ -734,25 +705,6 @@ void Mainwindow::on_target5000faces_clicked()
     ui.targetMeshVertices->setText(std::to_string(targetMesh.vertices.size()).c_str());
     ui.targetMeshFaces->setText(std::to_string(targetMesh.faces.size()).c_str());
     ui.actionProjected_mesh->setEnabled(true);
-}
-
-void Mainwindow::on_edgeLengthSlider_valueChanged(int value)
-{
-    if (ui.displacementSlider->isEnabled())
-    {
-        disableDisplacementSlider();
-    }
-
-    edgeLengthCurrentValue = 0.01f * value * baseMesh.bbox.diagonal();
-    ui.lengthCurrentValue->setText(std::to_string(edgeLengthCurrentValue).c_str());
-
-    if (subdividedMesh.isValid())
-    {
-        if (scheme == ANISOTROPIC)
-            on_anisotropic_micromesh_subdivision_clicked();
-        else
-            on_micromesh_subdivision_clicked();
-    }
 }
 
 void Mainwindow::on_displacementSlider_valueChanged(int value)
@@ -872,19 +824,4 @@ void Mainwindow::on_exportCurrentOFF_clicked()
         subdividedMesh.exportOFF(fileName);
     else
         projectedMesh.exportOFF(fileName);
-}
-
-void Mainwindow::on_radioTargetEdgeLength_clicked()
-{
-    ui.edgeLengthSlider->setEnabled(true);
-    ui.microFacesSlider->setEnabled(false);
-}
-
-void Mainwindow::on_radioTargetMicroFaces_clicked()
-{
-    ui.microFacesSlider->setEnabled(true);
-    ui.edgeLengthSlider->setEnabled(false);
-
-    ui.microFacesSlider->setMaximum(int(baseMesh.faces.size()) * HIGH_RES_FACTOR);
-    ui.microFacesSlider->setMinimum(int(baseMesh.faces.size()));
 }

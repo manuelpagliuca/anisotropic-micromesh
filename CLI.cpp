@@ -241,11 +241,11 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
     presetFile.close();
 }
 
-void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme, double minEdge, double maxEdge)
+void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme)
 {
     assert(baseMesh.isValid() == true);
 
-    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, scheme, baseMesh.bbox.diagonal() / 10000,  baseMesh.bbox.diagonal()/10);
+    double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, scheme, baseMesh.bbox.diagonal() / 10000,  baseMesh.bbox.diagonal() / 10);
 
     if (scheme == ANISOTROPIC)
     {

@@ -60,7 +60,7 @@
          <x>10</x>
          <y>130</y>
          <width>321</width>
-         <height>131</height>
+         <height>101</height>
         </rect>
        </property>
        <property name="title">
@@ -92,7 +92,7 @@
          <string>Anisotropic Micro-mesh</string>
         </property>
        </widget>
-       <widget class="QSlider" name="edgeLengthSlider">
+       <widget class="QSlider" name="microFacesSlider">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -105,69 +105,36 @@
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
-       <widget class="QLabel" name="lengthCurrentValue">
-        <property name="geometry">
-         <rect>
-          <x>290</x>
-          <y>50</y>
-          <width>21</width>
-          <height>16</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>1.0</string>
-        </property>
-       </widget>
-       <widget class="QSlider" name="microFacesSlider">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>110</y>
-          <width>301</width>
-          <height>18</height>
-         </rect>
-        </property>
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-       </widget>
-       <widget class="QRadioButton" name="radioTargetEdgeLength">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>50</y>
-          <width>121</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Target edge length</string>
-        </property>
-       </widget>
-       <widget class="QRadioButton" name="radioTargetMicroFaces">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>90</y>
-          <width>121</width>
-          <height>20</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Target Micro-faces</string>
-        </property>
-       </widget>
        <widget class="QLabel" name="microFacesCurrentValue">
         <property name="geometry">
          <rect>
-          <x>280</x>
-          <y>90</y>
-          <width>31</width>
+          <x>270</x>
+          <y>50</y>
+          <width>41</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label">
+        <property name="geometry">
+         <rect>
+          <x>10</x>
+          <y>50</y>
+          <width>81</width>
           <height>16</height>
          </rect>
         </property>
         <property name="text">
-         <string/>
+         <string>Micro-faces</string>
         </property>
        </widget>
       </widget>
@@ -178,7 +145,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>260</y>
+         <y>230</y>
          <width>321</width>
          <height>151</height>
         </rect>
@@ -417,9 +384,9 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>570</y>
+         <y>540</y>
          <width>321</width>
-         <height>221</height>
+         <height>251</height>
         </rect>
        </property>
        <property name="font">
@@ -565,7 +532,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>410</y>
+         <y>380</y>
          <width>321</width>
          <height>161</height>
         </rect>

@@ -132,6 +132,16 @@ void Mesh::removeDuplicatedVertices()
     vertices = std::vector(uniqueVertices.begin(), uniqueVertices.end());
 }
 
+void Mesh::removeDuplicatedFaces()
+{
+    std::unordered_set<Face> uniqueFaces;
+
+    for (const Face &f: faces)
+        uniqueFaces.insert(f);
+
+    faces = std::vector(uniqueFaces.begin(), uniqueFaces.end());
+}
+
 Mesh Mesh::parseOFF(const std::string &rawOFF)
 {
     if (rawOFF.empty())

@@ -87,6 +87,7 @@ public:
 
     // Utils
     void removeDuplicatedVertices();
+    void removeDuplicatedFaces();
     float minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target);
     float minimumDistanceBruteForce(const vec3 &origin, const vec3 &direction, Mesh &target);
     std::vector<float> getDisplacements(Mesh &target);

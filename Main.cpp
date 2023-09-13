@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
         QCommandLineOption maxEdgeOption("max-edge", "Maximum edge value (default: 20.0)", "max-edge");
         parser.addOption(maxEdgeOption);
 
-        QCommandLineOption targetOption("target-mesh", "Target mesh (default: pallas_5000.obj)", "target-mesh");
+        QCommandLineOption targetOption("target-mesh", "Target mesh (default: original_pallas_triquad.obj)", "target-mesh");
         parser.addOption(targetOption);
 
         QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_124.obj)", "base-mesh");
@@ -103,7 +103,7 @@ int main(int argc, char *argv[])
             int microFaces = int(w.targetMesh.faces.size()) * 2;
             microFaces = microfacesAmount.toInt() > microFaces ? microfacesAmount.toInt() : microFaces;
             qDebug() << "Generating a sample with: " << microFaces << " micro-faces.";
-            w.exportDisplacedBaseMesh(microFaces, scheme, minEdge.toDouble(), maxEdge.toDouble());
+            w.exportDisplacedBaseMesh(microFaces, scheme);
         }
 
         exit(0);

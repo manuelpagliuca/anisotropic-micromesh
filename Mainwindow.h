@@ -36,7 +36,7 @@ public:
     QString exportSameMicrofacesPreset(double minEdge = 1.0, double maxEdge = 10.0);
     void exportDisplacedSamplesWithSameFacesAmount(double minEdge = 1.0, double maxEdge = 10.0, QString presetFileName = "");
     void exportDisplacedSamples(const QString presetDirPath);
-    void exportDisplacedBaseMesh(int microFaces, Scheme scheme, double a = 1.0, double b = 10.0);
+    void exportDisplacedBaseMesh(int microFaces, Scheme scheme);
     double binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b);
     int predictMicroFaces(Scheme scheme, double edgeLength);
 
@@ -52,8 +52,8 @@ protected:
     void initUI();
     void setTargetAndResetDisplacementSlider(const Mesh &targetMesh);
     void setBaseMeshAndUI(const Mesh &mesh);
+    void setMicroFacesSliderRange();
     void disableSubdivisionsBox();
-    void disableEdgeLengthSlider();
     void disableDisplacementSlider();
     void resetSubdividedMeshLabels();
     void resetTargetMeshLabels();
@@ -103,7 +103,6 @@ public slots:
     void on_micromesh_subdivision_clicked();
     void on_anisotropic_micromesh_subdivision_clicked();
 
-    void on_edgeLengthSlider_valueChanged(int value);
     void on_displacementSlider_valueChanged(int value);
     void on_microFacesSlider_valueChanged(int microFaces);
 
@@ -119,8 +118,6 @@ public slots:
 private slots:
     void on_loadBaseMesh_clicked();
     void on_loadTargetMesh_clicked();
-    void on_radioTargetEdgeLength_clicked();
-    void on_radioTargetMicroFaces_clicked();
 };
 
 #endif // MAIN_WINDOW_H

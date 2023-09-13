@@ -324,6 +324,7 @@ Mesh Mesh::micromeshSubdivide()
     subdivided.updateBoundingBox();
     subdivided.updateEdges();
     subdivided.removeDuplicatedVertices();
+    subdivided.removeDuplicatedFaces();
 
     return subdivided;
 }
@@ -422,6 +423,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     subdivided.updateBoundingBox();
     subdivided.updateEdges();
     subdivided.removeDuplicatedVertices();
+    subdivided.removeDuplicatedFaces();
 
     return subdivided;
 }
