@@ -598,7 +598,6 @@ void Mainwindow::on_micromesh_subdivision_clicked()
     baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
     subdividedMesh = baseMesh.micromeshSubdivide();
 
-
     // Updating mesh data
     ui.openGLWidget->updateMeshData(subdividedMesh);
 
