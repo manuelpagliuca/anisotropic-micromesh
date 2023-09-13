@@ -105,20 +105,13 @@ void Mesh::removeDuplicatedVertices()
 
     for (Face &f : faces)
     {
-        Vertex v0 = vertices.at(f.index[0]);
-        Vertex v1 = vertices.at(f.index[1]);
-        Vertex v2 = vertices.at(f.index[2]);
-
-        auto it0 = uniqueVertices.find(v0);
-        auto it1 = uniqueVertices.find(v1);
-        auto it2 = uniqueVertices.find(v2);
-
-        if (it0 != uniqueVertices.end())
-            f.index[0] = std::distance(uniqueVertices.begin(), it0);
-        if (it1 != uniqueVertices.end())
-            f.index[1] = std::distance(uniqueVertices.begin(), it1);
-        if (it2 != uniqueVertices.end())
-            f.index[2] = std::distance(uniqueVertices.begin(), it2);
+        for (int w = 0; w < 3 ; w++)
+        {
+            Vertex v = vertices.at(f.index[w]);
+            auto it = uniqueVertices.find(v);
+            assert(it != uniqueVertices.end());
+            f.index[w] = std::distance(uniqueVertices.begin(), it);
+        }
     }
 
     vertices = std::vector(uniqueVertices.begin(), uniqueVertices.end());
