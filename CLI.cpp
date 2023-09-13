@@ -242,6 +242,7 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
 void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme)
 {
     edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0,  baseMesh.bbox.diagonal() / 10);
+
     subdividedMesh = subdivideBaseMesh(scheme);
 
     std::vector<float> displacements = subdividedMesh.getDisplacements(targetMesh);

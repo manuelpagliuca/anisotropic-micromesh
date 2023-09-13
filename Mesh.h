@@ -58,7 +58,7 @@ public:
     // Edge
     int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
     float getAvgEdgeLength() const;
-    void fixEdgesSubdivisionLevels();
+    void fixEdgesSubdivisionLevelsMicromesh();
     void setInitialEdgeSubdivisionLevels(float targetEdgeLength);
 
     // Get

@@ -707,7 +707,9 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
 
     ui.microFacesCurrentValue->setText(QString::number(microFaces));
     edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0, baseMesh.bbox.diagonal() * 10);
+
     subdividedMesh = subdivideBaseMesh(scheme);
+    qDebug() << microFaces << predictMicroFaces(scheme, edgeLengthCurrentValue) << subdividedMesh.faces.size();
 
     ui.openGLWidget->updateMeshData(subdividedMesh);
     ui.subdividedMeshFaces->setText(QString::number(subdividedMesh.faces.size()));

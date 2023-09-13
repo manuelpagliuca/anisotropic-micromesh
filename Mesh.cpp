@@ -245,10 +245,6 @@ Mesh Mesh::micromeshSubdivide()
 {
     Mesh subdivided = Mesh();
 
-    assert(isValid() == true);
-
-    fixEdgesSubdivisionLevels();
-
     auto toIndex = [&](int vx, int vy) { return vy * (vy + 1) / 2 + vx; };
     auto toIndexV = [&](ivec2 v) { return v.y * (v.y + 1) / 2 + v.x; };
 
@@ -324,7 +320,7 @@ Mesh Mesh::micromeshSubdivide()
     subdivided.updateBoundingBox();
     subdivided.updateEdges();
     subdivided.removeDuplicatedVertices();
-    subdivided.removeDegenerateFaces();
+//    subdivided.removeDegenerateFaces();
 
     return subdivided;
 }
@@ -363,9 +359,9 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
         assert(subLvlEdge0 == subLvlEdge1);
         assert(subLvlEdge2 <= subLvlEdge0);
 
-        int n = pow(2, subLvlEdge0);
-        int m = pow(2, subLvlEdge2);
-        int aniso = pow(2, subLvlEdge0 - subLvlEdge2);
+        int n = 1 << subLvlEdge0;
+        int m = 1 << subLvlEdge2;
+        int aniso = 1 << (subLvlEdge0 - subLvlEdge2);
         int k = int(subdivided.vertices.size());
 
         // add microvertices
@@ -422,15 +418,12 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
     subdivided.updateBoundingBox();
     subdivided.updateEdges();
     subdivided.removeDuplicatedVertices();
-    subdivided.removeDegenerateFaces();
 
     return subdivided;
 }
 
 int Mesh::micromeshPredictFaces() const
 {
-    assert(isValid() == true);
-
     int count = 0;
 
     for (const Face &f : faces)
@@ -449,8 +442,6 @@ int Mesh::micromeshPredictFaces() const
 
 int Mesh::anisotropicMicroMeshPredictFaces() const
 {
-    assert(isValid() == true);
-
     int count = 0;
 
     for (const Face &f : faces)
@@ -462,14 +453,18 @@ int Mesh::anisotropicMicroMeshPredictFaces() const
         int subLvlMax = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
         int subLvlMin = minInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
 
-        count += (1 << subLvlMax ) * (1 << subLvlMin);
+        int k = 1 << subLvlMax;
+        int h = 1 << subLvlMin;
+        int aniso = 1 << (subLvlMax - subLvlMin);
+
+        count += h * (k + aniso - 1);
     }
 
     return count;
 }
 
 // This function fixes the edges which are downscaled but should be higher scale
-void Mesh::fixEdgesSubdivisionLevels()
+void Mesh::fixEdgesSubdivisionLevelsMicromesh()
 {
     for (Edge &e : edges)
     {
@@ -480,9 +475,7 @@ void Mesh::fixEdgesSubdivisionLevels()
 
         // if the edge is between two triangles N + 1 and it is N
         if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0)
-        {
             e.subdivisions = eMax0;
-        }
     }
 }
 
@@ -596,6 +589,8 @@ void Mesh::updateEdgesSubdivisionLevelsMicromesh(double targetEdgeLength)
         if (!changeAnything)
             break;
     }
+
+    fixEdgesSubdivisionLevelsMicromesh();
 
     qDebug() << "Micromesh scheme enforced: " << count << " times.";
 }
