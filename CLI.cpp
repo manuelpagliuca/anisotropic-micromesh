@@ -246,6 +246,8 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
 
     double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme, baseMesh.bbox.diagonal() / 10000,  baseMesh.bbox.diagonal()/10);
 
+    qDebug() << predictMicroFaces(subdivisionScheme, targetEdgeLength);
+
     if (subdivisionScheme == "aniso")
     {
         baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
@@ -296,6 +298,8 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString su
     int aFaces = -1, bFaces = -2;
     int patience = 10;
 
+    qDebug() << "Target " << targetMicroFaces;
+
     while (1)
     {
         double c = (a + b) / 2.0;
@@ -308,13 +312,11 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString su
 
         if (cFaces < targetMicroFaces)
         {
-            if (bFaces == cFaces) break;
             bFaces = cFaces;
             b = c;
         }
         else
         {
-            if (aFaces == cFaces) break;
             aFaces = cFaces;
             a = c;
         }

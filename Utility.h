@@ -12,6 +12,11 @@
 #define MIN_TARGET_EDGE_LENGTH 0.1
 #define MAX_TARGET_EDGE_LENGTH 20.0
 
+enum Scheme {
+    ISOTROPIC,
+    ANISOTROPIC
+};
+
 int nearestRoundPow2(float edgeLength);
 int nearestCeilPow2(float edgeLength);
 

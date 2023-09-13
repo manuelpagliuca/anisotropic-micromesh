@@ -30,7 +30,8 @@ void Mainwindow::initUI()
     ui.edgeLengthSlider->setEnabled(true);
     int minIntValue = 10;   // 0.1
     int maxIntValue = 2000; // 20.0
-    ui.edgeLengthSlider->setRange(minIntValue, maxIntValue);
+    ui.edgeLengthSlider->setMinimum(baseMesh.bbox.diagonal() / 10000);
+    ui.edgeLengthSlider->setMaximum(baseMesh.bbox.diagonal() / 10);
     double decimalPrecision = 0.01;
     int numDecimalValues = (maxIntValue - minIntValue) / (decimalPrecision * 100);
     ui.edgeLengthSlider->setSingleStep(numDecimalValues);
@@ -784,7 +785,7 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
     double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, subdivisionScheme,
                                                            0,
                                                            baseMesh.bbox.diagonal() * 10);
-
+    qDebug() << predictMicroFaces(subdivisionScheme, targetEdgeLength);
     if (!isAniso)
     {
         baseMesh.updateEdgesSubdivisionLevelsMicromesh(targetEdgeLength);
