@@ -374,8 +374,9 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
         for (int vy = 0; vy <= m; vy++)
         {
             int lastVx = vy * aniso + aniso - 1;
-            if (vy == m)
-                lastVx -= aniso - 1;
+
+            if (vy == m) lastVx -= aniso - 1;
+
             for (int vx = 0; vx <= lastVx; vx++)
             {
                 // Number of vertical segments -> m - vx / aniso;
@@ -398,8 +399,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
         }
 
         // add microfaces
-        auto toVertexIndex = [&](ivec2 v)
-        { return v.y * aniso * (v.y + 1) / 2 + v.x; };
+        auto toVertexIndex = [&](ivec2 v) { return v.y * aniso * (v.y + 1) / 2 + v.x; };
 
         for (int fy = 0; fy < m; fy++)
         {

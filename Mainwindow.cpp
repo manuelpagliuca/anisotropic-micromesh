@@ -69,7 +69,7 @@ void Mainwindow::setBaseMeshAndUI(const Mesh &mesh)
 
 void Mainwindow::setMicroFacesSliderRange()
 {
-    ui.microFacesSlider->setMaximum(20000);
+    ui.microFacesSlider->setMaximum(GUI_MICROFACES_LIMIT);
     ui.microFacesSlider->setMinimum(int(baseMesh.faces.size()));
 }
 
@@ -373,15 +373,12 @@ void Mainwindow::on_actionLoad_triggered()
         baseMesh = Mesh();
 
         if (ext == ".off")
-        {
             setBaseMeshAndUI(Mesh::parseOFF(file));
-        }
         else if (ext == ".obj")
-        {
             setBaseMeshAndUI(Mesh::parseOBJ(file));
-        }
 
         baseMeshNameAndDetail = extractFileName(filePath.toStdString());
+        setMicroFacesSliderRange();
     }
 }
 

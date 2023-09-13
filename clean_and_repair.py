@@ -5,7 +5,6 @@ import glob
 import re
 import pymeshlab
 
-
 models_dir = "Models"
 mesh_list = glob.glob(os.path.join(models_dir, "*"))
 
