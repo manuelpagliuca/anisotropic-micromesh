@@ -26,6 +26,7 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
     while (j != i + 1)
     {
         int m = (i + j) / 2;
+
         if (target.faces.at(m).posMiddle > posOrigin)
             j = m;
         else
@@ -276,6 +277,7 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
         mesh.addVertex(pos);
 
     int i = 0;
+
     for (Vertex &v : mesh.vertices)
     {
         v.norm = normals[i];

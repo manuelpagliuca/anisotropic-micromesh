@@ -62,13 +62,13 @@ int main(int argc, char *argv[])
         if (maxEdge.isEmpty())
             maxEdge = "20.0";
         if (targetMesh.isEmpty())
-            targetMesh = "pallas_5000.obj";
+            targetMesh = "original_pallas_triquad.obj";
         if (baseMesh.isEmpty())
             baseMesh = "pallas_124.obj";
         if (presetFileName.isEmpty())
             presetFileName = "";
         if (microfacesAmount.isEmpty())
-            microfacesAmount = "";
+            microfacesAmount = "0";
         if (subdivisionScheme == "aniso")
             scheme = ANISOTROPIC;
 

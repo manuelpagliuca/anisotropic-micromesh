@@ -245,16 +245,7 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme)
 
     double targetEdgeLength = binarySearchTargetEdgeLength(microFaces, scheme, baseMesh.bbox.diagonal() / 10000,  baseMesh.bbox.diagonal() / 10);
 
-    if (scheme == ANISOTROPIC)
-    {
-        baseMesh.updateEdgesSubdivisionLevelsAniso(targetEdgeLength);
-        subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
-    }
-    else
-    {
-        baseMesh.updateEdgesSubdivisionLevelsMicromesh(targetEdgeLength);
-        subdividedMesh = baseMesh.micromeshSubdivide();
-    }
+    subdividedMesh = subdivideBaseMesh(scheme);
 
     assert(subdividedMesh.isValid() == true);
     assert(targetMesh.isValid() == true);

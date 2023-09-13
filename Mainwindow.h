@@ -106,8 +106,8 @@ public slots:
     void on_micromesh_subdivision_clicked();
     void on_anisotropic_micromesh_subdivision_clicked();
 
-    void on_displacementSlider_valueChanged(int value);
     void on_microFacesSlider_valueChanged(int microFaces);
+    void on_displacementSlider_valueChanged(int value);
 
     void on_target250faces_clicked();
     void on_target500faces_clicked();

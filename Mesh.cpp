@@ -21,11 +21,11 @@ void Mesh::updatePosMiddleAndR()
 
         float xMax = maxFloat3(pos0, pos1, pos2);
         float xMin = minFloat3(pos0, pos1, pos2);
-        f.posMiddle = (xMax + xMin) / 2.f;
         float halfExt = (xMax - xMin) / 2.f;
 
-        if (R < halfExt)
-            R = halfExt;
+        f.posMiddle = (xMax + xMin) / 2.f;
+
+        if (R < halfExt) R = halfExt;
     }
 }
 
@@ -354,9 +354,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
             w2 = 0;
         }
         else
-        {
             w0 = 0, w1 = 1, w2 = 2;
-        }
 
         int subLvlEdge0 = edges[f.edgesIndices[w0]].subdivisions;
         int subLvlEdge1 = edges[f.edgesIndices[w1]].subdivisions;
@@ -407,8 +405,9 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
             {
                 ivec2 v0(fx, fy), v1(fx, fy + 1), v2(fx + 1, fy + 1);
 
+                // flip "red" triangle
                 if (fx > (fy + 1) * aniso - 1)
-                { // flip "red" triangle
+                {
                     ivec2 rotate = ivec2(n + aniso - 1, m);
                     v0 = rotate - v0;
                     v1 = rotate - v1;
@@ -590,9 +589,7 @@ void Mesh::updateEdgesSubdivisionLevelsMicromesh(double targetEdgeLength)
         bool changeAnything = false;
 
         for (Face &f : faces)
-        {
             changeAnything |= enforceMicromesh(f);
-        }
 
         count++;
 
@@ -614,9 +611,7 @@ void Mesh::updateEdgesSubdivisionLevelsAniso(double targetEdgeLength)
         bool changeAnything = false;
 
         for (Face &f : faces)
-        {
             changeAnything |= enforceAnisotropicMicromesh(f);
-        }
 
         count++;
         if (!changeAnything)
@@ -693,6 +688,7 @@ bool Mesh::enforceAnisotropicMicromesh(const Face &f)
     for (int j = 0; j < 3; j++)
     {
         uint &e = edgeSubdivisions[j];
+
         if (e == maxEdgeMinor)
         {
             e = max;

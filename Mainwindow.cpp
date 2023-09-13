@@ -139,14 +139,11 @@ void Mainwindow::findTargetEdgeLengthCombinations()
         for (size_t i = 0; i < matchingLengths.size(); i += 2)
         {
             if (i + 1 < matchingLengths.size())
-            {
                 out << matchingLengths[i] << " " << matchingLengths[i + 1] << "\n";
-            }
             else
-            {
                 out << matchingLengths[i] << "\n";
-            }
         }
+
         file.close();
         qDebug() << "Vettore salvato correttamente in matching_lengths.txt";
     }
@@ -702,6 +699,20 @@ void Mainwindow::on_target5000faces_clicked()
     ui.actionProjected_mesh->setEnabled(true);
 }
 
+void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
+{
+    if (microFaces == baseMesh.faces.size())
+        return;
+
+    ui.microFacesCurrentValue->setText(QString::number(microFaces));
+    edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0, baseMesh.bbox.diagonal() * 10);
+    subdividedMesh = subdivideBaseMesh(scheme);
+
+    ui.openGLWidget->updateMeshData(subdividedMesh);
+    ui.subdividedMeshFaces->setText(QString::number(subdividedMesh.faces.size()));
+    ui.subdividedMeshVertices->setText(QString::number(subdividedMesh.vertices.size()));
+}
+
 void Mainwindow::on_displacementSlider_valueChanged(int value)
 {
     morphingCurrentValue = value;
@@ -718,22 +729,6 @@ void Mainwindow::on_displacementSlider_valueChanged(int value)
 
     ui.openGLWidget->updateMeshData(projectedMesh);
     ui.currentMeshLabel->setText("Projected mesh");
-}
-
-void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
-{
-    if (microFaces == baseMesh.faces.size())
-        return;
-
-    ui.microFacesCurrentValue->setText(QString::number(microFaces));
-    edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0, baseMesh.bbox.diagonal() * 10);
-    subdividedMesh = subdivideBaseMesh(scheme);
-
-    qDebug() << microFaces << predictMicroFaces(scheme, edgeLengthCurrentValue) << subdividedMesh.faces.size();
-
-    ui.openGLWidget->updateMeshData(subdividedMesh);
-    ui.subdividedMeshFaces->setText(QString::number(subdividedMesh.faces.size()));
-    ui.subdividedMeshVertices->setText(QString::number((subdividedMesh.vertices.size())));
 }
 
 Mesh Mainwindow::subdivideBaseMesh(Scheme scheme)
