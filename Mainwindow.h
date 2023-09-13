@@ -38,6 +38,7 @@ public:
     void exportDisplacedSamples(const QString presetDirPath);
     void exportDisplacedBaseMesh(int microFaces, QString subdivisionScheme, double a = 1.0, double b = 10.0);
     double binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b);
+    int predictMicroFaces(QString subdivisionScheme, double edgeLength);
 
     void loadBaseMesh(const QString &fileName);
     void loadTargetMesh(const QString &fileName);

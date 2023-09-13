@@ -294,42 +294,41 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, QString subdivisionSche
 double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, QString subdivisionScheme, double a, double b)
 {
     int aFaces = -1, bFaces = -2;
-    double c;
+    int patience = 10;
 
-    while (aFaces != bFaces)
+    while (1)
     {
-        c = (a + b) / 2.0;
-        qDebug() << a << b << c;
+        double c = (a + b) / 2.0;
 
-        int cFaces;
+        int cFaces = predictMicroFaces(subdivisionScheme, c);
 
-        if (subdivisionScheme == "aniso")
-        {
-            baseMesh.updateEdgesSubdivisionLevelsAniso(c);
-            cFaces = baseMesh.anisotropicMicroMeshPredictFaces();
-        }
-        else
-        {
-            baseMesh.updateEdgesSubdivisionLevelsMicromesh(c);
-            cFaces = baseMesh.micromeshPredictFaces();
-        }
+        if (cFaces == aFaces || cFaces == bFaces)
+            if (patience-- == 0)
+                return (abs(targetMicroFaces - aFaces) < abs(targetMicroFaces - bFaces)) ? a : b;
 
         if (cFaces < targetMicroFaces)
         {
-            aFaces = cFaces;
-            a = c;
-        }
-        else
-        {
+            if (bFaces == cFaces) break;
             bFaces = cFaces;
             b = c;
         }
+        else
+        {
+            if (aFaces == cFaces) break;
+            aFaces = cFaces;
+            a = c;
+        }
 
         if (cFaces == targetMicroFaces)
-        {
             return c;
-        }
     }
+}
 
-    return c;
+int Mainwindow::predictMicroFaces(QString subdivisionScheme, double edgeLength)
+{
+    if (subdivisionScheme == "aniso")
+        baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLength);
+    else
+        baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLength);
+    return baseMesh.micromeshPredictFaces();
 }

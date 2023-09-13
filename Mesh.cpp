@@ -577,7 +577,7 @@ void Mesh::setInitialEdgeSubdivisionLevels(float targetEdgeLength)
     }
 }
 
-void Mesh::updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength)
+void Mesh::updateEdgesSubdivisionLevelsMicromesh(double targetEdgeLength)
 {
     setInitialEdgeSubdivisionLevels(targetEdgeLength);
 
@@ -601,7 +601,7 @@ void Mesh::updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength)
     qDebug() << "Micromesh scheme enforced: " << count << " times.";
 }
 
-void Mesh::updateEdgesSubdivisionLevelsAniso(float targetEdgeLength)
+void Mesh::updateEdgesSubdivisionLevelsAniso(double targetEdgeLength)
 {
     setInitialEdgeSubdivisionLevels(targetEdgeLength);
 

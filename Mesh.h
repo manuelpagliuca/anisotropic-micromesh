@@ -82,8 +82,8 @@ public:
     void updateVertexNormals();
     void updateBoundingBox();
     void updateEdges();
-    void updateEdgesSubdivisionLevelsMicromesh(float targetEdgeLength);
-    void updateEdgesSubdivisionLevelsAniso(float targetEdgeLength);
+    void updateEdgesSubdivisionLevelsMicromesh(double targetEdgeLength);
+    void updateEdgesSubdivisionLevelsAniso(double targetEdgeLength);
 
     // Utils
     void removeDuplicatedVertices();
