@@ -317,10 +317,7 @@ Mesh Mesh::micromeshSubdivide()
         }
     }
 
-    qDebug() << "Subdivided micro-mesh constructed." ;
-    qDebug() << "Updating the AABB.";
     subdivided.updateBoundingBox();
-    qDebug() << "Updating the edges relationships.";
     subdivided.updateEdges();
 
     return subdivided;
@@ -414,8 +411,7 @@ Mesh Mesh::anisotropicMicromeshSubdivide()
 
     subdivided.updateBoundingBox();
     subdivided.updateEdges();
-    subdivided.removeDuplicatedVertices();
-
+\
     return subdivided;
 }
 

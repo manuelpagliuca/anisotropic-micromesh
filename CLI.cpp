@@ -1,144 +1,5 @@
 #include "Mainwindow.h"
 
-void Mainwindow::exportDisplacedSamplesSameTargetEdgeMetric(int nSamples, double minEdge, double maxEdge)
-{
-    if (nSamples <= 0)
-    {
-        perror("Invalid number of samples.\n");
-        return;
-    }
-
-    double step = (maxEdge - minEdge) / nSamples;
-    std::vector<float> displacements;
-
-    morphingCurrentValue = 100;
-
-    scheme = ISOTROPIC;
-
-    for (double length = minEdge; length < maxEdge; length += step)
-    {
-        edgeLengthCurrentValue = length;
-
-        projectedMesh = baseMesh;
-        projectedMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
-        projectedMesh = projectedMesh.micromeshSubdivide();
-
-        displacements.clear();
-        displacements = projectedMesh.getDisplacements(targetMesh);
-
-        int vertexIdx = 0;
-
-        for (const float &disp : displacements)
-            projectedMesh.displaceVertex(vertexIdx++, disp);
-
-        std::string pathAndName =
-            "Evaluation/same_target_edges/micro/" + baseMeshNameAndDetail + "_to_" + std::to_string(targetMesh.faces.size()) + "_disp_100_edge_" + std::to_string(length);
-
-        projectedMesh.exportOBJ(pathAndName.c_str());
-    }
-
-    scheme = ANISOTROPIC;
-
-    for (double length = minEdge; length < maxEdge; length += step)
-    {
-        edgeLengthCurrentValue = length;
-
-        projectedMesh = baseMesh;
-        projectedMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
-        projectedMesh = projectedMesh.anisotropicMicromeshSubdivide();
-
-        displacements.clear();
-        displacements = projectedMesh.getDisplacements(targetMesh);
-
-        int vertexIdx = 0;
-
-        for (const float &disp : displacements)
-            projectedMesh.displaceVertex(vertexIdx++, disp);
-
-        std::string pathAndName =
-            "Evaluation/same_target_edges/aniso/" + baseMeshNameAndDetail + "_to_" + std::to_string(targetMesh.faces.size()) + "_disp_100_edge_" + std::to_string(length);
-
-        projectedMesh.exportOBJ(pathAndName.c_str());
-    }
-}
-
-QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
-{
-    Mesh micro, aniso;
-    std::vector<float> microDisplacements, anisoDisplacements;
-
-    std::string minEdgeStr = std::to_string(minEdge);
-    std::string maxEdgeStr = std::to_string(maxEdge);
-    minEdgeStr = minEdgeStr.substr(0, minEdgeStr.find(".") + 3);
-    maxEdgeStr = maxEdgeStr.substr(0, maxEdgeStr.find(".") + 3);
-
-    QString presetFileName = QString::fromStdString(baseMeshNameAndDetail + "_minEdge_" + minEdgeStr + "_maxEdge_" + maxEdgeStr + ".txt");
-    QString outputFilePath = QString::fromStdString("./Output/Evaluation/same_microfaces/presets/") + presetFileName;
-    QFile presetFile(outputFilePath);
-
-    if (!presetFile.open(QIODevice::WriteOnly | QIODevice::Text))
-    {
-        qDebug() << "Failed to open file for writing.";
-        return QString("");
-    }
-
-    std::vector<int> microMeshFaces;
-
-    for (int microLengthIdx = 0; microLengthIdx < ((maxEdge - minEdge) / 0.01); ++microLengthIdx)
-    {
-        double microLength = minEdge + microLengthIdx * 0.01;
-        micro = baseMesh;
-        micro.updateEdgesSubdivisionLevelsMicromesh(microLength);
-        micro = micro.micromeshSubdivide();
-        microMeshFaces.push_back(int(micro.faces.size()));
-    }
-
-    std::vector<int> anisoMeshFaces;
-
-    for (int anisoLengthIdx = 0; anisoLengthIdx < ((maxEdge - minEdge) / 0.01); ++anisoLengthIdx)
-    {
-        double anisoLength = minEdge + anisoLengthIdx * 0.01;
-        aniso = baseMesh;
-        aniso.updateEdgesSubdivisionLevelsAniso(anisoLength);
-        aniso = aniso.anisotropicMicromeshSubdivide();
-        anisoMeshFaces.push_back(int(aniso.faces.size()));
-    }
-
-    QTextStream out(&presetFile);
-    out << "Micro\t| Aniso\t| Faces\n";
-    int lastFacesMatch = -1;
-
-    for (size_t i = 0; i < microMeshFaces.size(); ++i)
-    {
-        for (size_t j = 0; j < anisoMeshFaces.size(); ++j)
-        {
-            if (microMeshFaces[i] == anisoMeshFaces[j] && microMeshFaces[i] != lastFacesMatch)
-            {
-                lastFacesMatch = microMeshFaces[i];
-
-                double microLength = minEdge + i * 0.01;
-                double anisoLength = minEdge + j * 0.01;
-
-                out << microLength << "\t| " << anisoLength << "\t| " << microMeshFaces[i] << "\n";
-            }
-        }
-    }
-
-    qDebug() << "Preset generated at " << outputFilePath;
-
-    presetFile.close();
-    return presetFileName;
-}
-
-void Mainwindow::exportDisplacedSamplesWithSameFacesAmount(double minEdge, double maxEdge, QString presetFileName)
-{
-    if (presetFileName.isEmpty())
-        presetFileName = exportSameMicrofacesPreset(minEdge, maxEdge);
-
-    QString presetDirPath(QString::fromStdString("./Output/Evaluation/same_microfaces/presets/") + presetFileName);
-    exportDisplacedSamples(presetDirPath);
-}
-
 void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
 {
     QFile presetFile = QFile(presetDirPath);
@@ -234,27 +95,37 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
     presetFile.close();
 }
 
-void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme)
+void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
 {
-    qDebug() << "Binary searching for target edge length...";
+    int microFaces = int(targetMesh.faces.size() * mfsFactor);
+
+    qDebug() << "Binary searching the appropriate target edge length...";
     edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0,  baseMesh.bbox.diagonal() / 10);
-    qDebug() << "Target Edge lengh of : " << edgeLengthCurrentValue << ", approx. the " <<enumToString(scheme ) << " scheme will use " << predictMicroFaces(scheme, edgeLengthCurrentValue);
-    qDebug() << "Now subdividng the base mesh according using the found target edge length";
+
+    qDebug() << "Target Edge lengh of : " << edgeLengthCurrentValue
+             << ", approx. the " << enumToString(scheme)
+             << " scheme will use "
+             << predictMicroFaces(scheme, edgeLengthCurrentValue);
+
+    qDebug() << "Now subdividing the base mesh according using the found target edge length";
     subdivideBaseMesh(scheme);
-    qDebug() << "The subdivided mesh has " << subdividedMesh.faces.size() << " microfaces";
+
+    qDebug() << "The subdivided mesh has " << subdividedMesh.faces.size()
+             << " microfaces";
+
     qDebug() << "Starting the ray casting towards the target mesh";
     std::vector<float> displacements = subdividedMesh.getDisplacements(targetMesh);
-    qDebug() << "Displacements extracted";
-    projectedMesh = subdividedMesh;
+
+    qDebug() << "Displacements extracted successfully!";
+
 
     qDebug() << "Applying displacements on the subdivided mesh...";
-
+    projectedMesh = subdividedMesh;
     int vertexIdx = 0;
     for (const float &disp : displacements)
         projectedMesh.displaceVertex(vertexIdx++, disp);
 
-    qDebug() << "Projected mesh built successfully.";
-
+    qDebug() << "Projected mesh constructed successfully!";
     QString fileName = QString::fromStdString("displacedTo") +
                        QString::number(targetMesh.faces.size()) +
                        "_ApprxMicroFaces_" +

@@ -15,7 +15,8 @@ void Mesh::intersectTriangle(int fIndex, Line line, float &minDistance)
 
 float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
-    float minDistance = bbox.diagonal() * 0.01;
+    const float DIST_MAX = bbox.diagonal() * 0.01;
+    float minDistance = DIST_MAX;
 
     Line line = Line(origin, direction);
     float posOrigin = origin[maxAxis];
@@ -66,8 +67,7 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
         }
     }
 
-    if (minDistance == INF)
-        minDistance = 0.0f;
+    if (minDistance == DIST_MAX) minDistance = 0.0f;
 
     return minDistance;
 }
