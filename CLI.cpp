@@ -91,8 +91,6 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
         micro.updateEdgesSubdivisionLevelsMicromesh(microLength);
         micro = micro.micromeshSubdivide();
         microMeshFaces.push_back(int(micro.faces.size()));
-
-        qDebug() << "Progress (microMeshFaces): " << microLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", microLength: " << microLength;
     }
 
     std::vector<int> anisoMeshFaces;
@@ -104,9 +102,6 @@ QString Mainwindow::exportSameMicrofacesPreset(double minEdge, double maxEdge)
         aniso.updateEdgesSubdivisionLevelsAniso(anisoLength);
         aniso = aniso.anisotropicMicromeshSubdivide();
         anisoMeshFaces.push_back(int(aniso.faces.size()));
-
-        qDebug() << "Progress (anisoMeshFaces): " << anisoLengthIdx << "/" << ((maxEdge - minEdge) / 0.01) << ", anisoLength: " << anisoLength;
-        ;
     }
 
     QTextStream out(&presetFile);
@@ -245,16 +240,20 @@ void Mainwindow::exportDisplacedBaseMesh(int microFaces, Scheme scheme)
     edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0,  baseMesh.bbox.diagonal() / 10);
     qDebug() << "Target Edge lengh of : " << edgeLengthCurrentValue << ", approx. the " <<enumToString(scheme ) << " scheme will use " << predictMicroFaces(scheme, edgeLengthCurrentValue);
     qDebug() << "Now subdividng the base mesh according using the found target edge length";
-    subdividedMesh = subdivideBaseMesh(scheme);
+    subdivideBaseMesh(scheme);
     qDebug() << "The subdivided mesh has " << subdividedMesh.faces.size() << " microfaces";
     qDebug() << "Starting the ray casting towards the target mesh";
     std::vector<float> displacements = subdividedMesh.getDisplacements(targetMesh);
+    qDebug() << "Displacements extracted";
     projectedMesh = subdividedMesh;
 
-    int vertexIdx = 0;
+    qDebug() << "Applying displacements on the subdivided mesh...";
 
+    int vertexIdx = 0;
     for (const float &disp : displacements)
         projectedMesh.displaceVertex(vertexIdx++, disp);
+
+    qDebug() << "Projected mesh built successfully.";
 
     QString fileName = QString::fromStdString("displacedTo") +
                        QString::number(targetMesh.faces.size()) +

@@ -317,10 +317,11 @@ Mesh Mesh::micromeshSubdivide()
         }
     }
 
+    qDebug() << "Subdivided micro-mesh constructed." ;
+    qDebug() << "Updating the AABB.";
     subdivided.updateBoundingBox();
+    qDebug() << "Updating the edges relationships.";
     subdivided.updateEdges();
-    subdivided.removeDuplicatedVertices();
-//    subdivided.removeDegenerateFaces();
 
     return subdivided;
 }

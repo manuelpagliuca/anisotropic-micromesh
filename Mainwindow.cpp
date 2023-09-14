@@ -708,8 +708,7 @@ void Mainwindow::on_microFacesSlider_valueChanged(int microFaces)
     ui.microFacesCurrentValue->setText(QString::number(microFaces));
     edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0, baseMesh.bbox.diagonal() * 10);
 
-    subdividedMesh = subdivideBaseMesh(scheme);
-    qDebug() << microFaces << predictMicroFaces(scheme, edgeLengthCurrentValue) << subdividedMesh.faces.size();
+    subdivideBaseMesh(scheme);
 
     ui.openGLWidget->updateMeshData(subdividedMesh);
     ui.subdividedMeshFaces->setText(QString::number(subdividedMesh.faces.size()));
@@ -734,16 +733,16 @@ void Mainwindow::on_displacementSlider_valueChanged(int value)
     ui.currentMeshLabel->setText("Projected mesh");
 }
 
-Mesh Mainwindow::subdivideBaseMesh(Scheme scheme)
+void Mainwindow::subdivideBaseMesh(Scheme scheme)
 {
     if (scheme == ANISOTROPIC)
     {
         baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
-        return baseMesh.anisotropicMicromeshSubdivide();
+        subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
     }
 
     baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
-    return baseMesh.micromeshSubdivide();
+    subdividedMesh = baseMesh.micromeshSubdivide();
 }
 
 void Mainwindow::on_wireframeToggle_stateChanged()

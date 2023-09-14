@@ -15,7 +15,7 @@ void Mesh::intersectTriangle(int fIndex, Line line, float &minDistance)
 
 float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
-    float minDistance = INF;
+    float minDistance = bbox.diagonal() * 0.01;
 
     Line line = Line(origin, direction);
     float posOrigin = origin[maxAxis];
@@ -66,7 +66,8 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
         }
     }
 
-    if (minDistance == INF) minDistance = 0.0f;
+    if (minDistance == INF)
+        minDistance = 0.0f;
 
     return minDistance;
 }
@@ -86,8 +87,13 @@ std::vector<float> Mesh::getDisplacements(Mesh &target)
 {
     std::vector<float> displacements;
 
+    int currentVertex = 0;
+
     for (const Vertex &v : vertices)
+    {
         displacements.push_back(minimumDistance(v.pos, v.norm, target));
+        ++currentVertex;
+    }
 
     return displacements;
 }
@@ -96,12 +102,12 @@ void Mesh::removeDuplicatedVertices()
 {
     std::unordered_set<Vertex> uniqueVertices;
 
-    for (const Vertex &v : vertices)
+    for (Vertex &v : vertices)
         uniqueVertices.insert(v);
 
     for (Face &f : faces)
     {
-        for (int w = 0; w < 3 ; w++)
+        for (int w = 0; w < 3; w++)
         {
             Vertex v = vertices.at(f.index[w]);
             auto it = uniqueVertices.find(v);

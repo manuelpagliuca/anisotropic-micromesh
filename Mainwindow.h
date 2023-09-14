@@ -63,7 +63,7 @@ protected:
     std::string extractFileName(const std::string &fullPath);
 
 private:
-    Mesh subdivideBaseMesh(Scheme scheme);
+    void subdivideBaseMesh(Scheme scheme);
 
 public:
     Ui::mainWindowClass ui;
