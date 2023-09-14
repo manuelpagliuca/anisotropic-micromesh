@@ -127,9 +127,12 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
         projectedMesh.displaceVertex(vertexIdx++, disp);
 
     qDebug() << "Projected mesh constructed successfully!";
-    QString fileName = QString::fromStdString("displacedTo") +
+    QString fileName = QString::fromStdString("to_") +
                        QString::number(targetMesh.faces.size()) +
-                       "_factor_" + QString::number(mfsFactor);
+                       QString::fromStdString("_mfs_") +
+                       QString::number(projectedMesh.faces.size()) +
+                       QString::fromStdString("_factor_") +
+                       QString::number(mfsFactor);
 
     QDir outputDir =
         QDir("Evaluation/same_microfaces/" + QString::fromStdString(enumToString(scheme)) + "/" +
@@ -144,9 +147,11 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
         }
     }
 
+
     QString outputPath = outputDir.path() + "/";
 
     projectedMesh.exportOBJ(fileName.toStdString().c_str(), outputPath);
+    qDebug() << "Diagonal AABB of the target mesh: " << targetMesh.bbox.diagonal();
 }
 
 double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b)
