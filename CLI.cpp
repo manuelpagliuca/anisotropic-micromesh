@@ -105,7 +105,8 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
     qDebug() << "Target Edge lengh of : " << edgeLengthCurrentValue
              << ", approx. the " << enumToString(scheme)
              << " scheme will use "
-             << predictMicroFaces(scheme, edgeLengthCurrentValue);
+             << predictMicroFaces(scheme, edgeLengthCurrentValue)
+             << "(x" << mfsFactor << " faces of target-mesh).";
 
     qDebug() << "Now subdividing the base mesh according using the found target edge length";
     subdivideBaseMesh(scheme);
@@ -128,8 +129,7 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
     qDebug() << "Projected mesh constructed successfully!";
     QString fileName = QString::fromStdString("displacedTo") +
                        QString::number(targetMesh.faces.size()) +
-                       "_ApprxMicroFaces_" +
-                       QString::number(microFaces);
+                       "_factor_" + QString::number(mfsFactor);
 
     QDir outputDir =
         QDir("Evaluation/same_microfaces/" + QString::fromStdString(enumToString(scheme)) + "/" +

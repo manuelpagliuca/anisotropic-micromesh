@@ -32,11 +32,8 @@ public:
 
 public:
     // Command Line functions
-    void exportDisplacedSamplesSameTargetEdgeMetric(int nSamples = 5, double minEdge = 1.0, double maxEdge = 10.0);
-    QString exportSameMicrofacesPreset(double minEdge = 1.0, double maxEdge = 10.0);
-    void exportDisplacedSamplesWithSameFacesAmount(double minEdge = 1.0, double maxEdge = 10.0, QString presetFileName = "");
     void exportDisplacedSamples(const QString presetDirPath);
-    void exportDisplacedBaseMesh(int microFaces, Scheme scheme);
+    void exportDisplacedBaseMesh(double mfsFactor, Scheme scheme);
     double binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b);
     int predictMicroFaces(Scheme scheme, double edgeLength);
 

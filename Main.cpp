@@ -27,7 +27,6 @@ int main(int argc, char *argv[])
 
         QString targetMesh = parser.value(targetOption);
         QString baseMesh = parser.value(baseMeshOption);
-        QString microfacesAmount = parser.value(microfacesAmountOption);
         QString subdivisionScheme = parser.value(subdivisionSchemeOption);
         QString microfacesFactorStr = parser.value(microfacesFactorOption);
 
@@ -43,9 +42,6 @@ int main(int argc, char *argv[])
         if (cmd == "gen-sample")
         {
             w.loadTargetMesh(targetMesh);
-            int microFaces = microfacesAmount.isEmpty() ? int(w.targetMesh.faces.size() * microfacesFactorStr.toDouble()) : microfacesAmount.toInt();
-            microFaces = microfacesAmount.toInt() > microFaces ? microfacesAmount.toInt() : microFaces;
-            qDebug() << "Generating a sample with: " << microFaces << " micro-faces., using a factor of " << microfacesFactorStr;
             w.exportDisplacedBaseMesh(microfacesFactorStr.toDouble(), scheme);
         }
 
