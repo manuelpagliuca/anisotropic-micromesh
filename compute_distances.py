@@ -7,99 +7,61 @@ import pymeshlab
 from decimal import Decimal, ROUND_HALF_UP
 
 
-def clear_dir(directory_path):
-    file_list = os.listdir(directory_path)
-    for file_name in file_list:
-        file_path = os.path.join(directory_path, file_name)
-        try:
-            if os.path.isfile(file_path):
-                os.remove(file_path)
-                print(f"File '{file_name}' successfully deleted.")
-            else:
-                print(f"Unable to delete '{file_name}' as it is not a file.")
-        except Exception as e:
-            print(f"Error while deleting '{file_name}': {str(e)}")
-
-
-def extract_last_integer_number_from_string(input_string):
-    integer_numbers = re.findall(r"\d+", input_string)
-
-    if integer_numbers:
-        return int(integer_numbers[-1])
-    else:
-        return None
-
-
-def hausdorff_same_microfaces(base_mesh_name, target_mesh_faces, target_mesh_path, iso_samples_path, aniso_samples_path):
-    file_list = glob.glob(os.path.join(iso_samples_path, "*"))
+def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
+    # Get the list of files
+    file_list = glob.glob(os.path.join(displaced_samples_path, "*"))
+    # Consider only OBJ and OFF
     displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
+    # Sort the meshes by dimension (amount of micro-faces)
     displaced_meshes.sort(key=os.path.getsize)
+    # Initialise the factor (will be written in the .txt)
+    factor = Decimal('1.0')
 
-    with open(f"{iso_samples_path}/hausdorff_{base_mesh_name}_micro.txt", "w") as output_file:
-        output_file.write("microFaces RMS max mean\n")
+    # R/W a .txt file
+    with open(f"{displaced_samples_path}/hausdorff_{base_mesh_name}_micro.txt", "w") as output_file:
+
+        # Write the header
+        output_file.write("microFaces factor RMS max mean\n")
 
         for displaced_mesh_path in displaced_meshes:
+            # Load the displaced and target mesh in a MeshSet
             ms = pymeshlab.MeshSet()
             ms.load_new_mesh(displaced_mesh_path)
             ms.load_new_mesh(target_mesh_path)
 
+            # Extract the number of micro-faces (expressed in millions, e.g. 1.3mln)
             target_mesh_name = os.path.basename(displaced_mesh_path)
             mfs = int(target_mesh_name.split("_")[3])
             mln_mfs = Decimal(mfs) / Decimal(1000000)
             mln_mfs = mln_mfs.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
 
+            # Compute Hausdorff's distances
             res = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1)
 
-            output_file.write(str(mln_mfs))
+            # Write micro-faces, factor and distances in a row
+            output_file.write(str(mln_mfs) + " ")
+            output_file.write(f'{factor:.2f} ')
             output_file.write(str(res['RMS']) + " ")
             output_file.write(str(res['max']) + " ")
             output_file.write(str(res['mean']) + " ")
             output_file.write(" \\\\ \n")
 
+            # Increase the factor by 0.1
+            factor = factor + Decimal('0.1')
+
             print("Computed H.D. for: " + displaced_mesh_path)
 
     output_file.close()
 
-    print(f"Hausdorff's distances > {iso_samples_path}/hausdorff_{base_mesh_name}_micro.txt")
 
-    file_list = glob.glob(os.path.join(aniso_samples_path, "*"))
-    displaced_meshes = [file for file in file_list if os.path.splitext(file)[1] in ['.obj', '.off']]
-    displaced_meshes.sort(key=os.path.getsize)
-
-    with open(f"{aniso_samples_path}/hausdorff_{base_mesh_name}_aniso.txt", "w") as output_file:
-        output_file.write("microFaces RMS max mean\n")
-
-        for displaced_mesh_path in displaced_meshes:
-            ms = pymeshlab.MeshSet()
-            ms.load_new_mesh(displaced_mesh_path)
-            ms.load_new_mesh(target_mesh_path)
-
-            target_mesh_name = os.path.basename(displaced_mesh_path)
-            mfs = int(target_mesh_name.split("_")[3])
-            mln_mfs = Decimal(mfs) / Decimal(1000000)
-            mln_mfs = mln_mfs.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
-
-            res = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1)
-
-            output_file.write(str(mln_mfs))
-            output_file.write(str(res['RMS']) + " ")
-            output_file.write(str(res['max']) + " ")
-            output_file.write(str(res['mean']) + " ")
-            output_file.write(" \\\\ \n")
-
-            print("Computed H.D. for: " + displaced_mesh_path)
-    output_file.close()
-
-    print(f"Hausdorff's distances > {aniso_samples_path}/hausdorff_{base_mesh_name}_aniso.txt")
-
-
-def generating_sample():
+def generate_samples(params):
     exe_path = os.path.join(os.getcwd(), "Release", "anisotropic_micromesh.exe")
 
     MIN_MFS_FACTOR = 1.0
     MAX_MFS_FACTOR = 4.1
     STEP_SIZE = 0.1
 
+    # Using the received params, run 'gen-sample' cmd 30 times, from 1.0 to 4.0
     for num in range(int(MIN_MFS_FACTOR * 10), int(MAX_MFS_FACTOR * 10), int(STEP_SIZE * 10)):
         factor = num / 10.0
         params.append(f"--factor={factor}")
@@ -114,40 +76,34 @@ def generating_sample():
         params.pop()
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("--base-mesh", default="pallas_1000.obj", help="Parameter 3 (base-mesh)")
-parser.add_argument("--target-mesh", default="original_pallas_triquad.obj",
-                    help="Parameter 4 (target)")
-parser.add_argument("--clean", help="Parameter 6 (clean flag)", action="store_true")
+if __name__ == "__main__":
+    # Parsing command-line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--base-mesh", default="pallas_1000.obj")
+    parser.add_argument("--target-mesh", default="original_pallas_triquad.obj")
+    args = parser.parse_args()
 
-args = parser.parse_args()
+    # Building command-line arguments for generating the samples
+    params = []
 
-if args.clean:
-    clear_dir(dir_path_micro)
-    clear_dir(dir_path_aniso)
+    if args.base_mesh is not None:
+        params.append(f"--base-mesh={args.base_mesh}")
 
-params = []
+    if args.target_mesh is not None:
+        params.append(f"--target-mesh={args.target_mesh}")
 
-if args.base_mesh is not None:
-    params.append(f"--base-mesh={args.base_mesh}")
+    # Generating samples for both schemes
+    params.append("--scheme=micro")
+    generate_samples(params)
+    params.pop()
+    params.append("--scheme=aniso")
+    generate_samples(params)
 
-if args.target_mesh is not None:
-    params.append(f"--target-mesh={args.target_mesh}")
+    # Exporting Hausdorff distances
+    base_mesh_name = args.base_mesh[:-4]
+    iso_samples_path = "./Evaluation/micro/" + base_mesh_name
+    aniso_samples_path = "./Evaluation/aniso/" + base_mesh_name
+    target_mesh_path = "./Models/" + args.target_mesh
 
-# params.append("--scheme=micro")
-# generating_sample()
-# params.pop()
-# params.append("--scheme=aniso")
-# generating_sample()
-
-# computing hausdorff distances
-
-base_mesh_name = args.base_mesh[:-4]
-iso_samples_path = f"./Evaluation/micro/" + base_mesh_name
-aniso_samples_path = f"./Evaluation/aniso/" + base_mesh_name
-target_mesh_path = "./Models/" + args.target_mesh
-target_mesh_faces = extract_last_integer_number_from_string(args.target_mesh[:-4])
-
-hausdorff_same_microfaces(
-    base_mesh_name, target_mesh_faces,
-    target_mesh_path, iso_samples_path, aniso_samples_path)
+    export_hausdorff(base_mesh_name, target_mesh_path, iso_samples_path)
+    export_hausdorff(base_mesh_name, target_mesh_path, aniso_samples_path)
