@@ -40,7 +40,7 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
                 micro.displaceVertex(vertexIdx++, disp);
 
             QString microDir =
-                "Evaluation/same_microfaces/micro/" +
+                "Evaluation/micro/" +
                 QString::fromStdString(baseMeshNameAndDetail + "/");
             QDir microDirPath(QString::fromStdString("./Output/") + microDir);
 
@@ -71,7 +71,7 @@ void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
                 aniso.displaceVertex(vertexIdx++, disp);
 
             QString anisoDir =
-                "Evaluation/same_microfaces/aniso/" +
+                "Evaluation/aniso/" +
                 QString::fromStdString(baseMeshNameAndDetail + "/");
             QDir anisoDirPath(QString::fromStdString("./Output/") + anisoDir);
 
@@ -135,7 +135,7 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
                        QString::number(mfsFactor);
 
     QDir outputDir =
-        QDir("Evaluation/same_microfaces/" + QString::fromStdString(enumToString(scheme)) + "/" +
+        QDir("Evaluation/" + QString::fromStdString(enumToString(scheme)) + "/" +
         QString::fromStdString(baseMeshNameAndDetail) + "/");
 
     if (!outputDir.exists())
