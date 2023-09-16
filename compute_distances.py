@@ -17,11 +17,13 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
     # Initialise the factor (will be written in the .txt)
     factor = Decimal('1.0')
 
+    scheme = displaced_samples_path.split("/")[2]
+
     # R/W a .txt file
-    with open(f"{displaced_samples_path}/hausdorff_{base_mesh_name}_micro.txt", "w") as output_file:
+    with open(f"{displaced_samples_path}/hausdorff_{base_mesh_name}_{scheme}.txt", "w") as output_file:
 
         # Write the header
-        output_file.write("microFaces factor RMS max mean\n")
+        output_file.write("microFaces factor RMS max mean RMS_scaled max_scaled mean_scaled\n")
 
         for displaced_mesh_path in displaced_meshes:
             # Load the displaced and target mesh in a MeshSet
@@ -60,9 +62,8 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
 
             # Increase the factor by 0.1
             factor = factor + Decimal('0.1')
-
-            print("Computed H.D. for: " + displaced_mesh_path)
-
+    print(
+        f"Hausdorff's distances saved > {displaced_samples_path}/hausdorff_{base_mesh_name}_{scheme}.txt")
     output_file.close()
 
 
@@ -105,11 +106,11 @@ if __name__ == "__main__":
         params.append(f"--target-mesh={args.target_mesh}")
 
     # Generating samples for both schemes
-    params.append("--scheme=micro")
-    generate_samples(params)
-    params.pop()
-    params.append("--scheme=aniso")
-    generate_samples(params)
+    # params.append("--scheme=micro")
+    # generate_samples(params)
+    # params.pop()
+    # params.append("--scheme=aniso")
+    # generate_samples(params)
 
     # Exporting Hausdorff distances
     base_mesh_name = args.base_mesh[:-4]
