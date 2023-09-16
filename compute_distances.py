@@ -38,12 +38,24 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
             # Compute Hausdorff's distances
             res = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1)
 
+            # Compute the diagonal of the BBOX for scale the absolute distances
+            diagonal = ms.current_mesh().bounding_box().diagonal()
+
+            # Scale the distances
+            scaled_RMS = (res['RMS'] * 100) / diagonal
+            scaled_max = (res['max'] * 100) / diagonal
+            scaled_mean = (res['mean'] * 100) / diagonal
+
             # Write micro-faces, factor and distances in a row
             output_file.write(str(mln_mfs) + " ")
             output_file.write(f'{factor:.2f} ')
             output_file.write(str(res['RMS']) + " ")
             output_file.write(str(res['max']) + " ")
             output_file.write(str(res['mean']) + " ")
+            output_file.write(str(scaled_RMS) + " ")
+            output_file.write(str(scaled_max) + " ")
+            output_file.write(str(scaled_mean) + " ")
+
             output_file.write(" \\\\ \n")
 
             # Increase the factor by 0.1
