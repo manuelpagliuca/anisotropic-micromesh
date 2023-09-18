@@ -35,10 +35,12 @@ public:
     void exportDisplacedSamples(const QString presetDirPath);
     void exportDisplacedBaseMesh(double mfsFactor, Scheme scheme);
     double binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b);
-    int predictMicroFaces(Scheme scheme, double edgeLength);
+    void exportSubdividedBaseMesh(int targetMicroFaces, Scheme scheme);
 
+    // Utility
     void loadBaseMesh(const QString &fileName);
     void loadTargetMesh(const QString &fileName);
+    int predictMicroFaces(Scheme scheme, double edgeLength);
 
 protected:
     void mousePressEvent(QMouseEvent *ev);
@@ -79,7 +81,7 @@ public:
     // Morphing
     std::vector<float> displacementsDeltas;
     int morphingCurrentValue;
-
+    
 public slots:
     void on_actionLoad_triggered();
     void on_actionUnload_triggered();

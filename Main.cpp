@@ -23,26 +23,35 @@ int main(int argc, char *argv[])
         QCommandLineOption microfacesFactorOption("factor", "Microfaces factor (default: 2.0)", "factor");
         parser.addOption(microfacesFactorOption);
 
+        QCommandLineOption microfacesOption("microfaces", "Microfaces (default: 0)", "microfaces");
+        parser.addOption(microfacesOption);
+
         parser.process(a);
 
         QString targetMesh = parser.value(targetOption);
         QString baseMesh = parser.value(baseMeshOption);
         QString subdivisionScheme = parser.value(subdivisionSchemeOption);
-        QString microfacesFactorStr = parser.value(microfacesFactorOption);
+        QString microFacesFactorStr = parser.value(microfacesFactorOption);
+        QString microFacesStr = parser.value(microfacesOption);
 
         Scheme scheme = ISOTROPIC;
 
         if (targetMesh.isEmpty())          targetMesh = "original_pallas_triquad.obj";
         if (baseMesh.isEmpty())            baseMesh = "pallas_1000.obj";
-        if (microfacesFactorStr.isEmpty()) microfacesFactorStr = "2.0";
+        if (microFacesFactorStr.isEmpty()) microFacesFactorStr = "2.0";
         if (subdivisionScheme == "aniso")  scheme = ANISOTROPIC;
+        if (microFacesStr.isEmpty())       microFacesStr = "0";
 
         w.loadBaseMesh(baseMesh);
 
         if (cmd == "gen-sample")
         {
             w.loadTargetMesh(targetMesh);
-            w.exportDisplacedBaseMesh(microfacesFactorStr.toDouble(), scheme);
+            w.exportDisplacedBaseMesh(microFacesFactorStr.toDouble(), scheme);
+        }
+        else if (cmd == "gen-subdivided-sample" && !microFacesStr.isEmpty())
+        {
+            w.exportSubdividedBaseMesh(microFacesStr.toInt(), scheme);
         }
 
         exit(0);

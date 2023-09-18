@@ -150,8 +150,50 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
 
     QString outputPath = outputDir.path() + "/";
 
+    qDebug() << "Exporting the projected mesh...";
     projectedMesh.exportOBJ(fileName.toStdString().c_str(), outputPath);
-    qDebug() << "Diagonal AABB of the target mesh: " << targetMesh.bbox.diagonal();
+}
+
+void Mainwindow::exportSubdividedBaseMesh(int microFaces, Scheme scheme)
+{
+    qDebug() << "Binary searching the appropriate target edge length...";
+    edgeLengthCurrentValue = binarySearchTargetEdgeLength(microFaces, scheme, 0,  baseMesh.bbox.diagonal() / 10);
+
+    qDebug() << "Target Edge lengh of : " << edgeLengthCurrentValue
+             << ", approx. the " << enumToString(scheme)
+             << " scheme will use " << predictMicroFaces(scheme, edgeLengthCurrentValue) << ".";
+
+    qDebug() << "Now subdividing the base mesh according using the found target edge length";
+    subdivideBaseMesh(scheme);
+
+    qDebug() << "The subdivided mesh has " << subdividedMesh.faces.size() << " microfaces";
+    qDebug() << "Subdivided mesh constructed successfully!";
+
+    QString fileName = QString::number(baseMesh.faces.size()) +
+                       QString::fromStdString("_to_") +
+                       QString::number(subdividedMesh.faces.size());
+
+    QDir outputDir = QDir(
+                        "Evaluation/Subdivided/" +
+                        QString::fromStdString(enumToString(scheme)) +
+                        "/" +
+                        QString::fromStdString(baseMeshNameAndDetail) +
+                        "/");
+
+    if (!outputDir.exists())
+    {
+        if (!outputDir.mkpath("."))
+        {
+            qDebug() << "Error during the creation of the directory: " << outputDir;
+            return;
+        }
+    }
+
+
+    QString outputPath = outputDir.path() + "/";
+
+    qDebug() << "Exporting the subdivided mesh...";
+    subdividedMesh.exportOBJ(fileName.toStdString().c_str(), outputPath);
 }
 
 double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b)
