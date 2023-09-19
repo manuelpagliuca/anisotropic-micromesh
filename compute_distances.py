@@ -19,11 +19,10 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
 
     scheme = displaced_samples_path.split("/")[2]
 
-    # R/W a .txt file
-    with open(f"{displaced_samples_path}/hausdorff_{base_mesh_name}_{scheme}.txt", "w") as output_file:
+    with open(f"{displaced_samples_path}/hausdorff_{base_mesh_name}_{scheme}.txt", "w") as distances_file:
 
         # Write the header
-        output_file.write("microFaces factor RMS max mean RMS_scaled max_scaled mean_scaled\n")
+        distances_file.write("microFaces factor RMS max mean RMS_scaled max_scaled mean_scaled\n")
 
         for displaced_mesh_path in displaced_meshes:
             # Load the displaced and target mesh in a MeshSet
@@ -49,22 +48,64 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
             scaled_mean = (res['mean'] * 100) / diagonal
 
             # Write micro-faces, factor and distances in a row
-            output_file.write(str(mln_mfs) + " ")
-            output_file.write(f'{factor:.2f} ')
-            output_file.write(str(res['RMS']) + " ")
-            output_file.write(str(res['max']) + " ")
-            output_file.write(str(res['mean']) + " ")
-            output_file.write(str(scaled_RMS) + " ")
-            output_file.write(str(scaled_max) + " ")
-            output_file.write(str(scaled_mean) + " ")
+            distances_file.write(str(mln_mfs) + " ")
+            distances_file.write(f'{factor:.2f} ')
+            distances_file.write(str(res['RMS']) + " ")
+            distances_file.write(str(res['max']) + " ")
+            distances_file.write(str(res['mean']) + " ")
+            distances_file.write(str(scaled_RMS) + " ")
+            distances_file.write(str(scaled_max) + " ")
+            distances_file.write(str(scaled_mean) + " ")
 
-            output_file.write(" \\\\ \n")
+            distances_file.write("\\\\ \n")
 
             # Increase the factor by 0.1
             factor = factor + Decimal('0.1')
     print(
         f"Hausdorff's distances saved > {displaced_samples_path}/hausdorff_{base_mesh_name}_{scheme}.txt")
-    output_file.close()
+    distances_file.close()
+
+    with open(f"{displaced_samples_path}/table_data.txt", "w") as table_file:
+        for displaced_mesh_path in displaced_meshes:
+            # Load the displaced and target mesh in a MeshSet
+            ms = pymeshlab.MeshSet()
+            ms.load_new_mesh(displaced_mesh_path)
+            ms.load_new_mesh(target_mesh_path)
+
+            # Extract the number of micro-faces (expressed in millions, e.g. 1.3mln)
+            target_mesh_name = os.path.basename(displaced_mesh_path)
+            mfs = int(target_mesh_name.split("_")[3])
+            mln_mfs = Decimal(mfs) / Decimal(1000000)
+            mln_mfs = mln_mfs.quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+
+            # Compute Hausdorff's distances
+            res = ms.get_hausdorff_distance(sampledmesh=0, targetmesh=1)
+
+            # Compute the diagonal of the BBOX for scale the absolute distances
+            diagonal = ms.current_mesh().bounding_box().diagonal()
+
+            # Scale the distances
+            scaled_RMS = (res['RMS'] * 100) / diagonal
+            scaled_max = (res['max'] * 100) / diagonal
+            scaled_mean = (res['mean'] * 100) / diagonal
+
+            # Write micro-faces, factor and distances in a row
+            table_file.write(str(mln_mfs) + " & ")
+            table_file.write(f'{factor:.2f} & ')
+            table_file.write("{:.2e} & ".format(res['RMS']))
+            table_file.write("{:.2e} & ".format(res['max']))
+            table_file.write("{:.2e} & ".format(res['mean']))
+            table_file.write("{:.2e} & ".format(scaled_RMS))
+            table_file.write("{:.2e} & ".format(scaled_max))
+            table_file.write("{:.2e}".format(scaled_mean))
+
+            table_file.write("\n")
+
+            # Increase the factor by 0.1
+            factor = factor + Decimal('0.1')
+
+        print(f"Table data saved > {displaced_samples_path}/table_data.txt")
+    table_file.close()
 
 
 def generate_samples(params):
@@ -120,38 +161,3 @@ if __name__ == "__main__":
 
     export_hausdorff(base_mesh_name, target_mesh_path, iso_samples_path)
     export_hausdorff(base_mesh_name, target_mesh_path, aniso_samples_path)
-
-
-    # Apri il file in modalità lettura
-    with open("hausdorff_Homo_Heidelbergensis_Model_4158_micro.txt", "r") as file:
-        lines = file.readlines()
-
-    # Crea una lista per memorizzare le righe formattate
-    formatted_lines = []
-
-    # Loop attraverso le righe del file, ignorando la prima riga
-    for line in lines[1:]:
-        # Dividi la riga utilizzando uno o più spazi come delimitatori
-        parts = line.strip().split()
-
-        # Approssima la colonna "factor" a un solo numero dopo la virgola
-        parts[1] = str(round(float(parts[1]), 1))
-
-        # Approssima le prime 5 colonne usando la notazione scientifica
-        for i in range(2, 8):  # Considera solo le colonne da 2 a 6 (incluso)
-            parts[i] = format(float(parts[i]), ".2e")
-
-        # Unisci le prime 5 colonne della riga utilizzando " & "
-        formatted_line = " & ".join(parts[:5])
-
-        # Aggiungi la sesta colonna
-        formatted_line += " & " + parts[7] + " \\\\"
-
-        # Aggiungi la riga formattata alla lista
-        formatted_lines.append(formatted_line)
-
-    formatted_lines = [line.replace(" & \\", " \\") for line in formatted_lines]
-
-    # Scrivi le righe formattate in un nuovo file chiamato "table.txt"
-    with open("table.txt", "w") as output_file:
-        output_file.write("\n".join(formatted_lines))
