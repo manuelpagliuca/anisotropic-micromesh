@@ -185,10 +185,9 @@ Mesh Mesh::parseOFF(const std::string &rawOFF)
     mesh.updateBoundingBox();
     mesh.updateFaceNormals();
     mesh.updateVertexNormals();
-    mesh.updateEdges();
     mesh.updatePosMiddleAndR();
-
     std::sort(mesh.faces.begin(), mesh.faces.end());
+    mesh.updateEdges();
 
     return mesh;
 }
@@ -290,10 +289,9 @@ Mesh Mesh::parseOBJ(const std::string &raw_obj)
     mesh.updateBoundingBox();
     mesh.updateFaceNormals();
     mesh.updateVertexNormals();
-    mesh.updateEdges();
     mesh.updatePosMiddleAndR();
-
     std::sort(mesh.faces.begin(), mesh.faces.end());
+    mesh.updateEdges();
 
     return mesh;
 }

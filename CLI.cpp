@@ -109,6 +109,7 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
              << "(x" << mfsFactor << " faces of target-mesh).";
 
     qDebug() << "Now subdividing the base mesh according using the found target edge length";
+
     subdivideBaseMesh(scheme);
 
     qDebug() << "The subdivided mesh has " << subdividedMesh.faces.size()
@@ -234,7 +235,9 @@ int Mainwindow::predictMicroFaces(Scheme scheme, double edgeLength)
         baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLength);
         return baseMesh.anisotropicMicroMeshPredictFaces();
     }
-
-    baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLength);
-    return baseMesh.micromeshPredictFaces();
+    else
+    {
+        baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLength);
+        return baseMesh.micromeshPredictFaces();
+    }
 }

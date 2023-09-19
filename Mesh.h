@@ -52,13 +52,13 @@ public:
     int addFace(int i0, int i1, int i2);
     void displaceFace(int index, float k);
     void displaceFaces(float k);
-    uint getFaceSubdivisionLevel(int index) const;
+    int getFaceSubdivisionIndex(int index) const;
     float getAvgFacesDoubleArea() const;
 
     // Edge
     int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
     float getAvgEdgeLength() const;
-    void fixEdgesSubdivisionLevelsMicromesh();
+    void fixEdgesSubdivisionIndicesMicromesh();
     void setInitialEdgeSubdivisionLevels(float targetEdgeLength);
 
     // Get
@@ -103,7 +103,7 @@ protected:
     void drawDirect();
 
     // Test
-private:
+public:
     void setInitialEdgeSubdivisionLevelsTest();
     void sanityCheckEdge();
     bool isMicromeshScheme() const;

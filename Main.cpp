@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
         QCommandLineOption targetOption("target-mesh", "Target mesh (default: original_pallas_triquad.obj)", "target-mesh");
         parser.addOption(targetOption);
 
-        QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_124.obj)", "base-mesh");
+        QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_1000.obj)", "base-mesh");
         parser.addOption(baseMeshOption);
 
         QCommandLineOption subdivisionSchemeOption("scheme", "Scheme (default: micro)", "scheme");

@@ -7,7 +7,7 @@
 struct Face
 {
     uint index[3];
-    uint edgesIndices[3]; // 0, 1 and 2
+    uint edges[3];
     glm::vec3 norm;
     float posMiddle;
 
@@ -25,22 +25,22 @@ struct Face
 
 namespace std
 {
-template <>
-struct hash<Face>
-{
-    size_t operator()(const Face &f) const
+    template <>
+    struct hash<Face>
     {
-        size_t hash = 0;
+        size_t operator()(const Face &f) const
+        {
+            size_t hash = 0;
 
-        hash = std::hash<int>()(f.norm.x) ^ std::hash<int>()(f.norm.x) ^ std::hash<int>()(f.norm.x);
-        hash = std::hash<int>()(f.posMiddle) ^ std::hash<int>()(f.posMiddle) ^ std::hash<int>()(f.posMiddle);
-        hash = std::hash<int>()(f.index[0]) ^ std::hash<int>()(f.index[0]) ^ std::hash<int>()(f.index[0]);
-        hash = std::hash<int>()(f.index[1]) ^ std::hash<int>()(f.index[1]) ^ std::hash<int>()(f.index[1]);
-        hash = std::hash<int>()(f.index[2]) ^ std::hash<int>()(f.index[2]) ^ std::hash<int>()(f.index[2]);
+            hash = std::hash<int>()(f.norm.x) ^ std::hash<int>()(f.norm.x) ^ std::hash<int>()(f.norm.x);
+            hash = std::hash<int>()(f.posMiddle) ^ std::hash<int>()(f.posMiddle) ^ std::hash<int>()(f.posMiddle);
+            hash = std::hash<int>()(f.index[0]) ^ std::hash<int>()(f.index[0]) ^ std::hash<int>()(f.index[0]);
+            hash = std::hash<int>()(f.index[1]) ^ std::hash<int>()(f.index[1]) ^ std::hash<int>()(f.index[1]);
+            hash = std::hash<int>()(f.index[2]) ^ std::hash<int>()(f.index[2]) ^ std::hash<int>()(f.index[2]);
 
-        return hash;
-    }
-};
+            return hash;
+        }
+    };
 }
 
 #endif // FACE_H

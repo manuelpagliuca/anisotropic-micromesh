@@ -572,6 +572,7 @@ void Mainwindow::on_demo1000faces_clicked()
 {
     std::string pallasOBJ1000 = readFile("./Models/pallas_1000.obj");
     setBaseMeshAndUI(Mesh::parseOBJ(pallasOBJ1000));
+
     baseMeshNameAndDetail = extractFileName("./Models/pallas_1000.obj");
 
     ui.currentMeshLabel->setText("Base mesh");
@@ -590,7 +591,31 @@ void Mainwindow::on_micromesh_subdivision_clicked()
     // Setting target edge length + micromesh subdivision scheme
     scheme = ISOTROPIC;
     baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
+
     subdividedMesh = baseMesh.micromeshSubdivide();
+
+//    int idx = 0;
+
+//    for (Edge e: subdividedMesh.edges)
+//    {
+//        qDebug()
+//            << subdividedMesh.edges.at(subdividedMesh.faces.at(e.faces[0]).edges[0]).subdivisions
+//            << subdividedMesh.edges.at(subdividedMesh.faces.at(e.faces[0]).edges[1]).subdivisions
+//            << subdividedMesh.edges.at(subdividedMesh.faces.at(e.faces[0]).edges[2]).subdivisions
+//            << subdividedMesh.edges.at(subdividedMesh.faces.at(e.faces[1]).edges[0]).subdivisions
+//            << subdividedMesh.edges.at(subdividedMesh.faces.at(e.faces[1]).edges[1]).subdivisions
+//            << subdividedMesh.edges.at(subdividedMesh.faces.at(e.faces[1]).edges[2]).subdivisions;
+
+//        qDebug()
+//            << idx++
+//            << subdividedMesh.faces.at(e.faces[0]).edges[0]
+//            << subdividedMesh.faces.at(e.faces[0]).edges[1]
+//            << subdividedMesh.faces.at(e.faces[0]).edges[2]
+//            << subdividedMesh.faces.at(e.faces[1]).edges[0]
+//            << subdividedMesh.faces.at(e.faces[1]).edges[1]
+//            << subdividedMesh.faces.at(e.faces[1]).edges[2];
+//    }
+
 
     // Updating mesh data
     ui.openGLWidget->updateMeshData(subdividedMesh);
@@ -740,9 +765,11 @@ void Mainwindow::subdivideBaseMesh(Scheme scheme)
         baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLengthCurrentValue);
         subdividedMesh = baseMesh.anisotropicMicromeshSubdivide();
     }
-
-    baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
-    subdividedMesh = baseMesh.micromeshSubdivide();
+    else
+    {
+        baseMesh.updateEdgesSubdivisionLevelsMicromesh(edgeLengthCurrentValue);
+        subdividedMesh = baseMesh.micromeshSubdivide();
+    }
 }
 
 void Mainwindow::on_wireframeToggle_stateChanged()
@@ -782,10 +809,8 @@ void Mainwindow::on_exportCurrentOBJ_clicked()
 {
     std::ostringstream fileNameStream;
 
-    if (scheme == ANISOTROPIC)
-        fileNameStream << "displaced/aniso";
-    else
-        fileNameStream << "displaced/micro";
+    if (scheme == ANISOTROPIC) fileNameStream << "displaced/aniso";
+    else fileNameStream << "displaced/micro";
 
     fileNameStream << baseMeshNameAndDetail << "_to_" << targetMesh.faces.size() << "_disp_" << morphingCurrentValue << "_edge_" << edgeLengthCurrentValue;
     std::string fileName = fileNameStream.str();
