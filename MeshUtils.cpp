@@ -13,10 +13,10 @@ void Mesh::intersectTriangle(int fIndex, Line line, float &minDistance)
         minDistance = abs(minDistance) < abs(newDistance) ? minDistance : newDistance;
 }
 
-float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target)
+float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, Mesh &target)
 {
     const float DIST_MAX = bbox.diagonal() * 0.01;
-    float minDistance = DIST_MAX;
+    float minDisp = DIST_MAX;
 
     Line line = Line(origin, direction);
     float posOrigin = origin[maxAxis];
@@ -28,10 +28,8 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
     {
         int m = (i + j) / 2;
 
-        if (target.faces.at(m).posMiddle > posOrigin)
-            j = m;
-        else
-            i = m;
+        if (target.faces.at(m).posMiddle > posOrigin) j = m;
+        else i = m;
     }
 
     while (i >= 0 || j < target.faces.size())
@@ -39,14 +37,14 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
         if (i >= 0)
         {
             // early rejection test
-            if (target.faces.at(i).posMiddle - posOrigin + target.R < -abs(minDistance))
+            if (target.faces.at(i).posMiddle - posOrigin + target.R < -abs(minDisp))
             {
                 // stop leftmost search
                 i = -1;
             }
             else
             {
-                target.intersectTriangle(i, line, minDistance);
+                target.intersectTriangle(i, line, minDisp);
                 i--;
             }
         }
@@ -54,22 +52,22 @@ float Mesh::minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &tar
         if (j < target.faces.size())
         {
             // early rejection test
-            if (target.faces.at(j).posMiddle - posOrigin - target.R > abs(minDistance))
+            if (target.faces.at(j).posMiddle - posOrigin - target.R > abs(minDisp))
             {
                 // stop rightmost search
                 j = int(target.faces.size());
             }
             else
             {
-                target.intersectTriangle(j, line, minDistance);
+                target.intersectTriangle(j, line, minDisp);
                 j++;
             }
         }
     }
 
-    if (minDistance == DIST_MAX) minDistance = 0.0f;
+    if (minDisp == DIST_MAX) minDisp = 0.0f;
 
-    return minDistance;
+    return minDisp;
 }
 
 float Mesh::minimumDistanceBruteForce(const vec3 &origin, const vec3 &direction, Mesh &target)
@@ -87,23 +85,48 @@ std::vector<float> Mesh::getDisplacements(Mesh &target)
 {
     std::vector<float> displacements;
 
-    int currentVertex = 0;
-
     for (const Vertex &v : vertices)
-    {
-        displacements.push_back(minimumDistance(v.pos, v.norm, target));
-        ++currentVertex;
-    }
+        displacements.push_back(minimumDisplacement(v.pos, v.norm, target));
 
     return displacements;
+}
+
+float Mesh::getFaceAreaVariance() const
+{
+    float facesMeanArea = getFacesMeanArea();
+
+    float squaredDiffs = 0.f;
+
+    for (const Face &f : faces)
+    {
+        vec3 v0 = vertices.at(f.index[0]).pos;
+        vec3 v1 = vertices.at(f.index[1]).pos;
+        vec3 v2 = vertices.at(f.index[2]).pos;
+
+        vec3 ab = (vertices.at(v1).pos - vertices.at(v0).pos);
+        vec3 bc = (vertices.at(v2).pos - vertices.at(v1).pos);
+
+        float area = length(cross(ab, bc)) / 2.0f;
+        float squaredDiff = (area - facesMeanArea) * (area - facesMeanArea);
+        squaredDiffs += squaredDiff;
+    }
+
+    return squaredDiffs / float(faces.size());
+}
+
+float Mesh::getFaceAreaVariationCoefficient() const
+{
+    float facesMeanArea = getFacesMeanArea();
+    float stdDeviation = sqrtf(getFaceAreaVariance());
+
+    return (stdDeviation / facesMeanArea) * 100.0f;
 }
 
 void Mesh::removeDuplicatedVertices()
 {
     std::unordered_set<Vertex> uniqueVertices;
 
-    for (Vertex &v : vertices)
-        uniqueVertices.insert(v);
+    for (Vertex &v : vertices) uniqueVertices.insert(v);
 
     for (Face &f : faces)
     {
@@ -129,6 +152,35 @@ void Mesh::removeDegenerateFaces()
             cleanFaces.push_back(f);
 
     std::swap(faces, cleanFaces);
+}
+
+void Mesh::removeHighlyOttuseIsoFaces()
+{
+//    for (Face &f : faces)
+//    {
+//        Vertex v0 = vertices.at(f.index[0]);
+//        Vertex v1 = vertices.at(f.index[1]);
+//        Vertex v2 = vertices.at(f.index[2]);
+
+//        glm::vec3 side0 = v2.pos - v0.pos;
+//        glm::vec3 side1 = v2.pos - v1.pos;
+//        glm::vec3 side2 = v0.pos - v1.pos;
+
+//        float edgeL0 = glm::length(side0);
+//        float edgeL1 = glm::length(side1);
+//        float edgeL2 = glm::length(side2);
+//        float angle = -1.0f;
+
+//        if (edgeL0 == edgeL1)      angle = glm::angle(side0, side1);
+//        else if (edgeL0 == edgeL2) angle = glm::angle(side0, side2);
+//        else if (edgeL2 == edgeL1) angle = glm::angle(side2, side1);
+
+//        // the triangle is isosceles and highly obtuse
+//        if (angle >= 150.f && angle <= 180.f)
+//        {
+
+//        }
+//    }
 }
 
 Mesh Mesh::parseOFF(const std::string &rawOFF)

@@ -34,7 +34,7 @@ public:
 
     BoundingBox bbox;
 
-    float R;     // maximal extension on maxAxis (x,y,z) of the largest bbox of all faces
+    float R;     // maximal half-extension on maxAxis (x,y,z) of the largest bbox of all faces
     int maxAxis; // position on maxAxis (x,y or z) of the center of the bbox of this face
 
     Mesh();
@@ -53,7 +53,10 @@ public:
     void displaceFace(int index, float k);
     void displaceFaces(float k);
     int getFaceSubdivisionIndex(int index) const;
-    float getAvgFacesDoubleArea() const;
+    float getFacesMeanDoubleArea() const;
+    float getFacesMeanArea() const;
+    float getFaceAreaVariance() const;
+    float getFaceAreaVariationCoefficient() const;
 
     // Edge
     int addEdge(int faceIndex0, int faceIndex1, int side0, int side1);
@@ -88,9 +91,11 @@ public:
     // Utils
     void removeDuplicatedVertices();
     void removeDegenerateFaces();
-    float minimumDistance(const vec3 &origin, const vec3 &direction, Mesh &target);
+    void removeHighlyOttuseIsoFaces();
+    float minimumDisplacement(const vec3 &origin, const vec3 &direction, Mesh &target);
     float minimumDistanceBruteForce(const vec3 &origin, const vec3 &direction, Mesh &target);
     std::vector<float> getDisplacements(Mesh &target);
+
     static Mesh parseOFF(const std::string &rawOFF);
     static Mesh parseOBJ(const std::string &rawOBJ);
     void exportOFF(const std::string &fileName, QString filePath = QString("")) const;

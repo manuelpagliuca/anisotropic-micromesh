@@ -15,7 +15,7 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
     # Sort the meshes by dimension (amount of micro-faces)
     displaced_meshes.sort(key=os.path.getsize)
     # Initialise the factor (will be written in the .txt)
-    factor = Decimal('1.0')
+    factor = Decimal('0.2')
 
     scheme = displaced_samples_path.split("/")[2]
 
@@ -65,6 +65,8 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
         f"Hausdorff's distances saved > {displaced_samples_path}/hausdorff_{base_mesh_name}_{scheme}.txt")
     distances_file.close()
 
+    factor = Decimal('0.2')
+
     with open(f"{displaced_samples_path}/table_data.txt", "w") as table_file:
         for displaced_mesh_path in displaced_meshes:
             # Load the displaced and target mesh in a MeshSet
@@ -95,10 +97,7 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
             table_file.write("{:.2e} & ".format(res['RMS']))
             table_file.write("{:.2e} & ".format(res['max']))
             table_file.write("{:.2e} & ".format(res['mean']))
-            table_file.write("{:.2e} & ".format(scaled_RMS))
-            table_file.write("{:.2e} & ".format(scaled_max))
-            table_file.write("{:.2e}".format(scaled_mean))
-
+            table_file.write("{:.2e} \\".format(scaled_mean))
             table_file.write("\n")
 
             # Increase the factor by 0.1
@@ -111,11 +110,10 @@ def export_hausdorff(base_mesh_name, target_mesh_path, displaced_samples_path):
 def generate_samples(params):
     exe_path = os.path.join(os.getcwd(), "Release", "anisotropic_micromesh.exe")
 
-    MIN_MFS_FACTOR = 1.0
-    MAX_MFS_FACTOR = 4.1
+    MIN_MFS_FACTOR = 0.20
+    MAX_MFS_FACTOR = 1.0
     STEP_SIZE = 0.1
 
-    # Using the received params, run 'gen-sample' cmd 30 times, from 1.0 to 4.0
     for num in range(int(MIN_MFS_FACTOR * 10), int(MAX_MFS_FACTOR * 10), int(STEP_SIZE * 10)):
         factor = num / 10.0
         params.append(f"--factor={factor}")

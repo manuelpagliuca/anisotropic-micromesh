@@ -176,10 +176,8 @@ void Mainwindow::exportSubdividedBaseMesh(int microFaces, Scheme scheme)
 
     QDir outputDir = QDir(
                         "Evaluation/Subdivided/" +
-                        QString::fromStdString(enumToString(scheme)) +
-                        "/" +
-                        QString::fromStdString(baseMeshNameAndDetail) +
-                        "/");
+                        QString::fromStdString(enumToString(scheme)) + "/" +
+                        QString::fromStdString(baseMeshNameAndDetail) + "/");
 
     if (!outputDir.exists())
     {
@@ -189,7 +187,6 @@ void Mainwindow::exportSubdividedBaseMesh(int microFaces, Scheme scheme)
             return;
         }
     }
-
 
     QString outputPath = outputDir.path() + "/";
 
@@ -223,13 +220,12 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme sch
             a = c;
         }
 
-        if (cFaces == targetMicroFaces)
-            return c;
+        if (cFaces == targetMicroFaces) return c;
     }
 }
 
 int Mainwindow::predictMicroFaces(Scheme scheme, double edgeLength)
-{
+{    
     if (scheme == ANISOTROPIC)
     {
         baseMesh.updateEdgesSubdivisionLevelsAniso(edgeLength);

@@ -19,11 +19,11 @@ void Mesh::updatePosMiddleAndR()
         float pos1 = vertices.at(f.index[1]).pos[maxAxis];
         float pos2 = vertices.at(f.index[2]).pos[maxAxis];
 
-        float xMax = maxFloat3(pos0, pos1, pos2);
-        float xMin = minFloat3(pos0, pos1, pos2);
-        float halfExt = (xMax - xMin) / 2.f;
+        float posMax = maxFloat3(pos0, pos1, pos2);
+        float posMin = minFloat3(pos0, pos1, pos2);
+        float halfExt = (posMax - posMin) / 2.f;
 
-        f.posMiddle = (xMax + xMin) / 2.f;
+        f.posMiddle = (posMax + posMin) / 2.f;
 
         if (R < halfExt) R = halfExt;
     }
@@ -130,7 +130,7 @@ int Mesh::getFaceSubdivisionIndex(int index) const
     return maxInt3(e0SubdivisionLvl, e1SubdivisionLvl, e2SubdivisionLvl);
 }
 
-float Mesh::getAvgFacesDoubleArea() const
+float Mesh::getFacesMeanDoubleArea() const
 {
     float avgArea = 0.0f;
 
@@ -148,6 +148,29 @@ float Mesh::getAvgFacesDoubleArea() const
     }
 
     avgArea /= faces.size();
+    return avgArea;
+}
+
+float Mesh::getFacesMeanArea() const
+{
+    float avgArea = 0.0f;
+
+    for (const Face &f : faces)
+    {
+        int v0 = f.index[0];
+        int v1 = f.index[1];
+        int v2 = f.index[2];
+
+        vec3 ab = (vertices.at(v1).pos - vertices.at(v0).pos);
+        vec3 bc = (vertices.at(v2).pos - vertices.at(v1).pos);
+
+        float faceArea = length(cross(ab, bc)) / 2.0f;
+
+        avgArea += faceArea;
+    }
+
+    avgArea /= faces.size();
+
     return avgArea;
 }
 
@@ -459,8 +482,8 @@ void Mesh::fixEdgesSubdivisionIndicesMicromesh()
 {
     for (Edge &e : edges)
     {
-        if (e.faces[0] == -1 || e.faces[1] == -1)
-            continue;
+        if (e.faces[0] == -1 || e.faces[1] == -1) continue;
+
         uint eMax0 = getFaceSubdivisionIndex(e.faces[0]);
         uint eMax1 = getFaceSubdivisionIndex(e.faces[1]);
 
@@ -468,59 +491,6 @@ void Mesh::fixEdgesSubdivisionIndicesMicromesh()
         if (eMax0 == eMax1 && e.subdivisions + 1 == eMax0)
             e.subdivisions = eMax0;
     }
-
-//    int edgeIdx = -1;
-
-//    for (Edge &e: edges)
-//    {
-//        edgeIdx++;
-
-//        if (e.faces[0] == -1 || e.faces[1] == -1) continue;
-
-//        Edge &e0f0 = edges.at(faces.at(e.faces[0]).edges[0]);
-//        Edge &e1f0 = edges.at(faces.at(e.faces[0]).edges[1]);
-//        Edge &e2f0 = edges.at(faces.at(e.faces[0]).edges[2]);
-
-//        Edge &e0f1 = edges.at(faces.at(e.faces[1]).edges[0]);
-//        Edge &e1f1 = edges.at(faces.at(e.faces[1]).edges[1]);
-//        Edge &e2f1 = edges.at(faces.at(e.faces[1]).edges[2]);
-
-        //    bool c1 = false, c2 = false;
-
-//        int f0MaxEdge = maxInt3(e0f0.subdivisions, e1f0.subdivisions, e2f0.subdivisions);
-//        int f1MaxEdge = maxInt3(e0f1.subdivisions, e1f1.subdivisions, e2f1.subdivisions);
-
-//        if (f0MaxEdge != f1MaxEdge || f0MaxEdge != (e.subdivisions + 1)) continue;
-
-//        int consense = 0;
-
-//        if (e0f0.subdivisions == f0MaxEdge) consense++;
-//        if (e1f0.subdivisions == f0MaxEdge) consense++;
-//        if (e2f0.subdivisions == f0MaxEdge) consense++;
-//        if (e0f1.subdivisions == f1MaxEdge) consense++;
-//        if (e1f1.subdivisions == f1MaxEdge) consense++;
-//        if (e2f1.subdivisions == f1MaxEdge) consense++;
-
-//        if (consense >= 3)
-//        {
-//            qDebug() << e.subdivisions;
-//            qDebug() << edgeIdx;
-//            qDebug() << faces.at(e.faces[0]).edges[0]
-//                     << faces.at(e.faces[0]).edges[1]
-//                     << faces.at(e.faces[0]).edges[2];
-//            qDebug() << faces.at(e.faces[1]).edges[0]
-//                     << faces.at(e.faces[1]).edges[1]
-//                     << faces.at(e.faces[1]).edges[2];
-//            if (e0f0.subdivisions == e.subdivisions) e0f0.subdivisions = e.subdivisions + 1;
-//            else if (e1f0.subdivisions == e.subdivisions) e1f0.subdivisions = e.subdivisions + 1;
-//            else if (e2f0.subdivisions == e.subdivisions) e2f0.subdivisions = e.subdivisions + 1;
-//            else if (e0f0.subdivisions == e.subdivisions) e0f1.subdivisions = e.subdivisions + 1;
-//            else if (e1f1.subdivisions == e.subdivisions) e1f1.subdivisions = e.subdivisions + 1;
-//            else if (e2f1.subdivisions == e.subdivisions) e2f1.subdivisions = e.subdivisions + 1;
-
-//            e.subdivisions = e.subdivisions + 1;
-//        }
-//    }
 }
 
 void Mesh::updateFaceNormals()
@@ -620,7 +590,6 @@ void Mesh::setInitialEdgeSubdivisionLevels(float targetEdgeLength)
 
 void Mesh::updateEdgesSubdivisionLevelsMicromesh(double targetEdgeLength)
 {
-
     setInitialEdgeSubdivisionLevels(targetEdgeLength);
 
     int count = 0;
@@ -647,17 +616,16 @@ void Mesh::updateEdgesSubdivisionLevelsAniso(double targetEdgeLength)
 
     int count = 0;
 
-    while (true)
-    {
-        bool changeAnything = false;
+//    while (true)
+//    {
+//        bool changeAnything = false;
 
-        for (Face &f : faces)
-            changeAnything |= enforceAnisotropicMicromesh(f);
+//        for (Face &f : faces) changeAnything |= enforceAnisotropicMicromesh(f);
 
-        count++;
-        if (!changeAnything)
-            break;
-    }
+//        count++;
+
+//        if (!changeAnything) break;
+//    }
 
     qDebug() << "Anisotropic scheme enforced: " << count << " times.";
 }
@@ -665,8 +633,7 @@ void Mesh::updateEdgesSubdivisionLevelsAniso(double targetEdgeLength)
 void Mesh::updateBoundingBox()
 {
     bbox.init(vertices[0].pos);
-    for (Vertex &v : vertices)
-        bbox.includeAnotherPoint(v.pos);
+    for (Vertex &v : vertices) bbox.includeAnotherPoint(v.pos);
     maxAxis = bbox.maxAxis();
 }
 
@@ -716,14 +683,11 @@ bool Mesh::enforceAnisotropicMicromesh(const Face &f)
 
     for (uint e : edgeSubdivisions)
     {
-        if (e == max)
-            maxCount++;
-        else if (e < max)
-            edgeSubdivisionsLowerThenMax[i++] = e;
+        if (e == max) maxCount++;
+        else if (e < max) edgeSubdivisionsLowerThenMax[i++] = e;
     }
 
-    if (maxCount > 1)
-        return changeAnything;
+    if (maxCount > 1) return changeAnything;
 
     int maxEdgeMinor = maxInt2(edgeSubdivisionsLowerThenMax[0], edgeSubdivisionsLowerThenMax[1]);
 
