@@ -1,4 +1,4 @@
-#include "BoundingBox.h"
+#include "Sources/BoundingBox.h"
 
 BoundingBox::BoundingBox(vec3 point)
 {

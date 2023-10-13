@@ -1,4 +1,4 @@
-#include "Shader.h"
+#include "Sources/Shader.h"
 
 Shader::Shader(const char *vertexFilePath, const char *fragmentFilePath)
 {

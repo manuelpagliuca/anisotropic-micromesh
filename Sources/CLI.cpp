@@ -1,4 +1,4 @@
-#include "Mainwindow.h"
+#include "Sources/Mainwindow.h"
 
 void Mainwindow::exportDisplacedSamples(const QString presetDirPath)
 {

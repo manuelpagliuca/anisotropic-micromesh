@@ -1,4 +1,4 @@
-#include "Trackball.h"
+#include "Sources/Trackball.h"
 #include <iostream>
 
 TrackBall::TrackBall() {}

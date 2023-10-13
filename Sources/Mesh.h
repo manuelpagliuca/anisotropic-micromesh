@@ -15,13 +15,13 @@
 #include <map>
 #include <utility>
 
-#include "Utility.h"
-#include "Edge.h"
-#include "Vertex.h"
-#include "Face.h"
-#include "BoundingBox.h"
-#include "Line.h"
-#include "Ray.h"
+#include "Sources/Utility.h"
+#include "Sources/Edge.h"
+#include "Sources/Vertex.h"
+#include "Sources/Face.h"
+#include "Sources/BoundingBox.h"
+#include "Sources/Line.h"
+#include "Sources/Ray.h"
 
 using namespace glm;
 
