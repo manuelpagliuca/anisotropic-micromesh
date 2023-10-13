@@ -39,6 +39,7 @@ public:
 
     // Utility
     void loadBaseMesh(const QString &fileName);
+    void loadTmpMesh(const QString &filePath);
     void loadTargetMesh(const QString &fileName);
     int predictMicroFaces(Scheme scheme, double edgeLength);
 
@@ -70,6 +71,7 @@ public:
 
     // Mesh loading
     Mesh baseMesh, subdividedMesh, targetMesh, projectedMesh, swapMesh;
+    Mesh tmpMesh;
     Scheme scheme = UNCHOSEN;
     std::string baseMeshNameAndDetail;
     float edgeLengthCurrentValue;
@@ -81,7 +83,7 @@ public:
     // Morphing
     std::vector<float> displacementsDeltas;
     int morphingCurrentValue;
-    
+
 public slots:
     void on_actionLoad_triggered();
     void on_actionUnload_triggered();

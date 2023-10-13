@@ -1,7 +1,8 @@
 # Folders
 Debug
-Models
 Release
+debug
+release
 Dependencies
 Evaluation
 .qtc_clangd

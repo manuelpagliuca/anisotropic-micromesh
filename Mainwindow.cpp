@@ -169,10 +169,8 @@ void Mainwindow::loadBaseMesh(const QString &fileName)
         std::string ext = fileName.mid(fileName.lastIndexOf(".")).toStdString();
         std::string file = readFile(filePath.toStdString().c_str());
 
-        if (ext == ".off")
-            setBaseMeshAndUI(Mesh::parseOFF(file));
-        else if (ext == ".obj")
-            setBaseMeshAndUI(Mesh::parseOBJ(file));
+        if (ext == ".off") setBaseMeshAndUI(Mesh::parseOFF(file));
+        else if (ext == ".obj") setBaseMeshAndUI(Mesh::parseOBJ(file));
 
         baseMeshNameAndDetail = extractFileName(fileName.toStdString());
 
@@ -180,6 +178,20 @@ void Mainwindow::loadBaseMesh(const QString &fileName)
 
         ui.baseMeshVertices->setText(std::to_string(baseMesh.vertices.size()).c_str());
         ui.baseMeshFaces->setText(std::to_string(baseMesh.faces.size()).c_str());
+    }
+}
+
+void Mainwindow::loadTmpMesh(const QString &filePath)
+{
+    if (!filePath.isEmpty())
+    {
+        qDebug() << filePath;
+        std::string file = readFile(filePath.toStdString().c_str());
+
+        tmpMesh = Mesh::parseOBJ(file);
+        qDebug() << "tmpMesh has been loaded as base mesh.";
+
+        qDebug() << tmpMesh.faces.size();
     }
 }
 

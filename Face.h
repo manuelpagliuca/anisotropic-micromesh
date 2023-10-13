@@ -4,11 +4,13 @@
 #include <QtCore/QString>
 #include <GLM/glm.hpp>
 
+using namespace glm;
+
 struct Face
 {
     uint index[3];
     uint edges[3];
-    glm::vec3 norm;
+    vec3 norm;
     float posMiddle;
 
     bool operator<(const Face &other) const

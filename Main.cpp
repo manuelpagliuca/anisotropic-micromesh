@@ -17,6 +17,9 @@ int main(int argc, char *argv[])
         QCommandLineOption baseMeshOption("base-mesh", "Base mesh (default: pallas_1000.obj)", "base-mesh");
         parser.addOption(baseMeshOption);
 
+        QCommandLineOption tmpMeshOption("tmp-mesh", "Temporary mesh path (default: )", "tmp-mesh");
+        parser.addOption(tmpMeshOption);
+
         QCommandLineOption subdivisionSchemeOption("scheme", "Scheme (default: micro)", "scheme");
         parser.addOption(subdivisionSchemeOption);
 
@@ -28,11 +31,12 @@ int main(int argc, char *argv[])
 
         parser.process(a);
 
-        QString targetMesh = parser.value(targetOption);
-        QString baseMesh = parser.value(baseMeshOption);
-        QString subdivisionScheme = parser.value(subdivisionSchemeOption);
+        QString targetMesh          = parser.value(targetOption);
+        QString baseMesh            = parser.value(baseMeshOption);
+        QString tmpMesh             = parser.value(tmpMeshOption);
+        QString subdivisionScheme   = parser.value(subdivisionSchemeOption);
         QString microFacesFactorStr = parser.value(microfacesFactorOption);
-        QString microFacesStr = parser.value(microfacesOption);
+        QString microFacesStr       = parser.value(microfacesOption);
 
         Scheme scheme = ISOTROPIC;
 
@@ -42,16 +46,21 @@ int main(int argc, char *argv[])
         if (subdivisionScheme == "aniso")  scheme = ANISOTROPIC;
         if (microFacesStr.isEmpty())       microFacesStr = "0";
 
-        w.loadBaseMesh(baseMesh);
-
         if (cmd == "gen-sample")
         {
+            w.loadBaseMesh(baseMesh);
             w.loadTargetMesh(targetMesh);
             w.exportDisplacedBaseMesh(microFacesFactorStr.toDouble(), scheme);
         }
         else if (cmd == "gen-subdivided-sample" && !microFacesStr.isEmpty())
         {
+            w.loadBaseMesh(baseMesh);
             w.exportSubdividedBaseMesh(microFacesStr.toInt(), scheme);
+        }
+        else if (cmd == "compute-cv")
+        {
+            w.loadTmpMesh(tmpMesh);
+            w.tmpMesh.exportVariationCoefficient(0, QString("./"));
         }
 
         exit(0);

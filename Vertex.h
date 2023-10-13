@@ -6,15 +6,16 @@
 #include <cstdlib>
 #include <functional>
 
+using namespace glm;
+
 struct Vertex
 {
-    glm::vec3 pos;
-    glm::vec3 norm;
-    glm::vec2 tex;
+    vec3 pos;
+    vec3 norm;
 
     bool operator==(const Vertex &v) const
     {
-        return v.pos == pos && v.norm == norm && v.tex == tex;
+        return v.pos == pos && v.norm == norm;
     }
 
     bool operator<(const Vertex &v) const

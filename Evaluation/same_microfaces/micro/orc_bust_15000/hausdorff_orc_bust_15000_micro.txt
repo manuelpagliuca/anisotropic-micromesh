@@ -1,2 +1,0 @@
-microFaces RMS max mean min
-2999992.obj & 0.0099 & 0.131 & 0.0071\\ 

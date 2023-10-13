@@ -157,19 +157,19 @@ float Mesh::getFacesMeanArea() const
 
     for (const Face &f : faces)
     {
-        int v0 = f.index[0];
-        int v1 = f.index[1];
-        int v2 = f.index[2];
+        vec3 v0 = vertices.at(f.index[0]).pos;
+        vec3 v1 = vertices.at(f.index[1]).pos;
+        vec3 v2 = vertices.at(f.index[2]).pos;
 
-        vec3 ab = (vertices.at(v1).pos - vertices.at(v0).pos);
-        vec3 bc = (vertices.at(v2).pos - vertices.at(v1).pos);
+        vec3 ab = v1 - v0;
+        vec3 bc = v2 - v1;
 
         float faceArea = length(cross(ab, bc)) / 2.0f;
 
         avgArea += faceArea;
     }
 
-    avgArea /= faces.size();
+    avgArea /= float(faces.size());
 
     return avgArea;
 }
@@ -191,7 +191,8 @@ float Mesh::getAvgEdgeLength() const
         avgEdge += (l0 + l1 + l2);
     }
 
-    avgEdge /= faces.size() * 3;
+    avgEdge /= float(faces.size() * 3.f);
+
     return avgEdge;
 }
 
@@ -446,9 +447,9 @@ int Mesh::micromeshPredictFaces() const
         int subLvlEdge1 = edges[f.edges[1]].subdivisions;
         int subLvlEdge2 = edges[f.edges[2]].subdivisions;
 
-        int subLvlMax = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
+        int maxSubLvl = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
 
-        count += (1 << subLvlMax) * (1 << subLvlMax);
+        count += (1 << maxSubLvl) * (1 << maxSubLvl);
     }
 
     return count;
@@ -464,12 +465,12 @@ int Mesh::anisotropicMicroMeshPredictFaces() const
         int subLvlEdge1 = edges[f.edges[1]].subdivisions;
         int subLvlEdge2 = edges[f.edges[2]].subdivisions;
 
-        int subLvlMax = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
-        int subLvlMin = minInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
+        int maxSubLvl = maxInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
+        int minSubLvl = minInt3(subLvlEdge0, subLvlEdge1, subLvlEdge2);
 
-        int k = 1 << subLvlMax;
-        int h = 1 << subLvlMin;
-        int aniso = 1 << (subLvlMax - subLvlMin);
+        int k = 1 << maxSubLvl;
+        int h = 1 << minSubLvl;
+        int aniso = 1 << (maxSubLvl - minSubLvl);
 
         count += h * (k + aniso - 1);
     }

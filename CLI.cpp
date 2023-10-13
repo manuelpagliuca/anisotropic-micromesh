@@ -148,11 +148,13 @@ void Mainwindow::exportDisplacedBaseMesh(double mfsFactor, Scheme scheme)
         }
     }
 
-
     QString outputPath = outputDir.path() + "/";
 
     qDebug() << "Exporting the projected mesh...";
     projectedMesh.exportOBJ(fileName.toStdString().c_str(), outputPath);
+
+    qDebug() << "Exporting the variation coefficient...";
+    subdividedMesh.exportVariationCoefficient(mfsFactor, outputPath);
 }
 
 void Mainwindow::exportSubdividedBaseMesh(int microFaces, Scheme scheme)
@@ -194,7 +196,7 @@ void Mainwindow::exportSubdividedBaseMesh(int microFaces, Scheme scheme)
     subdividedMesh.exportOBJ(fileName.toStdString().c_str(), outputPath);
 }
 
-double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme scheme, double a, double b)
+double Mainwindow::binarySearchTargetEdgeLength(int target, Scheme scheme, double a, double b)
 {
     int aFaces = -1, bFaces = -2;
     int patience = 10;
@@ -205,11 +207,10 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme sch
 
         int cFaces = predictMicroFaces(scheme, c);
 
-        if (cFaces == aFaces || cFaces == bFaces)
-            if (patience-- == 0)
-                return (abs(targetMicroFaces - aFaces) < abs(targetMicroFaces - bFaces)) ? a : b;
+        if ((cFaces == aFaces || cFaces == bFaces) && patience-- == 0)
+            return (abs(target - aFaces) < abs(target - bFaces)) ? a : b;
 
-        if (cFaces < targetMicroFaces)
+        if (cFaces < target)
         {
             bFaces = cFaces;
             b = c;
@@ -220,7 +221,7 @@ double Mainwindow::binarySearchTargetEdgeLength(int targetMicroFaces, Scheme sch
             a = c;
         }
 
-        if (cFaces == targetMicroFaces) return c;
+        if (cFaces == target) return c;
     }
 }
 

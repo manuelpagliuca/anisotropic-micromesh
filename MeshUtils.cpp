@@ -44,8 +44,7 @@ float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, Mesh 
             }
             else
             {
-                target.intersectTriangle(i, line, minDisp);
-                i--;
+                target.intersectTriangle(i--, line, minDisp);
             }
         }
 
@@ -59,8 +58,7 @@ float Mesh::minimumDisplacement(const vec3 &origin, const vec3 &direction, Mesh 
             }
             else
             {
-                target.intersectTriangle(j, line, minDisp);
-                j++;
+                target.intersectTriangle(j++, line, minDisp);
             }
         }
     }
@@ -103,11 +101,12 @@ float Mesh::getFaceAreaVariance() const
         vec3 v1 = vertices.at(f.index[1]).pos;
         vec3 v2 = vertices.at(f.index[2]).pos;
 
-        vec3 ab = (vertices.at(v1).pos - vertices.at(v0).pos);
-        vec3 bc = (vertices.at(v2).pos - vertices.at(v1).pos);
+        vec3 ab = v1 - v0;
+        vec3 bc = v2 - v1;
 
         float area = length(cross(ab, bc)) / 2.0f;
         float squaredDiff = (area - facesMeanArea) * (area - facesMeanArea);
+
         squaredDiffs += squaredDiff;
     }
 
@@ -432,3 +431,27 @@ void Mesh::exportOBJ(const std::string &fName, QString filePath) const
 
     qDebug() << fileNameExt.c_str() << "has been exported.";
 }
+
+void Mesh::exportVariationCoefficient(float mfsFactor, QString filePath) const
+{
+    std::string fileNameExt = "variation_coefficients.txt";
+
+    if (filePath.isEmpty()) filePath = QString::fromStdString("./Output");
+
+    filePath += QString::fromStdString(fileNameExt.c_str());
+
+    // Apri il file in modalità append invece che write
+    std::ofstream fileStream(filePath.toStdString(), std::ios::out | std::ios::app);
+
+    if (!fileStream.is_open())
+    {
+        printf("Failed to open \'%s\'. File doesn't exist.", filePath.toStdString().c_str());
+        return;
+    }
+
+    fileStream << mfsFactor << " " << getFaceAreaVariationCoefficient() << "\n";
+    fileStream.close();
+
+    qDebug() << fileNameExt.c_str() << "has been exported.";
+}
+

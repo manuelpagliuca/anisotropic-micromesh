@@ -4,63 +4,64 @@
 ![Static Badge](https://img.shields.io/badge/language-C%2B%2B-brightgreen)
 [![Ask Me Anything !](https://img.shields.io/badge/Ask%20me-anything-1abc9c.svg)](mailto:pagliuca.manuel@gmail.com)
 
+![](gifs/dragon_render.png)
+
 ## About the project
-Final project for the master's degree in Computer Science A.A. 2022/2023.
+Final project for the master's degree in Computer Science A.Y. 2022/2023.
 
 ### Abstract
 This thesis aims to empirically investigate the imaginable performance for data structures suitable for effectively representing extreme-resolution 3D polygonal surfaces designed for multi-resolution rendering on GPUs.
 
 To this end, supporting algorithms will be designed, implemented, and tested that transform "traditional" (i.e., indexed) high-resolution triangular meshes into the analyzed data structures, and then measure the approximation errors introduced through appropriate geometric measurements.
 
-Other alternative schemes will be studied, which are considered variants of the so-called "micro-meshes" scheme offered by the latest generation of vendor-specific GPU hardware. These data structures are characterized by the use of a semi-regular subdivision of a medium-resolution "basic mesh," followed by displacement of the generated vertices. Variants introduced may include the adoption of an anisotropic subdivision step, the adoption of an irregular recursive subdivision scheme, or others.
-
-## Settings
-Compiler:
-* aggiungere nella PATH il compilatore utilizzato di Qt (per l'esecuzione dello script)
+Other alternative schemes will be studied, which are considered variants of the so-called "micro-meshes" scheme offered by the latest generation of vendor-specific GPU hardware. These data structures are characterized by the use of a semi-regular subdivision of a medium-resolution "base mesh," followed by displacement of the generated vertices. Variants introduced may include the adoption of an anisotropic subdivision step, the adoption of an irregular recursive subdivision scheme, or others.
 
 ## Dependencies
-* Python 3.11
-  * PyMeshLab
-* glm
+* [Qt](https://www.qt.io/)
+* [OpenGL Mathematics](https://glm.g-truc.net/0.9.9/index.html)
+* [PyMeshLab](https://pymeshlab.readthedocs.io/en/latest/installation.html)
 
-## Models
-Models that I've used for the empirical analysis:
-* models pallas cat-> author
-* [Orc dude sketch free 3D print model](https://www.cgtrader.com/free-3d-print-models/art/sculptures/orc-bust-d7a81f2f-6e47-45a7-88ce-108ea008be67) by FRKN
-* dragon -> https://www.cgtrader.com/free-3d-models/animals/reptile/dragon-f03649c0-cf42-4c8b-9edc-849703314a7b
+## Sample models
+As sample models in this repository I've prepared different version of [Pallas Cat](https://free3d.com/3d-model/pallas-cat-v1--576987.html) from printable_models
 
 ## Python script (empirical analysis)
-TODO: set the x number of samples to use
+Executing this script will generate **n** samples for both the subdivision schemes (current and variant). A table (as a text file) containing the face quality values (according to inradius/circumradius metric) will be built for both batches of samples.
 
-Executing this script will generate **x** samples for both the subdivision schemes (classic and anisotropic). A table (as a text file) containing the Hausdorff distances toward the target mesh will be built for both batches of samples.
+The table will be ordered by a factor **F** used, this will allow the comparison of one sample of a table with a sample of the other table, the factor modulates the intensity of subdivisions.
 
-The table will be ordered by the number of micro-faces used, this will allow the comparison of one sample of a table with a sample of the other table, using the number of micro-faces as the comparative criteria.
-- As an example, with the two given tables it is possible to compare the distance for the **micro-mesh** sample of 10,000 micro-faces will be tested against the 10,000 **anisotropic micro-mesh** sample
-
-TODO: Add thesis link
-In the thesis, the comparison is described by the scatter plot of pag. **x** (logarithmic scale on y-axis).
+In the [thesis](https://manuelpagliuca.github.io/uploads/MANUEL_PAGLIUCA_ANISOTROPIC_MM_Master_s_Thesis__Integral_.pdf), the comparison is also described using the face area coefficent of variation
 
 The commands generate two batches of samples, multiple execution of the commands are used for the analysis since multiple models are tested.
 ```batch
-python compute-distances.py --base-mesh=model.obj --target-mesh=target.obj
+python face-stats.py --base-mesh=base.obj --target-mesh=target.obj
 ```
 Default values if you *omit* some of the options:
 * `--base-mesh = pallas_124.obj`
 * `--target-mesh = pallas_5000.obj`
-* `--min-edge = 0.1`
-* `--max-edge = 10.0`
 
-## Application
-### Graphical User Interface
+## Graphical User Interface
 
-TODO: some gifs
+### Sample loading
+![](gifs/sample_loading.gif)
+### Scheme subdivisions
+![](gifs/subdivisions.gif)
+#### Displacement
+![](gifs/displacement.gif)
 
-### Commands for the CLI
+### CLI commands
+
+#### Generate single subdivided sample
+**Exports** the subdivided (not displaced) mesh of the given base mesh.
 
 ```cmd
-{o.exe} build-samples n=7 min_val=0.3 max_val=7.0 target_faces=5000
+anisotropic-micromesh.exe --base-mesh=base.obj --microfaces=100
 ```
+> In this example the base mesh is being subdivided by the amount of micro-faces passed (`F` can't be passed, since it works in function of the target mesh) using the current scheme ("isotropic" scheme).
+
+#### Generate sample
+**Exports** the subdvided and displaced mesh given the inputs
 
 ```cmd
-anisotropic_micromesh.exe build-samples --base-mesh=pallas_125.obj --target=pallas_5000.obj --n=4 --min-edge=0.8 --max-edge=1.2
+anisotropic_micromesh.exe gen-sample --base-mesh=base.obj --target=target.obj --scheme=aniso --factor=3.5
 ```
+> In this example the base mesh will be subdivided using the `anistropic` subdivision scheme, with a factor `F=3.5` (subdividing x3.5 times the faces of the target mesh).

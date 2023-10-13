@@ -100,6 +100,7 @@ public:
     static Mesh parseOBJ(const std::string &rawOBJ);
     void exportOFF(const std::string &fileName, QString filePath = QString("")) const;
     void exportOBJ(const std::string &fileName, QString filePath = QString("")) const;
+    void exportVariationCoefficient(float mfsFactor, QString filePath = QString("")) const;
     void intersectTriangle(int fIndex, Line line, float &minDistance);
 
 protected:
